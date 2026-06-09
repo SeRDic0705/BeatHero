@@ -1,9 +1,10 @@
 using System;
+using BeatHero.Combat;
+using BeatHero.Data;
 using UnityEngine;
 
 namespace BeatHero.Core
 {
-    // 런 전체 상태 관리: 현재 층, 플레이어 HP, 사망/클리어 처리
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
@@ -16,6 +17,9 @@ namespace BeatHero.Core
         public event Action OnGameOver;
         public event Action OnFloorCleared;
 
+        [SerializeField] private FloorData _floorData;
+        [SerializeField] private BattleStateMachine _battle;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -27,15 +31,28 @@ namespace BeatHero.Core
             DontDestroyOnLoad(gameObject);
         }
 
+        private void Start()
+        {
+            if (_battle != null && _floorData != null)
+                StartRun(100);
+        }
+
         public void StartRun(int maxHp)
         {
             PlayerMaxHp = maxHp;
             PlayerHp = maxHp;
             CurrentFloor = 1;
             OnFloorChanged?.Invoke(CurrentFloor);
+            StartBattleForCurrentFloor();
         }
 
-        // 피해 적용 — 0 이하면 게임오버 트리거
+        private void StartBattleForCurrentFloor()
+        {
+            if (_battle == null || _floorData == null) return;
+            var monster = _floorData.GetMonster(CurrentFloor);
+            if (monster != null) _battle.StartBattle(monster);
+        }
+
         public void ApplyDamage(int amount)
         {
             PlayerHp = Mathf.Max(0, PlayerHp - amount);
@@ -48,15 +65,14 @@ namespace BeatHero.Core
             PlayerHp = Mathf.Min(PlayerMaxHp, PlayerHp + amount);
         }
 
-        // 층 클리어 — HP 유지, 다음 층으로
         public void CompleteFloor()
         {
             CurrentFloor++;
             OnFloorCleared?.Invoke();
             OnFloorChanged?.Invoke(CurrentFloor);
+            StartBattleForCurrentFloor();
         }
 
-        // 게임오버 후 1층 재시작 (씬 전환은 SceneLoader가 처리)
         public void RestartRun()
         {
             StartRun(PlayerMaxHp);
