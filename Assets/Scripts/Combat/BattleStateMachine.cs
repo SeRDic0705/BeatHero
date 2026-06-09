@@ -12,9 +12,11 @@ namespace BeatHero.Combat
     // 의존: Conductor, GridManager, PatternPlayer, PlayerController, PlayerConfig, InputReader
     public class BattleStateMachine : MonoBehaviour
     {
-        private const float INPUT_WINDOW_SEC  = 0.021f;
-        private const int   BEATS_PER_PHASE   = 4;
+        private const int   BEATS_PER_PHASE      = 4;
         private const float CHARGE_MULT_PER_BEAT = 0.5f;
+
+        [Header("Input Timing")]
+        [SerializeField] private float _inputWindowSec = 0.15f; // 비트 전후 각각의 수용 범위(초)
 
         [Header("Dependencies")]
         [SerializeField] private Conductor        _conductor;
@@ -44,6 +46,10 @@ namespace BeatHero.Combat
         private bool    _tileWasDangerAtWindowOpen;
         private Vector2 _pendingMove;
         private bool    _hasPendingMove;
+
+        // 비트 전 선행 입력 버퍼
+        private float   _lastMoveTime = -1f;
+        private Vector2 _lastMoveDir;
 
         private void Awake()
         {
@@ -104,10 +110,15 @@ namespace BeatHero.Combat
         // ── ResponsePhase ──────────────────────────────────────
         private IEnumerator HandleResponseBeat()
         {
+            float beatTime = Time.time;
+
+            // 비트 직전 선행 입력 채택 (pre-beat buffer)
+            bool preBeatInput = _lastMoveTime >= beatTime - _inputWindowSec && _lastMoveTime > 0f;
+
             _tileWasDangerAtWindowOpen = _grid.GetDangerAt(_grid.PlayerPosition) != null;
             _inputWindowOpen = true;
-            _hasPendingMove  = false;
-            _pendingMove     = Vector2.zero;
+            _hasPendingMove  = preBeatInput;
+            _pendingMove     = preBeatInput ? _lastMoveDir : Vector2.zero;
 
             if (_attackHeld)
             {
@@ -117,8 +128,9 @@ namespace BeatHero.Combat
                 _chargeBeats++;
             }
 
-            yield return new WaitForSeconds(INPUT_WINDOW_SEC * 2f);
+            yield return new WaitForSeconds(_inputWindowSec);
             _inputWindowOpen = false;
+            _lastMoveTime = -1f; // 버퍼 소진
 
             if (_hasPendingMove) ProcessMovement(_pendingMove);
 
@@ -250,10 +262,18 @@ namespace BeatHero.Combat
         // ── 입력 핸들러 ────────────────────────────────────────
         private void OnMoveInput(Vector2 dir)
         {
-            if (!_inputWindowOpen || _state != State.ResponsePhase) return;
+            if (_state != State.ResponsePhase) return;
             if (dir.sqrMagnitude < 0.1f) return;
-            _pendingMove    = dir;
-            _hasPendingMove = true;
+
+            // 항상 마지막 입력 시각을 기록 (비트 전 선행 입력 대비)
+            _lastMoveDir  = dir;
+            _lastMoveTime = Time.time;
+
+            if (_inputWindowOpen)
+            {
+                _pendingMove    = dir;
+                _hasPendingMove = true;
+            }
         }
 
         private void OnAttackPressed()
