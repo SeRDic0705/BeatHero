@@ -257,7 +257,6 @@ namespace BeatHero.Combat
         // ── 패턴 전환 ──────────────────────────────────────────
         private void TransitionToNextPattern()
         {
-            _grid.ClearShape();
             CheckBossPhaseTransition();
 
             if (_monsterHp <= 0)
