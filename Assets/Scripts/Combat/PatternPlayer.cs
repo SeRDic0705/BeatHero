@@ -12,6 +12,8 @@ namespace BeatHero.Combat
         private PatternData _pattern;
         private int _currentIndex;
 
+        public PatternData CurrentPattern => _pattern;
+
         public BeatUnit Current => (_pattern != null && _currentIndex < _pattern.beatUnits.Count)
             ? _pattern.beatUnits[_currentIndex]
             : null;
