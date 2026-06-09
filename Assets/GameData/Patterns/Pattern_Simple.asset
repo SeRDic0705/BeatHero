@@ -25,9 +25,9 @@ MonoBehaviour:
   - noteLength: 12
     gridEffectShape: {fileID: 11400000, guid: cc55d15e061a91e48aa4415d95ab7b0c, type: 2}
   - noteLength: 12
-    gridEffectShape: {fileID: 0}
+    gridEffectShape: {fileID: 11400000, guid: a4c0f2f5d4de20f4da52caae5122e6c1, type: 2}
   - noteLength: 12
     gridEffectShape: {fileID: 11400000, guid: cc55d15e061a91e48aa4415d95ab7b0c, type: 2}
   - noteLength: 12
-    gridEffectShape: {fileID: 0}
+    gridEffectShape: {fileID: 11400000, guid: a4c0f2f5d4de20f4da52caae5122e6c1, type: 2}
   damageMultiplier: 1

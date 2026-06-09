@@ -29,5 +29,5 @@ MonoBehaviour:
   - noteLength: 12
     gridEffectShape: {fileID: 0}
   - noteLength: 12
-    gridEffectShape: {fileID: 11400000, guid: 1035a74f4e1608a4ead03b068ddaff2e, type: 2}
+    gridEffectShape: {fileID: 11400000, guid: d4f08f0192f726042bd21d9a6d1846d7, type: 2}
   damageMultiplier: 1.2
