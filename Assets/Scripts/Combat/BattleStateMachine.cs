@@ -12,9 +12,12 @@ namespace BeatHero.Combat
     // 의존: Conductor, GridManager, PatternPlayer, PlayerController, PlayerConfig, InputReader
     public class BattleStateMachine : MonoBehaviour
     {
-        private const float INPUT_WINDOW_SEC  = 0.021f;
-        private const int   BEATS_PER_PHASE   = 4;
+        private const int   BEATS_PER_PHASE      = 4;
         private const float CHARGE_MULT_PER_BEAT = 0.5f;
+
+        [Header("Input Timing")]
+        [SerializeField] private float _judgmentWindowSec = 0.021f; // 판정구간 반폭 (비트 전후 각각)
+        [SerializeField] private float _failZoneSec       = 0.021f; // 판정 실패구간 반폭 (판정구간 바깥)
 
         [Header("Dependencies")]
         [SerializeField] private Conductor        _conductor;
@@ -44,6 +47,12 @@ namespace BeatHero.Combat
         private bool    _tileWasDangerAtWindowOpen;
         private Vector2 _pendingMove;
         private bool    _hasPendingMove;
+
+        // 비트 전 선행 입력 버퍼 + 소진 플래그
+        private float   _lastMoveTime        = -1f;
+        private Vector2 _lastMoveDir;
+        private float   _lastAttackPressTime = -1f;
+        private bool    _beatInputConsumed;  // true면 이번 비트 추가 입력 무시
 
         private void Awake()
         {
@@ -104,12 +113,36 @@ namespace BeatHero.Combat
         // ── ResponsePhase ──────────────────────────────────────
         private IEnumerator HandleResponseBeat()
         {
+            float beatTime      = Time.time;
+            float preJudgStart  = beatTime - _judgmentWindowSec;
+            float preFailStart  = preJudgStart - _failZoneSec;
+
+            // 선행 입력 분류 (이동)
+            bool preMoveJudge = _lastMoveTime >= preJudgStart;
+            bool preMovesFail = !preMoveJudge && _lastMoveTime >= preFailStart;
+            // 선행 입력 분류 (공격)
+            bool preAttackJudge = _lastAttackPressTime >= preJudgStart;
+            bool preAttackFail  = !preAttackJudge && _lastAttackPressTime >= preFailStart;
+
+            bool continuingCharge = _attackHeld; // 이전 비트부터 홀드 중
+
+            // 판정 / 실패구간 선행 입력 → 슬롯 소진 처리
+            _beatInputConsumed = preMoveJudge || preMovesFail
+                               || preAttackJudge || preAttackFail
+                               || continuingCharge;
+
+            _hasPendingMove = preMoveJudge;
+            _pendingMove    = preMoveJudge ? _lastMoveDir : Vector2.zero;
+            if (preAttackJudge) _attackHeld = true;
+
+            // 버퍼 소진
+            _lastMoveTime       = -1f;
+            _lastAttackPressTime = -1f;
+
             _tileWasDangerAtWindowOpen = _grid.GetDangerAt(_grid.PlayerPosition) != null;
             _inputWindowOpen = true;
-            _hasPendingMove  = false;
-            _pendingMove     = Vector2.zero;
 
-            if (_attackHeld)
+            if (continuingCharge)
             {
                 // 구간 내 키 유지 = 차지 (마나 소모 + 배율 누적)
                 _player.SpendMana(1);
@@ -117,8 +150,9 @@ namespace BeatHero.Combat
                 _chargeBeats++;
             }
 
-            yield return new WaitForSeconds(INPUT_WINDOW_SEC * 2f);
-            _inputWindowOpen = false;
+            yield return new WaitForSeconds(_judgmentWindowSec);
+            _inputWindowOpen   = false;
+            _beatInputConsumed = false; // 다음 비트를 위해 초기화
 
             if (_hasPendingMove) ProcessMovement(_pendingMove);
 
@@ -250,16 +284,31 @@ namespace BeatHero.Combat
         // ── 입력 핸들러 ────────────────────────────────────────
         private void OnMoveInput(Vector2 dir)
         {
-            if (!_inputWindowOpen || _state != State.ResponsePhase) return;
+            if (_state != State.ResponsePhase) return;
             if (dir.sqrMagnitude < 0.1f) return;
-            _pendingMove    = dir;
-            _hasPendingMove = true;
+            if (_beatInputConsumed) return; // 이번 비트 슬롯 소진
+
+            _beatInputConsumed = true; // 첫 입력만 처리
+            _lastMoveDir  = dir;
+            _lastMoveTime = Time.time;
+
+            if (_inputWindowOpen)
+            {
+                _pendingMove    = dir;
+                _hasPendingMove = true;
+            }
         }
 
         private void OnAttackPressed()
         {
-            if (!_inputWindowOpen || _state != State.ResponsePhase) return;
-            _attackHeld = true;
+            if (_state != State.ResponsePhase) return;
+            if (_beatInputConsumed) return; // 이번 비트 슬롯 소진
+
+            _beatInputConsumed   = true; // 첫 입력만 처리
+            _lastAttackPressTime = Time.time;
+
+            if (_inputWindowOpen)
+                _attackHeld = true;
         }
 
         private void OnAttackReleased()
@@ -275,6 +324,7 @@ namespace BeatHero.Combat
 
         private void FireAttack()
         {
+            _hasPendingMove = false; // 공격 발동 → 같은 비트 이동 무효
             _player.SpendMana(1);
             int dmg = Mathf.RoundToInt(_playerConfig.attackPower * _chargeDamageMultiplier);
             _monsterHp = Mathf.Max(0, _monsterHp - dmg);
