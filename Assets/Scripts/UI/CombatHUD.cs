@@ -87,7 +87,10 @@ namespace BeatHero.UI
                 _conductor.OnBeat -= _beatBar.OnBeat;
             _conductor = conductor;
             if (_beatBar != null)
+            {
                 _conductor.OnBeat += _beatBar.OnBeat;
+                _beatBar.Bind(conductor);
+            }
         }
 
         private void UpdatePlayerHp(int current, int max)
