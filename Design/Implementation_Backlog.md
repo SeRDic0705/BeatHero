@@ -83,9 +83,9 @@
 ## Phase 5 — 오디오
 > (Settings_Design.md)
 
-- [ ] AudioMixer 셋업 — Master/BGM/SFX 버스, 파라미터 Expose
-- [ ] BGM 재생 — 전투/페이즈 동기, Conductor와 연동
-- [ ] SFX 재생 — hit/death/CellEffect feedback
+- [x] AudioMixer 셋업 — Master/BGM/SFX 버스, 파라미터 Expose
+- [x] BGM 재생 — 전투/페이즈 동기, Conductor와 연동
+- [x] SFX 재생 — hit/death/CellEffect feedback
 
 ---
 
@@ -123,3 +123,4 @@
 - **2026-06-09** Phase 2 완료 — Conductor/InputReader/GameManager/SceneLoader 구현. BeatHero.asmdef에 Unity.InputSystem 참조 추가. 컴파일 에러 0건.
 - **2026-06-09** Phase 3 완료 — GridManager/PatternPlayer/BattleStateMachine/ActiveHazard 구현. 전투 루프 로직 완성. 컴파일 에러 0건.
 - **2026-06-09** Phase 4 완료 — PlayerController(HP/마나/보호막/OnDeath) 구현. BattleStateMachine 전면 개편(PlayerController 연동, 데미지 공식 완성). PlayerConfig에 attackPower 추가. 컴파일 에러 0건.
+- **2026-06-09** Phase 5 완료 — AudioManager(Singleton/DontDestroyOnLoad, PlaySFX, 볼륨 PlayerPrefs) 구현. BeatHeroMixer.mixer 생성(Master/BGM/SFX 버스, MasterVolume/BGMVolume/SFXVolume Expose). Conductor AudioMixerGroup 연동. BattleStateMachine SFX 연결(CellEffect/hit/death). 컴파일 에러 0건.

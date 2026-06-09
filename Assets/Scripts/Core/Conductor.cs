@@ -1,10 +1,12 @@
 using System;
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace BeatHero.Core
 {
     public class Conductor : MonoBehaviour
     {
+        [SerializeField] private AudioMixerGroup _bgmMixerGroup;
         public double SongPositionSec => _songPositionSec;
         public double SongPositionInBeats => _songPositionSec / _secPerBeat;
         public int Bpm => _bpm;
@@ -32,6 +34,7 @@ namespace BeatHero.Core
             _audioSource = GetComponent<AudioSource>();
             if (_audioSource == null)
                 _audioSource = gameObject.AddComponent<AudioSource>();
+            _audioSource.outputAudioMixerGroup = _bgmMixerGroup;
         }
 
         private void Update()
@@ -90,6 +93,7 @@ namespace BeatHero.Core
             var nextSource = gameObject.AddComponent<AudioSource>();
             nextSource.clip = bgm;
             nextSource.loop = true;
+            nextSource.outputAudioMixerGroup = _bgmMixerGroup;
             nextSource.PlayScheduled(_switchDspTime);
             // 전환 완료 시 ApplyPendingSwitch에서 파라미터 교체
         }
