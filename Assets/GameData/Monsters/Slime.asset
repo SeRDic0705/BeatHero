@@ -24,13 +24,13 @@ MonoBehaviour:
   maxHp: 100
   attackPower: 10
   gridType: 0
-  sprite: {fileID: 0}
+  sprite: {fileID: -8198421445152465423, guid: 225a20553221fa646a36675ac91d4259, type: 3}
   animator: {fileID: 0}
-  hitSfx: {fileID: 0}
+  hitSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
   deathSfx: {fileID: 0}
   deathVfxPrefab: {fileID: 0}
-  bpm: 120
-  bgm: {fileID: 0}
+  bpm: 155
+  bgm: {fileID: 8300000, guid: c9c0238a25b072b47a4d6d89876c3227, type: 3}
   patterns:
   - {fileID: 11400000, guid: 538f31141fd331048a54941017aec844, type: 2}
   - {fileID: 11400000, guid: bbc6dc10c50c05f42b30d4f01ec11ca4, type: 2}
