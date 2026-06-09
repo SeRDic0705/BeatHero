@@ -109,12 +109,17 @@ namespace BeatHero.Combat
             {
                 _state = State.ResponsePhase;
                 _beatInPhase = 0;
+                _grid.ClearShape(); // CallPhase 마지막 패턴 제거
             }
         }
 
         // ── ResponsePhase ──────────────────────────────────────
         private IEnumerator HandleResponseBeat()
         {
+            // CallPhase와 동일 패턴을 비트 타이밍에 재표시
+            var bu = _patternPlayer.GetUnitAtPosition(PatternPlayer.BeatToUnitPosition(_beatInPhase));
+            _grid.ShowShape(bu?.gridEffectShape);
+
             float beatTime      = Time.time;
             float preJudgStart  = beatTime - _judgmentWindowSec;
             float preFailStart  = preJudgStart - _failZoneSec;
@@ -167,6 +172,7 @@ namespace BeatHero.Combat
             if (_hasPendingMove) ProcessMovement(_pendingMove);
 
             JudgeTile();
+            _grid.ClearShape(); // 판정 후 패턴 제거
             TickHazards();
             _grid.SetHazards(_hazards);
 
