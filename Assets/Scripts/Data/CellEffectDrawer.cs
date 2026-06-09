@@ -13,8 +13,10 @@ namespace BeatHero.Data
 
         public static CellEffect Draw(Rect rect, CellEffect value)
         {
-            Color bg = value == null            ? COLOR_EMPTY  :
-                       value is ShieldEffect    ? COLOR_SHIELD :
+            int controlId = GUIUtility.GetControlID(FocusType.Passive);
+
+            Color bg = value == null                   ? COLOR_EMPTY  :
+                       value is ShieldEffect           ? COLOR_SHIELD :
                        value is PersistentHazardEffect ? COLOR_HAZARD :
                        COLOR_DAMAGE;
 
@@ -22,8 +24,8 @@ namespace BeatHero.Data
 
             if (value != null)
             {
-                string lbl = value is DamageEffect          ? "DMG" :
-                             value is ShieldEffect          ? "SHD" :
+                string lbl = value is DamageEffect           ? "DMG" :
+                             value is ShieldEffect           ? "SHD" :
                              value is PersistentHazardEffect ? "HAZ" : "?";
                 var style = new GUIStyle(EditorStyles.boldLabel)
                 {
@@ -35,6 +37,15 @@ namespace BeatHero.Data
             }
 
             var e = Event.current;
+
+            // Object picker result — only handled by the cell that opened it
+            if (e.commandName == "ObjectSelectorUpdated" &&
+                EditorGUIUtility.GetObjectPickerControlID() == controlId)
+                return EditorGUIUtility.GetObjectPickerObject() as CellEffect;
+            if (e.commandName == "ObjectSelectorClosed" &&
+                EditorGUIUtility.GetObjectPickerControlID() == controlId)
+                return EditorGUIUtility.GetObjectPickerObject() as CellEffect;
+
             if (!rect.Contains(e.mousePosition)) return value;
 
             if (e.type == EventType.DragUpdated || e.type == EventType.DragPerform)
@@ -48,11 +59,19 @@ namespace BeatHero.Data
                 }
                 e.Use();
             }
-            else if (e.type == EventType.MouseDown && e.button == 1)
+            else if (e.type == EventType.MouseDown)
             {
-                GUI.changed = true;
-                e.Use();
-                return null;
+                if (e.button == 0)
+                {
+                    EditorGUIUtility.ShowObjectPicker<CellEffect>(value, false, "", controlId);
+                    e.Use();
+                }
+                else if (e.button == 1)
+                {
+                    GUI.changed = true;
+                    e.Use();
+                    return null;
+                }
             }
 
             return value;
