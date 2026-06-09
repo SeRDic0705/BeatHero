@@ -52,6 +52,7 @@ namespace BeatHero.Combat
         private float   _lastMoveTime        = -1f;
         private Vector2 _lastMoveDir;
         private float   _lastAttackPressTime = -1f;
+        private bool    _attackKeyDown;      // 공격 키가 물리적으로 눌린 상태
         private bool    _beatInputConsumed;  // true면 이번 비트 추가 입력 무시
 
         private void Awake()
@@ -127,16 +128,24 @@ namespace BeatHero.Combat
             bool continuingCharge = _attackHeld; // 이전 비트부터 홀드 중
 
             // 판정 / 실패구간 선행 입력 → 슬롯 소진 처리
+            // continuingCharge는 제외: 차지 중에도 이동으로 차지 취소 가능해야 함
             _beatInputConsumed = preMoveJudge || preMovesFail
-                               || preAttackJudge || preAttackFail
-                               || continuingCharge;
+                               || preAttackJudge || preAttackFail;
 
             _hasPendingMove = preMoveJudge;
             _pendingMove    = preMoveJudge ? _lastMoveDir : Vector2.zero;
-            if (preAttackJudge) _attackHeld = true;
+
+            // 선행 공격 판정: 키가 아직 눌린 상태면 차지 시작, 이미 뗐으면 탭 발사
+            if (preAttackJudge)
+            {
+                if (_attackKeyDown)
+                    _attackHeld = true;
+                else
+                    FireAttack(); // 비트 전 탭 공격 → 즉시 발사
+            }
 
             // 버퍼 소진
-            _lastMoveTime       = -1f;
+            _lastMoveTime        = -1f;
             _lastAttackPressTime = -1f;
 
             _tileWasDangerAtWindowOpen = _grid.GetDangerAt(_grid.PlayerPosition) != null;
@@ -286,33 +295,37 @@ namespace BeatHero.Combat
         {
             if (_state != State.ResponsePhase) return;
             if (dir.sqrMagnitude < 0.1f) return;
-            if (_beatInputConsumed) return; // 이번 비트 슬롯 소진
 
-            _beatInputConsumed = true; // 첫 입력만 처리
+            // 버퍼는 항상 최신 입력으로 갱신 — 비트 타이밍 판정은 HandleResponseBeat에서
             _lastMoveDir  = dir;
             _lastMoveTime = Time.time;
 
-            if (_inputWindowOpen)
-            {
-                _pendingMove    = dir;
-                _hasPendingMove = true;
-            }
+            // 윈도우가 열린 구간에서만 첫 입력 처리 후 슬롯 소진
+            if (!_inputWindowOpen) return;
+            if (_beatInputConsumed) return;
+            _beatInputConsumed = true;
+            _pendingMove    = dir;
+            _hasPendingMove = true;
         }
 
         private void OnAttackPressed()
         {
+            _attackKeyDown = true;
             if (_state != State.ResponsePhase) return;
-            if (_beatInputConsumed) return; // 이번 비트 슬롯 소진
 
-            _beatInputConsumed   = true; // 첫 입력만 처리
+            // 버퍼는 항상 최신 입력으로 갱신
             _lastAttackPressTime = Time.time;
 
-            if (_inputWindowOpen)
-                _attackHeld = true;
+            // 윈도우가 열린 구간에서만 첫 입력 처리 후 슬롯 소진
+            if (!_inputWindowOpen) return;
+            if (_beatInputConsumed) return;
+            _beatInputConsumed = true;
+            _attackHeld = true;
         }
 
         private void OnAttackReleased()
         {
+            _attackKeyDown = false;
             if (!_attackHeld) return;
             _attackHeld = false;
 
