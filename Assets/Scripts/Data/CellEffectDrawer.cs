@@ -39,12 +39,12 @@ namespace BeatHero.Data
             var e = Event.current;
 
             // Object picker result — only handled by the cell that opened it
-            if (e.commandName == "ObjectSelectorUpdated" &&
+            if ((e.commandName == "ObjectSelectorUpdated" || e.commandName == "ObjectSelectorClosed") &&
                 EditorGUIUtility.GetObjectPickerControlID() == controlId)
+            {
+                GUI.changed = true;
                 return EditorGUIUtility.GetObjectPickerObject() as CellEffect;
-            if (e.commandName == "ObjectSelectorClosed" &&
-                EditorGUIUtility.GetObjectPickerControlID() == controlId)
-                return EditorGUIUtility.GetObjectPickerObject() as CellEffect;
+            }
 
             if (!rect.Contains(e.mousePosition)) return value;
 
@@ -55,7 +55,7 @@ namespace BeatHero.Data
                 {
                     DragAndDrop.AcceptDrag();
                     foreach (var obj in DragAndDrop.objectReferences)
-                        if (obj is CellEffect ce) { e.Use(); return ce; }
+                        if (obj is CellEffect ce) { GUI.changed = true; e.Use(); return ce; }
                 }
                 e.Use();
             }
