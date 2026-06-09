@@ -12,7 +12,7 @@ namespace BeatHero.Data
 #if UNITY_EDITOR
         private static CellEffect DrawCell(Rect rect, CellEffect value)
         {
-            return (CellEffect)Sirenix.Utilities.Editor.SirenixEditorFields.UnityObjectField(rect, value, typeof(CellEffect), false);
+            return CellEffectDrawer.Draw(rect, value);
         }
 #endif
     }
