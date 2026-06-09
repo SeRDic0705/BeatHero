@@ -57,13 +57,13 @@
 ## Phase 3 — 전투 코어
 > Call & Response 루프. (CombatLogic_Design.md)
 
-- [ ] 그리드 시스템 — 타일 표현, 플레이어 위치, GridEffectShape 렌더링
-- [ ] `PatternPlayer` (런타임 재생 인덱스, SO 불변 유지)
-- [ ] 전투 상태머신 — CallPhase(이동잠금/패턴제시) → ResponsePhase(입력) → 패턴전환(랜덤) 반복
-- [ ] 입력 윈도우 판정 — ±21ms, 구간 종료 직후 위험타일 판정
-- [ ] CellEffect 적용 — DamageEffect 데미지 / ShieldEffect 보호막
-- [ ] 장애물 시스템 — `List<ActiveHazard>`, 이동 차단, 매 판정 데미지, 재진입 금지, 잔여 카운트 차감
-- [ ] 보스 페이즈 전환 — 판정 후 HP% 체크, `GetCurrentPhase()`, BGM/BPM/패턴풀 교체
+- [x] 그리드 시스템 — 타일 표현, 플레이어 위치, GridEffectShape 렌더링 (SpriteRenderer 색상 기반)
+- [x] `PatternPlayer` (런타임 재생 인덱스, SO 불변 유지, GetUnitAtPosition)
+- [x] 전투 상태머신 `BattleStateMachine` — CallPhase → ResponsePhase → 패턴전환(랜덤) 반복
+- [x] 입력 윈도우 판정 — ±21ms (`INPUT_WINDOW_SEC` 상수), 구간 종료 직후 위험타일 판정
+- [x] CellEffect 적용 — DamageEffect 데미지 / ShieldEffect 보호막 (Phase 4 플레이어 연동 예정)
+- [x] 장애물 시스템 — `List<ActiveHazard>`, 이동 차단, 매 판정 데미지, 잔여 카운트 차감
+- [x] 보스 페이즈 전환 — 판정 후 HP% 체크, `GetCurrentPhase()`, Conductor.SwitchPhaseAtNextMeasure
 
 ---
 
@@ -121,3 +121,4 @@
 - **2026-06-09** Phase 0 완료 — 폴더 구조(Scripts 7개, GameData 4개) + asmdef 2개 생성, 컴파일 에러 0건. Odin DLL은 Plugin auto-reference로 처리(별도 참조 불필요 확인).
 - **2026-06-09** Phase 1 완료 — Data 레이어 SO 16종 생성, 컴파일 에러 0건. GridEffectShape DrawElementMethod는 #if UNITY_EDITOR 인라인으로 처리(별도 Editor 스크립트 불필요).
 - **2026-06-09** Phase 2 완료 — Conductor/InputReader/GameManager/SceneLoader 구현. BeatHero.asmdef에 Unity.InputSystem 참조 추가. 컴파일 에러 0건.
+- **2026-06-09** Phase 3 완료 — GridManager/PatternPlayer/BattleStateMachine/ActiveHazard 구현. 전투 루프 로직 완성. 컴파일 에러 0건. ※ 공격 데미지 공식은 Phase 4 플레이어 HP 연동 후 최종 완성.
