@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using BeatHero.Audio;
 using BeatHero.Core;
 using BeatHero.Data;
 using BeatHero.Player;
@@ -177,6 +178,7 @@ namespace BeatHero.Combat
             {
                 _player.GainShield();
             }
+            AudioManager.Instance?.PlaySFX(effect.feedback?.activateSfx);
         }
 
         private int CalcMonsterDamage()
@@ -205,6 +207,7 @@ namespace BeatHero.Combat
 
             if (_monsterHp <= 0)
             {
+                AudioManager.Instance?.PlaySFX(_monster.deathSfx);
                 EndBattle(cleared: true);
                 return;
             }
@@ -269,10 +272,10 @@ namespace BeatHero.Combat
 
         private void FireAttack()
         {
-            // 릴리즈 박자 마나 1 소모
             _player.SpendMana(1);
             int dmg = Mathf.RoundToInt(_playerConfig.attackPower * _chargeDamageMultiplier);
             _monsterHp = Mathf.Max(0, _monsterHp - dmg);
+            AudioManager.Instance?.PlaySFX(_monster.hitSfx);
             ResetCharge();
         }
 
