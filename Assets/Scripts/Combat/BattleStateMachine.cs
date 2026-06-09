@@ -172,7 +172,6 @@ namespace BeatHero.Combat
             if (_hasPendingMove) ProcessMovement(_pendingMove);
 
             JudgeTile();
-            _grid.ClearShape(); // 판정 후 패턴 제거
             TickHazards();
             _grid.SetHazards(_hazards);
 
