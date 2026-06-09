@@ -47,10 +47,10 @@
 ## Phase 2 — 코어 / 인프라
 > 전투가 올라탈 토대. (CombatLogic_Design.md, SceneFlow_Design.md)
 
-- [ ] **Conductor (비트 클럭)** — `AudioSettings.dspTime` 기반 BPM→박자 타이밍. SongPositionInBeats(연속)·OnBeat 이벤트·GetBeatDspTime 제공. 보스 전환은 다음 마디 경계(A안). 상세: `Conductor_Design.md`
-- [ ] Input 래핑 — New Input System 액션맵(이동/공격) 연결 (`InputSystem_Actions.inputactions` 활용/확장)
-- [ ] `GameManager` / 런 진행 — 층 카운트, HP 층간 유지, 사망 시 1층 재시작
-- [ ] 씬 전환 매니저 — Title↔Game, 페이드 연출, 층 이동(씬 전환 없이 데이터 교체)
+- [x] **Conductor (비트 클럭)** — `AudioSettings.dspTime` 기반 BPM→박자 타이밍. SongPositionInBeats(연속)·OnBeat 이벤트·GetBeatDspTime 제공. 보스 전환은 다음 마디 경계(A안).
+- [x] Input 래핑 — `InputReader.cs` + `InputSystem_Actions.cs` 자동생성 (Move/Attack 이벤트 노출)
+- [x] `GameManager` / 런 진행 — 층 카운트, HP 층간 유지, 사망 시 1층 재시작, 싱글턴
+- [x] 씬 전환 매니저 `SceneLoader` — Title↔Game, 페이드 연출 (CanvasGroup), DontDestroyOnLoad
 
 ---
 
@@ -120,3 +120,4 @@
 ## 진행 현황 메모
 - **2026-06-09** Phase 0 완료 — 폴더 구조(Scripts 7개, GameData 4개) + asmdef 2개 생성, 컴파일 에러 0건. Odin DLL은 Plugin auto-reference로 처리(별도 참조 불필요 확인).
 - **2026-06-09** Phase 1 완료 — Data 레이어 SO 16종 생성, 컴파일 에러 0건. GridEffectShape DrawElementMethod는 #if UNITY_EDITOR 인라인으로 처리(별도 Editor 스크립트 불필요).
+- **2026-06-09** Phase 2 완료 — Conductor/InputReader/GameManager/SceneLoader 구현. BeatHero.asmdef에 Unity.InputSystem 참조 추가. 컴파일 에러 0건.
