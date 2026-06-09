@@ -24,6 +24,8 @@ namespace BeatHero.Combat
         [SerializeField] private PlayerController _player;
         [SerializeField] private PlayerConfig     _playerConfig;
 
+        public event System.Action<int, int> OnMonsterHpChanged; // (current, max)
+
         private MonsterData     _monster;
         private CombatPhaseData _phase;
         private int             _monsterHp;
@@ -65,6 +67,7 @@ namespace BeatHero.Combat
         {
             _monster   = monster;
             _monsterHp = monster.maxHp;
+            OnMonsterHpChanged?.Invoke(_monsterHp, _monster.maxHp);
             _hazards.Clear();
             _grid.Initialize(monster.gridType);
             _player.Initialize(_playerConfig.maxHp);
@@ -275,6 +278,7 @@ namespace BeatHero.Combat
             _player.SpendMana(1);
             int dmg = Mathf.RoundToInt(_playerConfig.attackPower * _chargeDamageMultiplier);
             _monsterHp = Mathf.Max(0, _monsterHp - dmg);
+            OnMonsterHpChanged?.Invoke(_monsterHp, _monster.maxHp);
             AudioManager.Instance?.PlaySFX(_monster.hitSfx);
             ResetCharge();
         }

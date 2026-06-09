@@ -29,6 +29,9 @@ namespace BeatHero.Core
         private AudioClip _nextBgm;
         private int _nextBpm;
 
+        private bool _isPaused;
+        private double _pauseDspTime;
+
         private void Awake()
         {
             _audioSource = GetComponent<AudioSource>();
@@ -39,7 +42,7 @@ namespace BeatHero.Core
 
         private void Update()
         {
-            if (!_isPlaying) return;
+            if (!_isPlaying || _isPaused) return;
 
             // 페이즈 전환 시각 도달 체크
             if (_switchPending && AudioSettings.dspTime >= _switchDspTime)
@@ -76,7 +79,25 @@ namespace BeatHero.Core
         {
             _audioSource.Stop();
             _isPlaying = false;
+            _isPaused = false;
             _switchPending = false;
+        }
+
+        public void Pause()
+        {
+            if (!_isPlaying || _isPaused) return;
+            _pauseDspTime = AudioSettings.dspTime;
+            _audioSource.Pause();
+            _isPaused = true;
+        }
+
+        public void Resume()
+        {
+            if (!_isPlaying || !_isPaused) return;
+            double pausedDuration = AudioSettings.dspTime - _pauseDspTime;
+            _dspSongStartTime += pausedDuration;
+            _audioSource.UnPause();
+            _isPaused = false;
         }
 
         // 보스 페이즈 전환: 다음 마디 경계(4박 배수)에서 BGM/BPM 교체

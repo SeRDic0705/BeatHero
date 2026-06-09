@@ -92,11 +92,11 @@
 ## Phase 6 — UI
 > (SceneFlow_Design.md §HUD, Settings_Design.md)
 
-- [ ] 전투 HUD — 좌상 플레이어HP / 상단중앙 층수 / 우상 몬스터HP / 하단좌 마나 / 하단중앙 비트바
-- [ ] 비트바 (시각적 메트로놈) — 4분음표 기준, Conductor 동기
-- [ ] 타이틀 화면 — 시작/설정 버튼
-- [ ] 일시정지 메뉴 — ESC, 재개/설정/메인으로
-- [ ] 설정 패널 (프리팹) — 해상도 드롭다운, 볼륨 슬라이더3, PlayerPrefs 저장/적용, Title·일시정지 공유
+- [x] 전투 HUD — 좌상 플레이어HP / 상단중앙 층수 / 우상 몬스터HP / 하단좌 마나 / 하단중앙 비트바
+- [x] 비트바 (시각적 메트로놈) — 4분음표 기준, Conductor 동기
+- [x] 타이틀 화면 — 시작/설정 버튼
+- [x] 일시정지 메뉴 — ESC, 재개/설정/메인으로
+- [x] 설정 패널 (프리팹) — 해상도 드롭다운, 볼륨 슬라이더3, PlayerPrefs 저장/적용, Title·일시정지 공유
 
 ---
 
@@ -124,3 +124,4 @@
 - **2026-06-09** Phase 3 완료 — GridManager/PatternPlayer/BattleStateMachine/ActiveHazard 구현. 전투 루프 로직 완성. 컴파일 에러 0건.
 - **2026-06-09** Phase 4 완료 — PlayerController(HP/마나/보호막/OnDeath) 구현. BattleStateMachine 전면 개편(PlayerController 연동, 데미지 공식 완성). PlayerConfig에 attackPower 추가. 컴파일 에러 0건.
 - **2026-06-09** Phase 5 완료 — AudioManager(Singleton/DontDestroyOnLoad, PlaySFX, 볼륨 PlayerPrefs) 구현. BeatHeroMixer.mixer 생성(Master/BGM/SFX 버스, MasterVolume/BGMVolume/SFXVolume Expose). Conductor AudioMixerGroup 연동. BattleStateMachine SFX 연결(CellEffect/hit/death). 컴파일 에러 0건.
+- **2026-06-09** Phase 6 완료 — CombatHUD/BeatBar/TitleUI/PauseMenu/SettingsPanel 5종 구현. Conductor Pause/Resume 추가. BattleStateMachine OnMonsterHpChanged 이벤트 추가. 컴파일 에러 0건.
