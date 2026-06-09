@@ -101,6 +101,7 @@ namespace BeatHero.Combat
         // ── CallPhase ──────────────────────────────────────────
         private void HandleCallBeat()
         {
+            _grid.SetResponsePhase(false);
             var bu = _patternPlayer.GetUnitAtPosition(PatternPlayer.BeatToUnitPosition(_beatInPhase));
             _grid.ShowShape(bu?.gridEffectShape);
 
@@ -109,8 +110,6 @@ namespace BeatHero.Combat
             {
                 _state = State.ResponsePhase;
                 _beatInPhase = 0;
-                _grid.ClearShape();
-                _grid.SetResponsePhase(true);
             }
         }
 
@@ -118,6 +117,7 @@ namespace BeatHero.Combat
         private IEnumerator HandleResponseBeat()
         {
             // CallPhase와 동일 패턴을 비트 타이밍에 재표시
+            _grid.SetResponsePhase(true);
             var bu = _patternPlayer.GetUnitAtPosition(PatternPlayer.BeatToUnitPosition(_beatInPhase));
             _grid.ShowShape(bu?.gridEffectShape);
 
@@ -258,7 +258,6 @@ namespace BeatHero.Combat
         // ── 패턴 전환 ──────────────────────────────────────────
         private void TransitionToNextPattern()
         {
-            _grid.SetResponsePhase(false);
             CheckBossPhaseTransition();
 
             if (_monsterHp <= 0)

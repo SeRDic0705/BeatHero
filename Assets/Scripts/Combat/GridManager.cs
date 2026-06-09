@@ -90,7 +90,6 @@ namespace BeatHero.Combat
         public void SetResponsePhase(bool isResponse)
         {
             _isResponsePhase = isResponse;
-            RefreshVisuals();
         }
 
         public Vector3 GetTileWorldPosition(Vector2Int gridPos)
