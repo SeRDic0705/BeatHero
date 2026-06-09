@@ -25,10 +25,13 @@ namespace BeatHero.Combat
         private GameObject[,] _tiles;
 
         // 타일 색상
-        private static readonly Color COLOR_NORMAL  = new Color(0.2f, 0.2f, 0.2f);
-        private static readonly Color COLOR_DANGER  = new Color(0.8f, 0.2f, 0.2f);
-        private static readonly Color COLOR_HAZARD  = new Color(0.6f, 0.1f, 0.6f);
-        private static readonly Color COLOR_SHIELD  = new Color(0.2f, 0.4f, 0.9f);
+        private static readonly Color COLOR_NORMAL           = new Color(0.2f, 0.2f, 0.2f);
+        private static readonly Color COLOR_DANGER_CALL      = new Color(0.8f, 0.2f, 0.2f);
+        private static readonly Color COLOR_DANGER_RESPONSE  = new Color(1.0f, 0.85f, 0.0f);
+        private static readonly Color COLOR_HAZARD           = new Color(0.6f, 0.1f, 0.6f);
+        private static readonly Color COLOR_SHIELD           = new Color(0.2f, 0.4f, 0.9f);
+
+        private bool _isResponsePhase;
 
         public void Initialize(GridType gridType)
         {
@@ -82,6 +85,12 @@ namespace BeatHero.Combat
             RefreshVisuals();
             OnPlayerMoved?.Invoke(PlayerPosition);
             return true;
+        }
+
+        public void SetResponsePhase(bool isResponse)
+        {
+            _isResponsePhase = isResponse;
+            RefreshVisuals();
         }
 
         public Vector3 GetTileWorldPosition(Vector2Int gridPos)
@@ -145,7 +154,7 @@ namespace BeatHero.Combat
                     else if (_dangerMap[x, y] is ShieldEffect)
                         sr.color = COLOR_SHIELD;
                     else if (_dangerMap[x, y] != null)
-                        sr.color = COLOR_DANGER;
+                        sr.color = _isResponsePhase ? COLOR_DANGER_RESPONSE : COLOR_DANGER_CALL;
                     else
                         sr.color = COLOR_NORMAL;
                 }

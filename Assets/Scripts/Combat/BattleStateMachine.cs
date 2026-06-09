@@ -109,7 +109,8 @@ namespace BeatHero.Combat
             {
                 _state = State.ResponsePhase;
                 _beatInPhase = 0;
-                _grid.ClearShape(); // CallPhase 마지막 패턴 제거
+                _grid.ClearShape();
+                _grid.SetResponsePhase(true);
             }
         }
 
@@ -257,6 +258,7 @@ namespace BeatHero.Combat
         // ── 패턴 전환 ──────────────────────────────────────────
         private void TransitionToNextPattern()
         {
+            _grid.SetResponsePhase(false);
             CheckBossPhaseTransition();
 
             if (_monsterHp <= 0)
