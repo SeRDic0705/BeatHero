@@ -295,6 +295,7 @@ namespace BeatHero.Combat
 
         private void FireAttack()
         {
+            _hasPendingMove = false; // 공격 발동 → 같은 비트 이동 무효
             _player.SpendMana(1);
             int dmg = Mathf.RoundToInt(_playerConfig.attackPower * _chargeDamageMultiplier);
             _monsterHp = Mathf.Max(0, _monsterHp - dmg);
