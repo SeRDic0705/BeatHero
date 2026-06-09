@@ -1,0 +1,11 @@
+using UnityEngine;
+
+namespace BeatHero.Data
+{
+    [CreateAssetMenu(menuName = "BeatHero/CellEffectFeedback")]
+    public class CellEffectFeedback : ScriptableObject
+    {
+        public AudioClip activateSfx;
+        public GameObject vfxPrefab;
+    }
+}
