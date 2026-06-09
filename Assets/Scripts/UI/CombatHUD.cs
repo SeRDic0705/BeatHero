@@ -28,6 +28,15 @@ namespace BeatHero.UI
 
         private void Start()
         {
+            var player = Object.FindAnyObjectByType<PlayerController>();
+            if (player != null) BindPlayer(player);
+
+            var battle = Object.FindAnyObjectByType<BattleStateMachine>();
+            if (battle != null) BindBattle(battle);
+
+            var conductor = Object.FindAnyObjectByType<Conductor>();
+            if (conductor != null) BindConductor(conductor);
+
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.OnFloorChanged += UpdateFloor;
