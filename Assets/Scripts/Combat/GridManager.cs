@@ -28,7 +28,6 @@ namespace BeatHero.Combat
         private static readonly Color COLOR_NORMAL  = new Color(0.2f, 0.2f, 0.2f);
         private static readonly Color COLOR_DANGER  = new Color(0.8f, 0.2f, 0.2f);
         private static readonly Color COLOR_HAZARD  = new Color(0.6f, 0.1f, 0.6f);
-        private static readonly Color COLOR_PLAYER  = new Color(0.2f, 0.8f, 0.4f);
         private static readonly Color COLOR_SHIELD  = new Color(0.2f, 0.4f, 0.9f);
 
         public void Initialize(GridType gridType)
@@ -85,6 +84,15 @@ namespace BeatHero.Combat
             return true;
         }
 
+        public Vector3 GetTileWorldPosition(Vector2Int gridPos)
+        {
+            float offset = (GridWidth - 1) * _cellSize * 0.5f;
+            return transform.position + new Vector3(
+                gridPos.x * _cellSize - offset,
+                gridPos.y * _cellSize - offset,
+                0f);
+        }
+
         public CellEffect GetDangerAt(Vector2Int pos)
             => (pos.x >= 0 && pos.x < GridWidth && pos.y >= 0 && pos.y < GridHeight)
                 ? _dangerMap[pos.x, pos.y]
@@ -132,9 +140,7 @@ namespace BeatHero.Combat
                     if (sr == null) continue;
 
                     var pos = new Vector2Int(x, y);
-                    if (pos == PlayerPosition)
-                        sr.color = COLOR_PLAYER;
-                    else if (IsHazardAt(pos))
+                    if (IsHazardAt(pos))
                         sr.color = COLOR_HAZARD;
                     else if (_dangerMap[x, y] is ShieldEffect)
                         sr.color = COLOR_SHIELD;

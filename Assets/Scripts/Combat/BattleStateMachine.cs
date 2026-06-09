@@ -87,6 +87,7 @@ namespace BeatHero.Combat
             SelectRandomPattern();
             _state = State.CallPhase;
             _beatInPhase = 0;
+            _player.transform.position = _grid.GetTileWorldPosition(_grid.PlayerPosition);
         }
 
         private void OnBeat(int beatIndex)
@@ -184,7 +185,10 @@ namespace BeatHero.Combat
 
             bool moved = _grid.TryMovePlayer(delta);
             if (moved)
+            {
+                _player.transform.position = _grid.GetTileWorldPosition(_grid.PlayerPosition);
                 _player.AddMana(_tileWasDangerAtWindowOpen ? 2 : 1);
+            }
 
             // 이동 시 차지 취소 (이동과 공격 배타적)
             if (moved && _attackHeld)
