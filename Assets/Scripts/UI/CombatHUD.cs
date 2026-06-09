@@ -53,8 +53,6 @@ namespace BeatHero.UI
             }
             if (_battle != null)
                 _battle.OnMonsterHpChanged -= UpdateMonsterHp;
-            if (_conductor != null)
-                _conductor.OnBeat -= _beatBar.OnBeat;
             if (GameManager.Instance != null)
                 GameManager.Instance.OnFloorChanged -= UpdateFloor;
         }
@@ -83,14 +81,9 @@ namespace BeatHero.UI
 
         public void BindConductor(Conductor conductor)
         {
-            if (_conductor != null && _beatBar != null)
-                _conductor.OnBeat -= _beatBar.OnBeat;
             _conductor = conductor;
             if (_beatBar != null)
-            {
-                _conductor.OnBeat += _beatBar.OnBeat;
                 _beatBar.Bind(conductor);
-            }
         }
 
         private void UpdatePlayerHp(int current, int max)

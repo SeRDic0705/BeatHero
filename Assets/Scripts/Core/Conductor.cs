@@ -13,6 +13,7 @@ namespace BeatHero.Core
         public double SecPerBeat => _secPerBeat;
 
         public event Action<int> OnBeat;
+        public event Action<double, int> OnSongScheduled; // (dspSongStartTime, bpm)
 
         private AudioSource _audioSource;
         private double _dspSongStartTime;
@@ -67,12 +68,14 @@ namespace BeatHero.Core
             _lastFiredBeat = 0;
             _switchPending = false;
 
-            // 약간의 여유(0.1초)를 두고 예약해 시작 시각을 확정
-            _dspSongStartTime = AudioSettings.dspTime + 0.1;
+            // 마커 어프로치 리드타임 = 1마디 (BeatBar 첫 마커가 커서 도달 순간 BGM 시작)
+            double measureDuration = _secPerBeat * 4.0;
+            _dspSongStartTime = AudioSettings.dspTime + measureDuration;
             _audioSource.clip = bgm;
             _audioSource.loop = true;
             _audioSource.PlayScheduled(_dspSongStartTime);
             _isPlaying = true;
+            OnSongScheduled?.Invoke(_dspSongStartTime, _bpm);
         }
 
         public void Stop()
@@ -140,6 +143,8 @@ namespace BeatHero.Core
                     _audioSource = src;
                     break;
                 }
+
+            OnSongScheduled?.Invoke(_dspSongStartTime, _bpm);
         }
     }
 }
