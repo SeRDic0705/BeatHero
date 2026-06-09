@@ -13,11 +13,11 @@
 ## Phase 0 — 프로젝트 스캐폴딩
 > 코드 폴더·어셈블리·에셋 폴더 골격. (CLAUDE.md §4)
 
-- [ ] `Assets/Scripts/` 하위 폴더 생성: Core, Data, Combat, Player, Audio, UI, Editor
-- [ ] 런타임 asmdef `BeatHero.asmdef` (Assets/Scripts) — Odin 런타임 어셈블리 참조
-- [ ] 에디터 asmdef `BeatHero.Editor.asmdef` (Assets/Scripts/Editor, Editor 플랫폼 한정) — Odin Editor + BeatHero 참조
-- [ ] `Assets/GameData/` 하위 폴더 생성: Patterns, Monsters, GridShapes, Feedback
-- [ ] 컴파일 통과 확인 (빈 어셈블리)
+- [x] `Assets/Scripts/` 하위 폴더 생성: Core, Data, Combat, Player, Audio, UI, Editor
+- [x] 런타임 asmdef `BeatHero.asmdef` (Assets/Scripts) — Odin DLL auto-reference
+- [x] 에디터 asmdef `BeatHero.Editor.asmdef` (Assets/Scripts/Editor, Editor 플랫폼 한정) — BeatHero GUID 참조
+- [x] `Assets/GameData/` 하위 폴더 생성: Patterns, Monsters, GridShapes, Feedback
+- [x] 컴파일 통과 확인 (빈 어셈블리) — 에러/경고 0건
 
 ---
 
@@ -118,4 +118,4 @@
 ---
 
 ## 진행 현황 메모
-- (작업하며 여기에 완료/블로커/결정사항 누적 기록)
+- **2026-06-09** Phase 0 완료 — 폴더 구조(Scripts 7개, GameData 4개) + asmdef 2개 생성, 컴파일 에러 0건. Odin DLL은 Plugin auto-reference로 처리(별도 참조 불필요 확인).
