@@ -24,23 +24,23 @@
 ## Phase 1 — Data 레이어 (ScriptableObject)
 > 모든 시스템의 기반. (PatternData_Design.md, MonsterData_Design.md)
 
-- [ ] `NoteLength` enum (Quarter=12 / Eighth=6 / Triplet=4 / Sixteenth=3)
-- [ ] `CellEffect` (abstract SO) + `CellEffectFeedback feedback` 필드
-- [ ] `DamageEffect` : CellEffect
-- [ ] `PersistentHazardEffect` : CellEffect (`int durationResponsePhases`)
-- [ ] `ShieldEffect` : CellEffect
-- [ ] `CellEffectFeedback` (SO): activateSfx, vfxPrefab
-- [ ] `GridEffectShape` (abstract SO) + `GridEffectShape3x3`(CellEffect[3,3]) / `GridEffectShape5x5`(CellEffect[5,5])
-- [ ] **(Editor)** GridEffectShape용 Odin `[TableMatrix]` 커스텀 셀 렌더러 — 격자 클릭 편집
-- [ ] `BeatUnit` (NoteLength + GridEffectShape 참조, 쉼표=null)
-- [ ] `PatternData` (SO): `List<BeatUnit>` + `damageMultiplier` + `[ValidateInput]` 합=48 검증
-- [ ] `GridType` enum (Normal3x3 / Boss5x5)
-- [ ] `MonsterData` (abstract SO): maxHp, attackPower, gridType, 프레젠테이션(sprite/animator/hitSfx/deathSfx/deathVfx) + `abstract GetCurrentPhase(float hpPercent)`
-- [ ] `CombatPhaseData` (class): bpm, bgm, patterns
-- [ ] `NormalMonsterData` : MonsterData (단일 CombatPhaseData)
-- [ ] `BossPhase` : CombatPhaseData (+hpThreshold)
-- [ ] `BossMonsterData` : MonsterData (List<BossPhase>, HP 기준 전환)
-- [ ] `PlayerConfig` (SO 또는 상수): maxHp=100, maxMana=5 등 임시값 — 인스펙터 조정 가능
+- [x] `NoteLength` enum (Quarter=12 / Eighth=6 / Triplet=4 / Sixteenth=3)
+- [x] `CellEffect` (abstract SO) + `CellEffectFeedback feedback` 필드
+- [x] `DamageEffect` : CellEffect
+- [x] `PersistentHazardEffect` : CellEffect (`int durationResponsePhases`)
+- [x] `ShieldEffect` : CellEffect
+- [x] `CellEffectFeedback` (SO): activateSfx, vfxPrefab
+- [x] `GridEffectShape` (abstract SO) + `GridEffectShape3x3`(CellEffect[3,3]) / `GridEffectShape5x5`(CellEffect[5,5])
+- [x] **(Editor)** GridEffectShape용 Odin `[TableMatrix]` 커스텀 셀 렌더러 — DrawElementMethod 인라인 구현 (#if UNITY_EDITOR)
+- [x] `BeatUnit` (NoteLength + GridEffectShape 참조, 쉼표=null)
+- [x] `PatternData` (SO): `List<BeatUnit>` + `damageMultiplier` + `[ValidateInput]` 합=48 검증
+- [x] `GridType` enum (Normal3x3 / Boss5x5)
+- [x] `MonsterData` (abstract SO): maxHp, attackPower, gridType, 프레젠테이션(sprite/animator/hitSfx/deathSfx/deathVfx) + `abstract GetCurrentPhase(float hpPercent)`
+- [x] `CombatPhaseData` (class): bpm, bgm, patterns
+- [x] `NormalMonsterData` : MonsterData (단일 CombatPhaseData)
+- [x] `BossPhase` : CombatPhaseData (+hpThreshold)
+- [x] `BossMonsterData` : MonsterData (List<BossPhase>, HP 기준 전환)
+- [x] `PlayerConfig` (SO 또는 상수): maxHp=100, maxMana=5 등 임시값 — 인스펙터 조정 가능
 
 ---
 
@@ -119,3 +119,4 @@
 
 ## 진행 현황 메모
 - **2026-06-09** Phase 0 완료 — 폴더 구조(Scripts 7개, GameData 4개) + asmdef 2개 생성, 컴파일 에러 0건. Odin DLL은 Plugin auto-reference로 처리(별도 참조 불필요 확인).
+- **2026-06-09** Phase 1 완료 — Data 레이어 SO 16종 생성, 컴파일 에러 0건. GridEffectShape DrawElementMethod는 #if UNITY_EDITOR 인라인으로 처리(별도 Editor 스크립트 불필요).
