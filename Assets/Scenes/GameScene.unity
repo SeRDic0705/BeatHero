@@ -5526,6 +5526,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: BeatHero::BeatHero.Combat.BattleStateMachine
   _judgmentWindowSec: 0.084
   _failZoneSec: 0.021
+  _callBeatSfx: {fileID: 8300000, guid: 44376458ef543b94e97e7090ae81c23c, type: 3}
   _conductor: {fileID: 2136934201}
   _grid: {fileID: 1667971344}
   _patternPlayer: {fileID: 1667971343}

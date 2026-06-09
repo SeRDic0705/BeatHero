@@ -19,6 +19,9 @@ namespace BeatHero.Combat
         [SerializeField] private float _judgmentWindowSec = 0.021f; // 판정구간 반폭 (비트 전후 각각)
         [SerializeField] private float _failZoneSec       = 0.021f; // 판정 실패구간 반폭 (판정구간 바깥)
 
+        [Header("Audio")]
+        [SerializeField] private AudioClip _callBeatSfx;
+
         [Header("Dependencies")]
         [SerializeField] private Conductor        _conductor;
         [SerializeField] private GridManager      _grid;
@@ -104,6 +107,7 @@ namespace BeatHero.Combat
             _grid.SetResponsePhase(false);
             var bu = _patternPlayer.GetUnitAtPosition(PatternPlayer.BeatToUnitPosition(_beatInPhase));
             _grid.ShowShape(bu?.gridEffectShape);
+            AudioManager.Instance?.PlaySFX(_callBeatSfx);
 
             _beatInPhase++;
             if (_beatInPhase >= BEATS_PER_PHASE)
