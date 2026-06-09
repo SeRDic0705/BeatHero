@@ -103,11 +103,11 @@
 ## Phase 7 — 콘텐츠 & 폴리시
 > 테스트 데이터·확장.
 
-- [ ] 샘플 GridEffectShape 몇 종 제작 (테스트용)
-- [ ] 샘플 PatternData 제작 (일반/특수 각각)
-- [ ] 샘플 몬스터 1~2종 (Normal/Boss) + 페이즈
+- [x] 샘플 GridEffectShape 몇 종 제작 (테스트용) — Shape_Center/Cross/Corners/Shield/Edges (5종)
+- [x] 샘플 PatternData 제작 (일반/특수 각각) — Pattern_Simple/Cross/Corners/Boss_Hard (4종)
+- [x] 샘플 몬스터 1~2종 (Normal/Boss) + 페이즈 — Slime(Normal), Goblin(Normal), Dragon_Boss(Boss 2-phase)
 - [ ] 1~3층 플레이 가능한 수직 슬라이스 검증
-- [ ] FloorData 테이블 (기획자 작성 예정 — 임시 스텁만)
+- [x] FloorData 테이블 (기획자 작성 예정 — 임시 스텁만) — FloorData_Default.asset (floors: Slime→Goblin→Dragon)
 
 ### 비필수 (추후, 우선순위 최하)
 - [ ] 차지 단계별 빛 모이는 VFX
@@ -125,3 +125,4 @@
 - **2026-06-09** Phase 4 완료 — PlayerController(HP/마나/보호막/OnDeath) 구현. BattleStateMachine 전면 개편(PlayerController 연동, 데미지 공식 완성). PlayerConfig에 attackPower 추가. 컴파일 에러 0건.
 - **2026-06-09** Phase 5 완료 — AudioManager(Singleton/DontDestroyOnLoad, PlaySFX, 볼륨 PlayerPrefs) 구현. BeatHeroMixer.mixer 생성(Master/BGM/SFX 버스, MasterVolume/BGMVolume/SFXVolume Expose). Conductor AudioMixerGroup 연동. BattleStateMachine SFX 연결(CellEffect/hit/death). 컴파일 에러 0건.
 - **2026-06-09** Phase 6 완료 — CombatHUD/BeatBar/TitleUI/PauseMenu/SettingsPanel 5종 구현. Conductor Pause/Resume 추가. BattleStateMachine OnMonsterHpChanged 이벤트 추가. 컴파일 에러 0건.
+- **2026-06-09** Phase 7 (에셋 일부) 완료 — FloorData.cs + GridShape 5종 + Pattern 4종 + Monster 3종(Slime/Goblin/Dragon_Boss) + FloorData_Default.asset 생성. 수직 슬라이스 검증은 런타임 테스트 필요(미완).
