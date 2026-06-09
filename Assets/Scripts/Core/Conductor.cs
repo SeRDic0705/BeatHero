@@ -65,7 +65,7 @@ namespace BeatHero.Core
             _bpm = bpm;
             _secPerBeat = 60.0 / bpm;
             _firstBeatOffsetSec = firstBeatOffsetSec;
-            _lastFiredBeat = 0;
+            _lastFiredBeat = -1;
             _switchPending = false;
 
             // 마커 어프로치 리드타임 = 1마디 (BeatBar 첫 마커가 커서 도달 순간 BGM 시작)
