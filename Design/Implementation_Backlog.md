@@ -70,13 +70,13 @@
 ## Phase 4 — 플레이어
 > 이동·마나·공격. (CombatLogic_Design.md)
 
-- [ ] 그리드 이동 — ResponsePhase 입력 구간에서 1칸, CallPhase 잠금
-- [ ] 마나 시스템 — 이동+1 / 아슬아슬회피+2 / 제자리0 / 최대5 / 층클리어 리셋
-- [ ] 아슬아슬 회피 판정 — 구간 열릴 때 위험칸 기록 → 이동 시 출발칸 위험 여부로 +1/+2
-- [ ] 기본 공격 — 탭(누르고 뗌), 자동 타깃, 데미지=attackPower×damageMultiplier
-- [ ] 차지 공격 — 가변 길이, ResponsePhase 구간마다 마나1+배율누적, CallPhase 유지는 무비용, 구간 밖 릴리즈=취소
-- [ ] 차지 취소 처리 — 피격 시/구간 밖 릴리즈 시 취소, 소모 마나 미환급
-- [ ] 플레이어 HP / 피격 — 데미지 수용, 0 이하 게임오버
+- [x] 그리드 이동 — ResponsePhase 입력 구간 1칸, CallPhase 잠금 (BattleStateMachine.ProcessMovement)
+- [x] 마나 시스템 — 이동+1 / 아슬아슬+2 / 최대5 / 층클리어 리셋 (PlayerController.AddMana/ResetMana)
+- [x] 아슬아슬 회피 판정 — 위험 타일 여부 기록 → 이동 시 +1/+2 분기
+- [x] 기본 공격 — 탭(pressed+released), 데미지=PlayerConfig.attackPower×chargeMult
+- [x] 차지 공격 — ResponsePhase 구간마다 마나-1+배율+0.5, CallPhase 유지는 무비용
+- [x] 차지 취소 처리 — 피격 시/구간 밖 릴리즈 시 ResetCharge (소모 마나 미환급)
+- [x] 플레이어 HP / 피격 — PlayerController.TakeDamage, OnDeath→GameManager.RestartRun
 
 ---
 
@@ -121,4 +121,5 @@
 - **2026-06-09** Phase 0 완료 — 폴더 구조(Scripts 7개, GameData 4개) + asmdef 2개 생성, 컴파일 에러 0건. Odin DLL은 Plugin auto-reference로 처리(별도 참조 불필요 확인).
 - **2026-06-09** Phase 1 완료 — Data 레이어 SO 16종 생성, 컴파일 에러 0건. GridEffectShape DrawElementMethod는 #if UNITY_EDITOR 인라인으로 처리(별도 Editor 스크립트 불필요).
 - **2026-06-09** Phase 2 완료 — Conductor/InputReader/GameManager/SceneLoader 구현. BeatHero.asmdef에 Unity.InputSystem 참조 추가. 컴파일 에러 0건.
-- **2026-06-09** Phase 3 완료 — GridManager/PatternPlayer/BattleStateMachine/ActiveHazard 구현. 전투 루프 로직 완성. 컴파일 에러 0건. ※ 공격 데미지 공식은 Phase 4 플레이어 HP 연동 후 최종 완성.
+- **2026-06-09** Phase 3 완료 — GridManager/PatternPlayer/BattleStateMachine/ActiveHazard 구현. 전투 루프 로직 완성. 컴파일 에러 0건.
+- **2026-06-09** Phase 4 완료 — PlayerController(HP/마나/보호막/OnDeath) 구현. BattleStateMachine 전면 개편(PlayerController 연동, 데미지 공식 완성). PlayerConfig에 attackPower 추가. 컴파일 에러 0건.

@@ -2,74 +2,73 @@ using System.Collections;
 using System.Collections.Generic;
 using BeatHero.Core;
 using BeatHero.Data;
+using BeatHero.Player;
 using UnityEngine;
 
 namespace BeatHero.Combat
 {
     // Call & Response 전투 루프 총괄.
-    // 의존: Conductor, GridManager, PatternPlayer, GameManager, InputReader, MonsterData
+    // 의존: Conductor, GridManager, PatternPlayer, PlayerController, PlayerConfig, InputReader
     public class BattleStateMachine : MonoBehaviour
     {
-        private const float INPUT_WINDOW_SEC = 0.021f;
-        private const int   BEATS_PER_PHASE  = 4;
-        private const int   MAX_MANA         = 5;
+        private const float INPUT_WINDOW_SEC  = 0.021f;
+        private const int   BEATS_PER_PHASE   = 4;
+        private const float CHARGE_MULT_PER_BEAT = 0.5f;
 
         [Header("Dependencies")]
-        [SerializeField] private Conductor    _conductor;
-        [SerializeField] private GridManager  _grid;
-        [SerializeField] private PatternPlayer _patternPlayer;
-        [SerializeField] private InputReader  _input;
+        [SerializeField] private Conductor        _conductor;
+        [SerializeField] private GridManager      _grid;
+        [SerializeField] private PatternPlayer    _patternPlayer;
+        [SerializeField] private InputReader      _input;
+        [SerializeField] private PlayerController _player;
+        [SerializeField] private PlayerConfig     _playerConfig;
 
-        private MonsterData    _monster;
+        private MonsterData     _monster;
         private CombatPhaseData _phase;
         private int             _monsterHp;
-        private int             _playerMana;
 
         private List<ActiveHazard> _hazards = new();
 
         private enum State { Idle, CallPhase, ResponsePhase, BattleEnd }
         private State _state = State.Idle;
-        private int   _beatInPhase;  // 0~3
+        private int   _beatInPhase;
 
-        // ResponsePhase 입력 처리용
-        private bool   _inputWindowOpen;
-        private bool   _attackPressed;
-        private bool   _attackHeld;
-        private int    _chargeBeats;
-        private float  _chargeDamageMultiplier = 1f;
-        private bool   _tileWasDangerAtWindowOpen;
+        // 입력 윈도우
+        private bool    _inputWindowOpen;
+        private bool    _attackHeld;
+        private int     _chargeBeats;
+        private float   _chargeDamageMultiplier = 1f;
+        private bool    _tileWasDangerAtWindowOpen;
         private Vector2 _pendingMove;
         private bool    _hasPendingMove;
 
-        // 누적 차지 배율 (박자당 +0.5)
-        private const float CHARGE_MULT_PER_BEAT = 0.5f;
-
         private void Awake()
         {
-            _conductor.OnBeat += OnBeat;
-            _input.OnMoveInput += OnMoveInput;
-            _input.OnAttackPressed += OnAttackPressed;
+            _conductor.OnBeat    += OnBeat;
+            _input.OnMoveInput   += OnMoveInput;
+            _input.OnAttackPressed  += OnAttackPressed;
             _input.OnAttackReleased += OnAttackReleased;
+            _player.OnDeath      += OnPlayerDeath;
         }
 
         private void OnDestroy()
         {
-            _conductor.OnBeat -= OnBeat;
-            _input.OnMoveInput -= OnMoveInput;
-            _input.OnAttackPressed -= OnAttackPressed;
+            _conductor.OnBeat       -= OnBeat;
+            _input.OnMoveInput      -= OnMoveInput;
+            _input.OnAttackPressed  -= OnAttackPressed;
             _input.OnAttackReleased -= OnAttackReleased;
+            _player.OnDeath         -= OnPlayerDeath;
         }
 
         public void StartBattle(MonsterData monster)
         {
             _monster   = monster;
             _monsterHp = monster.maxHp;
-            _playerMana = 0;
             _hazards.Clear();
             _grid.Initialize(monster.gridType);
+            _player.Initialize(_playerConfig.maxHp);
 
-            float hpPercent = 1f;
-            _phase = monster.GetCurrentPhase(hpPercent);
+            _phase = monster.GetCurrentPhase(1f);
             _conductor.StartSong(_phase.bgm, _phase.bpm);
             SelectRandomPattern();
             _state = State.CallPhase;
@@ -87,34 +86,29 @@ namespace BeatHero.Combat
         // ── CallPhase ──────────────────────────────────────────
         private void HandleCallBeat()
         {
-            // 현재 박자에 맞는 BeatUnit의 shape 표시
             var bu = _patternPlayer.GetUnitAtPosition(PatternPlayer.BeatToUnitPosition(_beatInPhase));
             _grid.ShowShape(bu?.gridEffectShape);
 
             _beatInPhase++;
             if (_beatInPhase >= BEATS_PER_PHASE)
-                TransitionToResponsePhase();
-        }
-
-        private void TransitionToResponsePhase()
-        {
-            _state = State.ResponsePhase;
-            _beatInPhase = 0;
+            {
+                _state = State.ResponsePhase;
+                _beatInPhase = 0;
+            }
         }
 
         // ── ResponsePhase ──────────────────────────────────────
         private IEnumerator HandleResponseBeat()
         {
-            // 입력 윈도우 열기 전: 위험 타일 여부 기록
             _tileWasDangerAtWindowOpen = _grid.GetDangerAt(_grid.PlayerPosition) != null;
             _inputWindowOpen = true;
-            _hasPendingMove = false;
-            _pendingMove = Vector2.zero;
+            _hasPendingMove  = false;
+            _pendingMove     = Vector2.zero;
 
             if (_attackHeld)
             {
-                // ResponsePhase 구간 내 키 유지 = 차지
-                _playerMana = Mathf.Max(0, _playerMana - 1);
+                // 구간 내 키 유지 = 차지 (마나 소모 + 배율 누적)
+                _player.SpendMana(1);
                 _chargeDamageMultiplier += CHARGE_MULT_PER_BEAT;
                 _chargeBeats++;
             }
@@ -122,14 +116,9 @@ namespace BeatHero.Combat
             yield return new WaitForSeconds(INPUT_WINDOW_SEC * 2f);
             _inputWindowOpen = false;
 
-            // 이동 처리
-            if (_hasPendingMove)
-                ProcessMovement(_pendingMove);
+            if (_hasPendingMove) ProcessMovement(_pendingMove);
 
-            // 판정: 위험 타일
             JudgeTile();
-
-            // 장애물 카운트 차감
             TickHazards();
             _grid.SetHazards(_hazards);
 
@@ -148,52 +137,54 @@ namespace BeatHero.Combat
 
             bool moved = _grid.TryMovePlayer(delta);
             if (moved)
-            {
-                // 마나: 아슬아슬 회피 or 일반 이동
-                _playerMana = Mathf.Min(MAX_MANA, _playerMana + (_tileWasDangerAtWindowOpen ? 2 : 1));
-            }
-            // 이동 후 차지는 유지 (이동과 공격은 배타적이므로 차지 취소)
-            if (_attackHeld && moved)
+                _player.AddMana(_tileWasDangerAtWindowOpen ? 2 : 1);
+
+            // 이동 시 차지 취소 (이동과 공격 배타적)
+            if (moved && _attackHeld)
                 CancelCharge();
         }
 
         private void JudgeTile()
         {
+            // 장애물 위에 있으면 데미지
+            foreach (var h in _hazards)
+                if (h.Position == _grid.PlayerPosition)
+                {
+                    _player.TakeDamage(CalcMonsterDamage());
+                    return;
+                }
+
             var effect = _grid.GetDangerAt(_grid.PlayerPosition);
-            if (effect == null)
-            {
-                // 장애물 위에 있는지 별도 체크
-                foreach (var h in _hazards)
-                    if (h.Position == _grid.PlayerPosition)
-                    {
-                        int dmg = Mathf.RoundToInt(_monster.attackPower * GetCurrentPatternMultiplier());
-                        GameManager.Instance.ApplyDamage(dmg);
-                        return;
-                    }
-                return;
-            }
+            if (effect == null) return;
 
             if (effect is DamageEffect)
             {
-                int dmg = Mathf.RoundToInt(_monster.attackPower * GetCurrentPatternMultiplier());
-                GameManager.Instance.ApplyDamage(dmg);
+                _player.TakeDamage(CalcMonsterDamage());
             }
             else if (effect is PersistentHazardEffect hazardEffect)
             {
-                // 장애물 등록 + 즉시 데미지
                 _hazards.Add(new ActiveHazard
                 {
                     Position = _grid.PlayerPosition,
-                    Effect = hazardEffect,
+                    Effect   = hazardEffect,
                     RemainingResponsePhases = hazardEffect.durationResponsePhases
                 });
-                int dmg = Mathf.RoundToInt(_monster.attackPower * GetCurrentPatternMultiplier());
-                GameManager.Instance.ApplyDamage(dmg);
+                _player.TakeDamage(CalcMonsterDamage());
+                // 피격 시 차지 취소
+                if (_attackHeld) CancelCharge();
             }
             else if (effect is ShieldEffect)
             {
-                // 보호막은 Phase 4 플레이어에서 처리 예정
+                _player.GainShield();
             }
+        }
+
+        private int CalcMonsterDamage()
+        {
+            float multiplier = _patternPlayer.CurrentPattern != null
+                ? _patternPlayer.CurrentPattern.damageMultiplier
+                : 1f;
+            return Mathf.RoundToInt(_monster.attackPower * multiplier);
         }
 
         private void TickHazards()
@@ -214,9 +205,7 @@ namespace BeatHero.Combat
 
             if (_monsterHp <= 0)
             {
-                _state = State.BattleEnd;
-                _conductor.Stop();
-                GameManager.Instance.CompleteFloor();
+                EndBattle(cleared: true);
                 return;
             }
 
@@ -225,20 +214,29 @@ namespace BeatHero.Combat
             _beatInPhase = 0;
         }
 
+        private void EndBattle(bool cleared)
+        {
+            _state = State.BattleEnd;
+            _conductor.Stop();
+            if (cleared)
+            {
+                _player.ResetMana();
+                GameManager.Instance.CompleteFloor();
+            }
+        }
+
         private void SelectRandomPattern()
         {
             if (_phase.patterns == null || _phase.patterns.Count == 0) return;
-            int idx = Random.Range(0, _phase.patterns.Count);
-            _patternPlayer.SetPattern(_phase.patterns[idx]);
+            _patternPlayer.SetPattern(_phase.patterns[Random.Range(0, _phase.patterns.Count)]);
         }
 
         private void CheckBossPhaseTransition()
         {
             if (_monster is not BossMonsterData boss) return;
-            float hpPercent = (float)_monsterHp / _monster.maxHp;
-            var newPhase = boss.GetCurrentPhase(hpPercent);
+            float hpPct = (float)_monsterHp / _monster.maxHp;
+            var newPhase = boss.GetCurrentPhase(hpPct);
             if (newPhase == _phase) return;
-
             _phase = newPhase;
             _conductor.SwitchPhaseAtNextMeasure(_phase.bgm, _phase.bpm);
         }
@@ -248,7 +246,7 @@ namespace BeatHero.Combat
         {
             if (!_inputWindowOpen || _state != State.ResponsePhase) return;
             if (dir.sqrMagnitude < 0.1f) return;
-            _pendingMove = dir;
+            _pendingMove    = dir;
             _hasPendingMove = true;
         }
 
@@ -256,7 +254,6 @@ namespace BeatHero.Combat
         {
             if (!_inputWindowOpen || _state != State.ResponsePhase) return;
             _attackHeld = true;
-            _attackPressed = true;
         }
 
         private void OnAttackReleased()
@@ -267,44 +264,32 @@ namespace BeatHero.Combat
             if (_inputWindowOpen && _state == State.ResponsePhase)
                 FireAttack();
             else
-                CancelCharge(); // 구간 밖 릴리즈 = 취소
+                CancelCharge();
         }
 
         private void FireAttack()
         {
-            // 마지막 릴리즈 박자 마나 소모
-            _playerMana = Mathf.Max(0, _playerMana - 1);
-            int dmg = Mathf.RoundToInt(10 * _chargeDamageMultiplier); // 기본 데미지 10, Phase 4에서 공식 완성
+            // 릴리즈 박자 마나 1 소모
+            _player.SpendMana(1);
+            int dmg = Mathf.RoundToInt(_playerConfig.attackPower * _chargeDamageMultiplier);
             _monsterHp = Mathf.Max(0, _monsterHp - dmg);
             ResetCharge();
         }
 
-        private void CancelCharge()
-        {
-            // 소모된 마나 반환 없음
-            ResetCharge();
-        }
+        private void CancelCharge() => ResetCharge();
 
         private void ResetCharge()
         {
-            _attackHeld = false;
-            _attackPressed = false;
-            _chargeBeats = 0;
+            _attackHeld             = false;
+            _chargeBeats            = 0;
             _chargeDamageMultiplier = 1f;
         }
 
-        private float GetCurrentPatternMultiplier()
+        private void OnPlayerDeath()
         {
-            var bu = _patternPlayer.GetUnitAtPosition(PatternPlayer.BeatToUnitPosition(_beatInPhase));
-            return bu != null ? (_patternPlayer.Current?.gridEffectShape != null
-                ? GetPatternDamageMultiplier() : 1f) : 1f;
-        }
-
-        private float GetPatternDamageMultiplier()
-        {
-            // PatternPlayer가 현재 재생 중인 PatternData의 multiplier
-            // 현재는 1f 반환 (정확한 연결은 PatternPlayer에 currentPattern 프로퍼티 추가 시 개선)
-            return 1f;
+            _state = State.BattleEnd;
+            _conductor.Stop();
+            GameManager.Instance.RestartRun();
         }
     }
 }
