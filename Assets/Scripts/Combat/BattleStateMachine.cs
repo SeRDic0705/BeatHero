@@ -96,6 +96,9 @@ namespace BeatHero.Combat
 
             _phase = monster.GetCurrentPhase(1f);
             _conductor.PrepareSong(_phase.bgm, _phase.bpm);
+            // 콜 효과음 프리로드 — 미로드 시 첫 PlayScheduled에서 로딩 지연으로 첫 박이 밀린다.
+            if (_callBeatSfx != null && _callBeatSfx.loadState != AudioDataLoadState.Loaded)
+                _callBeatSfx.LoadAudioData();
             SelectRandomPattern();
             _player.transform.position = _grid.GetTileWorldPosition(_grid.PlayerPosition);
             _state = State.Idle;
@@ -240,7 +243,8 @@ namespace BeatHero.Combat
             // 장애물 틱은 프레이즈 단위 — 음표 수와 무관
             TickHazards();
             _grid.SetHazards(_hazards);
-            _grid.ClearShape();
+            // 마지막 그리드는 다음 페이즈 첫 ShowShape가 덮을 때까지 유지(깜빡임 방지).
+            // 전투 종료 시점의 정리는 EndBattle에서 처리.
         }
 
         private void ProcessMovement(Vector2 raw)
@@ -337,6 +341,8 @@ namespace BeatHero.Combat
         {
             _state = State.BattleEnd;
             _conductor.Stop();
+            // 전투 종료 — 유지되던 마지막 위험 그리드를 비운다(다음 층 미존재 시에도 잔상 방지).
+            _grid.ClearShape();
             if (cleared)
             {
                 _player.ResetMana();
