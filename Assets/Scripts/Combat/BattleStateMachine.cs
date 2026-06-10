@@ -18,6 +18,7 @@ namespace BeatHero.Combat
         [Header("Input Timing")]
         [SerializeField] private float _judgmentWindowSec = 0.021f; // 판정구간 반폭 (비트 전후 각각)
         [SerializeField] private float _failZoneSec       = 0.021f; // 판정 실패구간 반폭 (판정구간 바깥)
+        [SerializeField] private float _tapGraceSec       = 0.15f;  // 탭 릴리즈 유예 (새 프레스 한정)
 
         [Header("Audio")]
         [SerializeField] private AudioClip _callBeatSfx;
@@ -30,8 +31,10 @@ namespace BeatHero.Combat
         [SerializeField] private PlayerController _player;
         [SerializeField] private PlayerConfig     _playerConfig;
 
+        public event System.Action<MonsterData> OnBattleStarted;
         public event System.Action<int, int> OnMonsterHpChanged; // (current, max)
 
+        public MonsterData CurrentMonster => _monster;
         private MonsterData     _monster;
         private CombatPhaseData _phase;
         private int             _monsterHp;
@@ -52,9 +55,11 @@ namespace BeatHero.Combat
         private bool    _hasPendingMove;
 
         // 비트 전 선행 입력 버퍼 + 소진 플래그
-        private float   _lastMoveTime        = -1f;
+        private float   _lastMoveTime          = -1f;
         private Vector2 _lastMoveDir;
-        private float   _lastAttackPressTime = -1f;
+        private float   _lastAttackPressTime   = -1f;
+        private float   _lastAttackReleaseTime = -1f;
+        private float   _tapGraceEndTime      = -1f;
         private bool    _attackKeyDown;      // 공격 키가 물리적으로 눌린 상태
         private bool    _beatInputConsumed;  // true면 이번 비트 추가 입력 무시
 
@@ -80,6 +85,7 @@ namespace BeatHero.Combat
         {
             _monster   = monster;
             _monsterHp = monster.maxHp;
+            OnBattleStarted?.Invoke(_monster);
             OnMonsterHpChanged?.Invoke(_monsterHp, _monster.maxHp);
             _hazards.Clear();
             _grid.Initialize(monster.gridType);
@@ -129,14 +135,28 @@ namespace BeatHero.Combat
             float preJudgStart  = beatTime - _judgmentWindowSec;
             float preFailStart  = preJudgStart - _failZoneSec;
 
+            // 선행 릴리즈 처리: 윈도우 밖에서 뗀 상태로 비트가 도달한 경우
+            // (_attackHeld=true이면서 키가 이미 올라와 있음 = OnAttackReleased가 defer한 것)
+            if (_attackHeld && !_attackKeyDown)
+            {
+                bool inPreBuffer = _lastAttackReleaseTime >= preJudgStart;
+                bool inTapGrace  = _tapGraceEndTime > 0f && _lastAttackReleaseTime <= _tapGraceEndTime;
+                if (inPreBuffer || inTapGrace)
+                    FireAttack(); // 사전버퍼 또는 탭유예 내 릴리즈 → 공격 발동
+                else
+                    CancelCharge(); // 유효구간 밖 릴리즈 → 취소
+                _lastAttackReleaseTime = -1f;
+                _tapGraceEndTime       = -1f;
+            }
+
             // 선행 입력 분류 (이동)
             bool preMoveJudge = _lastMoveTime >= preJudgStart;
             bool preMovesFail = !preMoveJudge && _lastMoveTime >= preFailStart;
-            // 선행 입력 분류 (공격)
+            // 선행 입력 분류 (공격 프레스)
             bool preAttackJudge = _lastAttackPressTime >= preJudgStart;
             bool preAttackFail  = !preAttackJudge && _lastAttackPressTime >= preFailStart;
 
-            bool continuingCharge = _attackHeld; // 이전 비트부터 홀드 중
+            bool continuingCharge = _attackHeld; // 이전 비트부터 홀드 중 (선행 릴리즈 처리 후 스냅샷)
 
             // 판정 / 실패구간 선행 입력 → 슬롯 소진 처리
             // continuingCharge는 제외: 차지 중에도 이동으로 차지 취소 가능해야 함
@@ -162,17 +182,28 @@ namespace BeatHero.Combat
             _tileWasDangerAtWindowOpen = _grid.GetDangerAt(_grid.PlayerPosition) != null;
             _inputWindowOpen = true;
 
-            if (continuingCharge)
-            {
-                // 구간 내 키 유지 = 차지 (마나 소모 + 배율 누적)
-                _player.SpendMana(1);
-                _chargeDamageMultiplier += CHARGE_MULT_PER_BEAT;
-                _chargeBeats++;
-            }
-
             yield return new WaitForSeconds(_judgmentWindowSec);
             _inputWindowOpen   = false;
             _beatInputConsumed = false; // 다음 비트를 위해 초기화
+
+            // 윈도우 종료 시 공격 처리 — 이동과 동일한 타이밍으로 발동
+            if (_attackHeld && !_attackKeyDown)
+            {
+                FireAttack(); // 탭 or 차지 릴리즈: 윈도우 안에서 뗀 경우
+            }
+            else if (!continuingCharge && _attackHeld && _attackKeyDown)
+            {
+                // 새 프레스, 아직 홀드 중 → 탭 유예 시작 (느린 탭과 차지 의도 구분 유예)
+                _tapGraceEndTime = Time.time + _tapGraceSec;
+            }
+            else if (continuingCharge && _attackHeld && _attackKeyDown)
+            {
+                // 차지 유지: 윈도우 종료까지 홀드 = 차지 의도 확정, 마나 후납
+                _player.SpendMana(1);
+                _chargeDamageMultiplier += CHARGE_MULT_PER_BEAT;
+                _chargeBeats++;
+                _tapGraceEndTime = -1f;
+            }
 
             if (_hasPendingMove) ProcessMovement(_pendingMove);
 
@@ -340,12 +371,16 @@ namespace BeatHero.Combat
         {
             _attackKeyDown = false;
             if (!_attackHeld) return;
-            _attackHeld = false;
 
-            if (_inputWindowOpen && _state == State.ResponsePhase)
-                FireAttack();
-            else
+            _lastAttackReleaseTime = Time.time;
+
+            if (_state != State.ResponsePhase)
+            {
+                _attackHeld = false;
                 CancelCharge();
+            }
+            // ResponsePhase: _attackHeld 유지, HandleResponseBeat에서 처리
+            // 윈도우 안/밖 모두 window-close 또는 사전버퍼 체크에서 발동
         }
 
         private void FireAttack()
@@ -366,6 +401,8 @@ namespace BeatHero.Combat
             _attackHeld             = false;
             _chargeBeats            = 0;
             _chargeDamageMultiplier = 1f;
+            _lastAttackReleaseTime  = -1f;
+            _tapGraceEndTime        = -1f;
         }
 
         private void OnPlayerDeath()
