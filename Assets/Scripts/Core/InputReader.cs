@@ -33,13 +33,5 @@ namespace BeatHero.Core
             if (ctx.canceled) OnAttackReleased?.Invoke();
         }
 
-        // 사용하지 않는 액션 — 빈 구현으로 인터페이스 충족
-        void InputSystem_Actions.IPlayerActions.OnLook(InputAction.CallbackContext ctx) { }
-        void InputSystem_Actions.IPlayerActions.OnInteract(InputAction.CallbackContext ctx) { }
-        void InputSystem_Actions.IPlayerActions.OnCrouch(InputAction.CallbackContext ctx) { }
-        void InputSystem_Actions.IPlayerActions.OnJump(InputAction.CallbackContext ctx) { }
-        void InputSystem_Actions.IPlayerActions.OnPrevious(InputAction.CallbackContext ctx) { }
-        void InputSystem_Actions.IPlayerActions.OnNext(InputAction.CallbackContext ctx) { }
-        void InputSystem_Actions.IPlayerActions.OnSprint(InputAction.CallbackContext ctx) { }
     }
 }
