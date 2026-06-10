@@ -26,7 +26,7 @@ namespace BeatHero.UI
         private BattleStateMachine _battle;
         private Conductor _conductor;
 
-        private void Start()
+        private void Awake()
         {
             var player = Object.FindAnyObjectByType<PlayerController>();
             if (player != null) BindPlayer(player);
@@ -36,7 +36,10 @@ namespace BeatHero.UI
 
             var conductor = Object.FindAnyObjectByType<Conductor>();
             if (conductor != null) BindConductor(conductor);
+        }
 
+        private void Start()
+        {
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.OnFloorChanged += UpdateFloor;

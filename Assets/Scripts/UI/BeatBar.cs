@@ -55,14 +55,17 @@ namespace BeatHero.UI
         {
             ReturnAllMarkers();
 
-            float secPerBeat     = 60f / bpm;
-            float measureDuration = secPerBeat * 4f;
+            float secPerBeat = 60f / bpm;
 
             float dist = (_rightSpawn != null && _cursor != null)
                 ? Mathf.Abs(_rightSpawn.position.x - _cursor.position.x)
                 : 500f;
 
-            _markerSpeed   = dist / measureDuration;
+            // BPM 계산이 아닌 실제 DSP 잔여시간으로 마커 속도 결정 — dspTime 오프셋 오차 방지
+            float leadTime = (float)(dspStartTime - AudioSettings.dspTime);
+            if (leadTime <= 0f) leadTime = secPerBeat * 4f;
+
+            _markerSpeed   = dist / leadTime;
             _spawnInterval = secPerBeat;
             _spawnTimer    = 0f;
             _isRunning     = true;
