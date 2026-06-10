@@ -31,6 +31,7 @@ namespace BeatHero.Combat
         [SerializeField] private PlayerController _player;
         [SerializeField] private PlayerConfig     _playerConfig;
 
+        public event System.Action<MonsterData> OnBattleStarted;
         public event System.Action<int, int> OnMonsterHpChanged; // (current, max)
 
         private MonsterData     _monster;
@@ -83,6 +84,7 @@ namespace BeatHero.Combat
         {
             _monster   = monster;
             _monsterHp = monster.maxHp;
+            OnBattleStarted?.Invoke(_monster);
             OnMonsterHpChanged?.Invoke(_monsterHp, _monster.maxHp);
             _hazards.Clear();
             _grid.Initialize(monster.gridType);
