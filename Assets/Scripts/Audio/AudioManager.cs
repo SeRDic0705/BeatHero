@@ -29,8 +29,8 @@ namespace BeatHero.Audio
         {
             if (Instance != null) { Destroy(gameObject); return; }
             Instance = this;
+            transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
-            ApplySavedVolumes();
 
             _scheduledSfxSources = new AudioSource[2];
             for (int i = 0; i < 2; i++)
@@ -41,6 +41,8 @@ namespace BeatHero.Audio
                 _scheduledSfxSources[i] = src;
             }
         }
+
+        private void Start() => ApplySavedVolumes();
 
         public void PlaySFX(AudioClip clip)
         {

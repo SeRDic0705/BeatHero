@@ -28,6 +28,7 @@ namespace BeatHero.Core
                 return;
             }
             Instance = this;
+            transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
         }
 
@@ -50,7 +51,11 @@ namespace BeatHero.Core
         {
             if (_battle == null || _floorData == null) return;
             var monster = _floorData.GetMonster(CurrentFloor);
-            if (monster != null) _battle.StartBattle(monster);
+            if (monster == null) return;
+
+            // 1) 층 데이터 세팅·로드 → 2) 층 시작(클럭 가동)
+            _battle.SetFloorData(monster);
+            _battle.StartFloor();
         }
 
         public void ApplyDamage(int amount)

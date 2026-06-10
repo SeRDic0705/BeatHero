@@ -54,12 +54,12 @@ namespace BeatHero.Combat
         private Vector2 _pendingMove;
         private bool    _hasPendingMove;
 
-        // 비트 전 선행 입력 버퍼 + 소진 플래그
-        private float   _lastMoveTime          = -1f;
+        // 비트 전 선행 입력 버퍼 + 소진 플래그 (타임스탬프는 DSP 기준 — Time.time 미사용)
+        private double  _lastMoveTime          = -1.0;
         private Vector2 _lastMoveDir;
-        private float   _lastAttackPressTime   = -1f;
-        private float   _lastAttackReleaseTime = -1f;
-        private float   _tapGraceEndTime      = -1f;
+        private double  _lastAttackPressTime   = -1.0;
+        private double  _lastAttackReleaseTime = -1.0;
+        private double  _tapGraceEndTime       = -1.0;
         private bool    _attackKeyDown;      // 공격 키가 물리적으로 눌린 상태
         private bool    _beatInputConsumed;  // true면 이번 비트 추가 입력 무시
 
@@ -81,7 +81,8 @@ namespace BeatHero.Combat
             _player.OnDeath         -= OnPlayerDeath;
         }
 
-        public void StartBattle(MonsterData monster)
+        // 1단계: 현재 층에 등장할 몬스터·bpm·bgm·패턴을 미리 세팅/로드. 클럭은 아직 시작 안 함.
+        public void SetFloorData(MonsterData monster)
         {
             StopAllCoroutines();
             _phraseRunning = false;
@@ -94,10 +95,18 @@ namespace BeatHero.Combat
             _player.Initialize(_playerConfig.maxHp);
 
             _phase = monster.GetCurrentPhase(1f);
-            _conductor.StartSong(_phase.bgm, _phase.bpm);
+            _conductor.PrepareSong(_phase.bgm, _phase.bpm);
             SelectRandomPattern();
-            _state = State.CallPhase;
             _player.transform.position = _grid.GetTileWorldPosition(_grid.PlayerPosition);
+            _state = State.Idle;
+        }
+
+        // 2단계: 층 시작. Conductor가 dspTime을 시작시간으로 저장하고 1마디 뒤 beat0에서
+        // BGM 재생과 CallPhase(OnBeat→HandlePhrasePair)가 동시에 시작된다.
+        public void StartFloor()
+        {
+            _conductor.StartFloor();
+            _state = State.CallPhase;
         }
 
         private void OnBeat(int beatIndex)
@@ -165,9 +174,9 @@ namespace BeatHero.Combat
 
                 _grid.ShowShape(bu.gridEffectShape);
 
-                float beatTime     = Time.time;
-                float preJudgStart = beatTime - _judgmentWindowSec;
-                float preFailStart = preJudgStart - _failZoneSec;
+                double beatTime     = noteStartDsp;
+                double preJudgStart = beatTime - _judgmentWindowSec;
+                double preFailStart = preJudgStart - _failZoneSec;
 
                 if (_attackHeld && !_attackKeyDown)
                 {
@@ -196,20 +205,23 @@ namespace BeatHero.Combat
                     else FireAttack();
                 }
 
-                _lastMoveTime        = -1f;
-                _lastAttackPressTime = -1f;
+                _lastMoveTime        = -1.0;
+                _lastAttackPressTime = -1.0;
 
                 _tileWasDangerAtWindowOpen = _grid.GetDangerAt(_grid.PlayerPosition) != null;
                 _inputWindowOpen = true;
 
-                yield return new WaitForSeconds(_judgmentWindowSec);
+                // 판정 윈도우 닫힘 = 비트 + 판정구간 반폭 (DSP 절대시각 기준)
+                double windowCloseDsp = noteStartDsp + _judgmentWindowSec;
+                if (AudioSettings.dspTime < windowCloseDsp)
+                    yield return new WaitUntil(() => AudioSettings.dspTime >= windowCloseDsp);
                 _inputWindowOpen   = false;
                 _beatInputConsumed = false;
 
                 if (_attackHeld && !_attackKeyDown)
                     FireAttack();
                 else if (!continuingCharge && _attackHeld && _attackKeyDown)
-                    _tapGraceEndTime = Time.time + _tapGraceSec;
+                    _tapGraceEndTime = AudioSettings.dspTime + _tapGraceSec;
                 else if (continuingCharge && _attackHeld && _attackKeyDown)
                 {
                     _player.SpendMana(1);
@@ -356,7 +368,7 @@ namespace BeatHero.Combat
 
             // 버퍼는 항상 최신 입력으로 갱신 — 비트 타이밍 판정은 HandleResponseBeat에서
             _lastMoveDir  = dir;
-            _lastMoveTime = Time.time;
+            _lastMoveTime = AudioSettings.dspTime;
 
             // 윈도우가 열린 구간에서만 첫 입력 처리 후 슬롯 소진
             if (!_inputWindowOpen) return;
@@ -372,7 +384,7 @@ namespace BeatHero.Combat
             if (_state != State.ResponsePhase) return;
 
             // 버퍼는 항상 최신 입력으로 갱신
-            _lastAttackPressTime = Time.time;
+            _lastAttackPressTime = AudioSettings.dspTime;
 
             // 윈도우가 열린 구간에서만 첫 입력 처리 후 슬롯 소진
             if (!_inputWindowOpen) return;
@@ -386,7 +398,7 @@ namespace BeatHero.Combat
             _attackKeyDown = false;
             if (!_attackHeld) return;
 
-            _lastAttackReleaseTime = Time.time;
+            _lastAttackReleaseTime = AudioSettings.dspTime;
 
             if (_state != State.ResponsePhase)
             {
