@@ -34,6 +34,7 @@ namespace BeatHero.Combat
         public event System.Action<MonsterData> OnBattleStarted;
         public event System.Action<int, int> OnMonsterHpChanged; // (current, max)
 
+        public MonsterData CurrentMonster => _monster;
         private MonsterData     _monster;
         private CombatPhaseData _phase;
         private int             _monsterHp;

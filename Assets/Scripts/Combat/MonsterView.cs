@@ -16,13 +16,18 @@ namespace BeatHero.Combat
         {
             _renderer = GetComponent<SpriteRenderer>();
             _animator = GetComponent<Animator>();
+
+            // Awake에서 구독: GameManager.Start()가 StartBattle을 호출하기 전에 등록 보장
+            _battle = Object.FindAnyObjectByType<BattleStateMachine>();
+            if (_battle != null)
+                _battle.OnBattleStarted += SetMonster;
         }
 
         private void Start()
         {
-            _battle = Object.FindAnyObjectByType<BattleStateMachine>();
-            if (_battle != null)
-                _battle.OnBattleStarted += SetMonster;
+            // Awake 시점에 이미 StartBattle이 호출된 경우 대비 (스크립트 실행 순서가 다를 때)
+            if (_battle != null && _battle.CurrentMonster != null)
+                SetMonster(_battle.CurrentMonster);
         }
 
         private void OnDestroy()
