@@ -1,19 +1,22 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace BeatHero.Core
 {
-    // Title↔Game 씬 전환 + 페이드 연출
     public class SceneLoader : MonoBehaviour
     {
         public static SceneLoader Instance { get; private set; }
 
-        private const string SCENE_TITLE = "TitleScene";
-        private const string SCENE_GAME  = "GameScene";
-        private const float FADE_DURATION = 0.4f;
+        private const string SCENE_TITLE   = "TitleScene";
+        private const string SCENE_GAME    = "GameScene";
+        private const float  WIPE_DURATION = 0.5f;
 
-        [SerializeField] private CanvasGroup _fadeCanvas;
+        [SerializeField] private Image _wipeImage;
+
+        private Material _wipeMat;
 
         private void Awake()
         {
@@ -24,31 +27,55 @@ namespace BeatHero.Core
             }
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
+            if (_wipeImage != null)
+            {
+                _wipeMat = new Material(_wipeImage.material);
+                _wipeImage.material = _wipeMat;
+                _wipeImage.gameObject.SetActive(false);
+            }
         }
 
-        public void LoadGame() => StartCoroutine(LoadWithFade(SCENE_GAME));
-        public void LoadTitle() => StartCoroutine(LoadWithFade(SCENE_TITLE));
+        public void LoadGame()  => StartCoroutine(LoadWithWipe(SCENE_GAME));
+        public void LoadTitle() => StartCoroutine(LoadWithWipe(SCENE_TITLE));
 
-        private IEnumerator LoadWithFade(string sceneName)
+        // 씬 이동 없는 와이프 전환 — 층 클리어·게임 오버 등에서 사용
+        public IEnumerator DoTransition(Action onMidpoint)
         {
-            yield return Fade(0f, 1f);
+            yield return StartCoroutine(AnimateWipe(1f, 0f));
+            onMidpoint?.Invoke();
+            yield return StartCoroutine(AnimateWipe(0f, 1f));
+        }
+
+        private IEnumerator LoadWithWipe(string sceneName)
+        {
+            yield return StartCoroutine(AnimateWipe(1f, 0f));
             yield return SceneManager.LoadSceneAsync(sceneName);
-            yield return Fade(1f, 0f);
+            yield return StartCoroutine(AnimateWipe(0f, 1f));
         }
 
-        private IEnumerator Fade(float from, float to)
+        private IEnumerator AnimateWipe(float fromRadius, float toRadius)
         {
-            if (_fadeCanvas == null) yield break;
-            _fadeCanvas.gameObject.SetActive(true);
+            if (_wipeImage == null) yield break;
+
+            _wipeImage.gameObject.SetActive(true);
+            SetRadius(fromRadius);
+
             float t = 0f;
-            while (t < FADE_DURATION)
+            while (t < WIPE_DURATION)
             {
                 t += Time.unscaledDeltaTime;
-                _fadeCanvas.alpha = Mathf.Lerp(from, to, t / FADE_DURATION);
+                SetRadius(Mathf.Lerp(fromRadius, toRadius, Mathf.Clamp01(t / WIPE_DURATION)));
                 yield return null;
             }
-            _fadeCanvas.alpha = to;
-            if (to <= 0f) _fadeCanvas.gameObject.SetActive(false);
+
+            SetRadius(toRadius);
+            if (toRadius >= 1f) _wipeImage.gameObject.SetActive(false);
+        }
+
+        private void SetRadius(float r)
+        {
+            if (_wipeMat != null) _wipeMat.SetFloat("_Radius", r);
         }
     }
 }
