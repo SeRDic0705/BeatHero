@@ -14,8 +14,14 @@ namespace BeatHero.Core
 
         public event Action<int> OnBeat;
         public event Action<double, int> OnSongScheduled; // (dspSongStartTime, bpm)
+        public event Action OnPaused;
+        public event Action<double> OnResumed; // (pausedDurationSec)
+
+        // 마커 어프로치 리드타임 = 1마디(4박). secPerBeat*BEATS_PER_MEASURE = 240/BPM 초.
+        private const int BEATS_PER_MEASURE = 4;
 
         private AudioSource _audioSource;
+        private double _floorStartDsp;
         private double _dspSongStartTime;
         private double _firstBeatOffsetSec;
         private double _songPositionSec;
@@ -60,19 +66,30 @@ namespace BeatHero.Core
             }
         }
 
-        public void StartSong(AudioClip bgm, int bpm, double firstBeatOffsetSec = 0.0)
+        // 1단계: 층 데이터 세팅 — clip/bpm 준비 + 오디오 데이터 프리로드(예약 재생 레이턴시 제거). 클럭 미시작.
+        public void PrepareSong(AudioClip bgm, int bpm, double firstBeatOffsetSec = 0.0)
         {
             _bpm = bpm;
             _secPerBeat = 60.0 / bpm;
             _firstBeatOffsetSec = firstBeatOffsetSec;
             _lastFiredBeat = -1;
             _switchPending = false;
+            _isPlaying = false;
+            _isPaused = false;
 
-            // 마커 어프로치 리드타임 = 1마디 (BeatBar 첫 마커가 커서 도달 순간 BGM 시작)
-            double measureDuration = _secPerBeat * 4.0;
-            _dspSongStartTime = AudioSettings.dspTime + measureDuration;
             _audioSource.clip = bgm;
             _audioSource.loop = true;
+            if (bgm != null && bgm.loadState != AudioDataLoadState.Loaded)
+                bgm.LoadAudioData();
+        }
+
+        // 2단계: 층 시작 — 현재 dspTime을 시작시간으로 저장. 1마디(리드) 뒤에 BGM 시작 = beat0 = CallPhase 시작.
+        public void StartFloor()
+        {
+            _floorStartDsp = AudioSettings.dspTime;
+            double leadSec = _secPerBeat * BEATS_PER_MEASURE; // 240/BPM
+            _dspSongStartTime = _floorStartDsp + leadSec;
+            _lastFiredBeat = -1;
             _audioSource.PlayScheduled(_dspSongStartTime);
             _isPlaying = true;
             OnSongScheduled?.Invoke(_dspSongStartTime, _bpm);
@@ -92,15 +109,18 @@ namespace BeatHero.Core
             _pauseDspTime = AudioSettings.dspTime;
             _audioSource.Pause();
             _isPaused = true;
+            OnPaused?.Invoke();
         }
 
         public void Resume()
         {
             if (!_isPlaying || !_isPaused) return;
             double pausedDuration = AudioSettings.dspTime - _pauseDspTime;
-            _dspSongStartTime += pausedDuration;
+            _floorStartDsp     += pausedDuration;
+            _dspSongStartTime  += pausedDuration;
             _audioSource.UnPause();
             _isPaused = false;
+            OnResumed?.Invoke(pausedDuration);
         }
 
         // 보스 페이즈 전환: 다음 마디 경계(4박 배수)에서 BGM/BPM 교체

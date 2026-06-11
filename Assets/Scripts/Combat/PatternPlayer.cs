@@ -6,7 +6,7 @@ namespace BeatHero.Combat
     // 런타임 패턴 재생 인덱스 관리. PatternData SO는 읽기 전용으로만 사용.
     public class PatternPlayer : MonoBehaviour
     {
-        private const int UNITS_PER_BEAT  = 12;
+        public const int UNITS_PER_BEAT  = 12;
         private const int TOTAL_UNITS     = 48; // 4박
 
         private PatternData _pattern;

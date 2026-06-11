@@ -33,6 +33,7 @@ namespace BeatHero.Combat
 
         public event System.Action<MonsterData> OnBattleStarted;
         public event System.Action<int, int> OnMonsterHpChanged; // (current, max)
+        public event System.Action OnBeatUnitFired;
 
         public MonsterData CurrentMonster => _monster;
         private MonsterData     _monster;
@@ -43,7 +44,7 @@ namespace BeatHero.Combat
 
         private enum State { Idle, CallPhase, ResponsePhase, BattleEnd }
         private State _state = State.Idle;
-        private int   _beatInPhase;
+        private bool  _phraseRunning;
 
         // 입력 윈도우
         private bool    _inputWindowOpen;
@@ -54,12 +55,12 @@ namespace BeatHero.Combat
         private Vector2 _pendingMove;
         private bool    _hasPendingMove;
 
-        // 비트 전 선행 입력 버퍼 + 소진 플래그
-        private float   _lastMoveTime          = -1f;
+        // 비트 전 선행 입력 버퍼 + 소진 플래그 (타임스탬프는 DSP 기준 — Time.time 미사용)
+        private double  _lastMoveTime          = -1.0;
         private Vector2 _lastMoveDir;
-        private float   _lastAttackPressTime   = -1f;
-        private float   _lastAttackReleaseTime = -1f;
-        private float   _tapGraceEndTime      = -1f;
+        private double  _lastAttackPressTime   = -1.0;
+        private double  _lastAttackReleaseTime = -1.0;
+        private double  _tapGraceEndTime       = -1.0;
         private bool    _attackKeyDown;      // 공격 키가 물리적으로 눌린 상태
         private bool    _beatInputConsumed;  // true면 이번 비트 추가 입력 무시
 
@@ -81,8 +82,11 @@ namespace BeatHero.Combat
             _player.OnDeath         -= OnPlayerDeath;
         }
 
-        public void StartBattle(MonsterData monster)
+        // 1단계: 현재 층에 등장할 몬스터·bpm·bgm·패턴을 미리 세팅/로드. 클럭은 아직 시작 안 함.
+        public void SetFloorData(MonsterData monster)
         {
+            StopAllCoroutines();
+            _phraseRunning = false;
             _monster   = monster;
             _monsterHp = monster.maxHp;
             OnBattleStarted?.Invoke(_monster);
@@ -92,128 +96,158 @@ namespace BeatHero.Combat
             _player.Initialize(_playerConfig.maxHp);
 
             _phase = monster.GetCurrentPhase(1f);
-            _conductor.StartSong(_phase.bgm, _phase.bpm);
+            _conductor.PrepareSong(_phase.bgm, _phase.bpm);
+            // 콜 효과음 프리로드 — 미로드 시 첫 PlayScheduled에서 로딩 지연으로 첫 박이 밀린다.
+            if (_callBeatSfx != null && _callBeatSfx.loadState != AudioDataLoadState.Loaded)
+                _callBeatSfx.LoadAudioData();
             SelectRandomPattern();
-            _state = State.CallPhase;
-            _beatInPhase = 0;
             _player.transform.position = _grid.GetTileWorldPosition(_grid.PlayerPosition);
+            _state = State.Idle;
+        }
+
+        // 2단계: 층 시작. Conductor가 dspTime을 시작시간으로 저장하고 1마디 뒤 beat0에서
+        // BGM 재생과 CallPhase(OnBeat→HandlePhrasePair)가 동시에 시작된다.
+        public void StartFloor()
+        {
+            _conductor.StartFloor();
+            _state = State.CallPhase;
         }
 
         private void OnBeat(int beatIndex)
         {
+            // 프레이즈 시작 비트에만 반응 — 서브비트 처리는 코루틴 내부에서
+            if (_state == State.CallPhase && !_phraseRunning)
+                StartCoroutine(HandlePhrasePair(_conductor.GetBeatDspTime(beatIndex)));
+        }
+
+        // ── 프레이즈 사이클 ─────────────────────────────────────
+        private IEnumerator HandlePhrasePair(double phraseStartDsp)
+        {
+            _phraseRunning = true;
+            double phraseDurationSec = _conductor.SecPerBeat * BEATS_PER_PHASE;
+
+            yield return StartCoroutine(HandleCallPhrase(phraseStartDsp));
+
+            _state = State.ResponsePhase;
+            double responseDsp = phraseStartDsp + phraseDurationSec;
+            yield return StartCoroutine(HandleResponsePhrase(responseDsp));
+
+            TransitionToNextPattern();
+            _phraseRunning = false;
+
             if (_state == State.CallPhase)
-                HandleCallBeat();
-            else if (_state == State.ResponsePhase)
-                StartCoroutine(HandleResponseBeat());
+                StartCoroutine(HandlePhrasePair(responseDsp + phraseDurationSec));
         }
 
         // ── CallPhase ──────────────────────────────────────────
-        private void HandleCallBeat()
+        private IEnumerator HandleCallPhrase(double phraseStartDsp)
         {
             _grid.SetResponsePhase(false);
-            var bu = _patternPlayer.GetUnitAtPosition(PatternPlayer.BeatToUnitPosition(_beatInPhase));
-            _grid.ShowShape(bu?.gridEffectShape);
-            AudioManager.Instance?.PlaySFX(_callBeatSfx);
+            double secPerUnit = _conductor.SecPerBeat / PatternPlayer.UNITS_PER_BEAT;
+            int unitOffset = 0;
 
-            _beatInPhase++;
-            if (_beatInPhase >= BEATS_PER_PHASE)
+            foreach (var bu in _patternPlayer.CurrentPattern.beatUnits)
             {
-                _state = State.ResponsePhase;
-                _beatInPhase = 0;
+                double noteStartDsp = phraseStartDsp + secPerUnit * unitOffset;
+
+                // WaitUntil 전에 SFX 예약 — 리드타임 최대화로 DSP 정확도 확보
+                AudioManager.Instance?.PlaySFXScheduled(_callBeatSfx, noteStartDsp);
+
+                // 이미 지난 시점이면 동일 프레임 즉시 실행, 아직 안 됐을 때만 대기
+                if (AudioSettings.dspTime < noteStartDsp)
+                    yield return new WaitUntil(() => AudioSettings.dspTime >= noteStartDsp);
+
+                OnBeatUnitFired?.Invoke();
+                _grid.ShowShape(bu.gridEffectShape);
+
+                unitOffset += (int)bu.noteLength;
             }
         }
 
         // ── ResponsePhase ──────────────────────────────────────
-        private IEnumerator HandleResponseBeat()
+        private IEnumerator HandleResponsePhrase(double phraseStartDsp)
         {
-            // CallPhase와 동일 패턴을 비트 타이밍에 재표시
             _grid.SetResponsePhase(true);
-            var bu = _patternPlayer.GetUnitAtPosition(PatternPlayer.BeatToUnitPosition(_beatInPhase));
-            _grid.ShowShape(bu?.gridEffectShape);
+            double secPerUnit = _conductor.SecPerBeat / PatternPlayer.UNITS_PER_BEAT;
+            int unitOffset = 0;
 
-            float beatTime      = Time.time;
-            float preJudgStart  = beatTime - _judgmentWindowSec;
-            float preFailStart  = preJudgStart - _failZoneSec;
-
-            // 선행 릴리즈 처리: 윈도우 밖에서 뗀 상태로 비트가 도달한 경우
-            // (_attackHeld=true이면서 키가 이미 올라와 있음 = OnAttackReleased가 defer한 것)
-            if (_attackHeld && !_attackKeyDown)
+            foreach (var bu in _patternPlayer.CurrentPattern.beatUnits)
             {
-                bool inPreBuffer = _lastAttackReleaseTime >= preJudgStart;
-                bool inTapGrace  = _tapGraceEndTime > 0f && _lastAttackReleaseTime <= _tapGraceEndTime;
-                if (inPreBuffer || inTapGrace)
-                    FireAttack(); // 사전버퍼 또는 탭유예 내 릴리즈 → 공격 발동
-                else
-                    CancelCharge(); // 유효구간 밖 릴리즈 → 취소
-                _lastAttackReleaseTime = -1f;
-                _tapGraceEndTime       = -1f;
+                double noteStartDsp = phraseStartDsp + secPerUnit * unitOffset;
+                if (AudioSettings.dspTime < noteStartDsp)
+                    yield return new WaitUntil(() => AudioSettings.dspTime >= noteStartDsp);
+
+                OnBeatUnitFired?.Invoke();
+                _grid.ShowShape(bu.gridEffectShape);
+
+                double beatTime     = noteStartDsp;
+                double preJudgStart = beatTime - _judgmentWindowSec;
+                double preFailStart = preJudgStart - _failZoneSec;
+
+                if (_attackHeld && !_attackKeyDown)
+                {
+                    bool inPreBuffer = _lastAttackReleaseTime >= preJudgStart;
+                    bool inTapGrace  = _tapGraceEndTime > 0f && _lastAttackReleaseTime <= _tapGraceEndTime;
+                    if (inPreBuffer || inTapGrace) FireAttack();
+                    else CancelCharge();
+                    _lastAttackReleaseTime = -1f;
+                    _tapGraceEndTime       = -1f;
+                }
+
+                bool preMoveJudge   = _lastMoveTime >= preJudgStart;
+                bool preMovesFail   = !preMoveJudge && _lastMoveTime >= preFailStart;
+                bool preAttackJudge = _lastAttackPressTime >= preJudgStart;
+                bool preAttackFail  = !preAttackJudge && _lastAttackPressTime >= preFailStart;
+
+                bool continuingCharge = _attackHeld;
+
+                _beatInputConsumed = preMoveJudge || preMovesFail || preAttackJudge || preAttackFail;
+                _hasPendingMove    = preMoveJudge;
+                _pendingMove       = preMoveJudge ? _lastMoveDir : Vector2.zero;
+
+                if (preAttackJudge)
+                {
+                    if (_attackKeyDown) _attackHeld = true;
+                    else FireAttack();
+                }
+
+                _lastMoveTime        = -1.0;
+                _lastAttackPressTime = -1.0;
+
+                _tileWasDangerAtWindowOpen = _grid.GetDangerAt(_grid.PlayerPosition) != null;
+                _inputWindowOpen = true;
+
+                // 판정 윈도우 닫힘 = 비트 + 판정구간 반폭 (DSP 절대시각 기준)
+                double windowCloseDsp = noteStartDsp + _judgmentWindowSec;
+                if (AudioSettings.dspTime < windowCloseDsp)
+                    yield return new WaitUntil(() => AudioSettings.dspTime >= windowCloseDsp);
+                _inputWindowOpen   = false;
+                _beatInputConsumed = false;
+
+                if (_attackHeld && !_attackKeyDown)
+                    FireAttack();
+                else if (!continuingCharge && _attackHeld && _attackKeyDown)
+                    _tapGraceEndTime = AudioSettings.dspTime + _tapGraceSec;
+                else if (continuingCharge && _attackHeld && _attackKeyDown)
+                {
+                    _player.SpendMana(1);
+                    _chargeDamageMultiplier += CHARGE_MULT_PER_BEAT;
+                    _chargeBeats++;
+                    _tapGraceEndTime = -1f;
+                }
+
+                if (_hasPendingMove) ProcessMovement(_pendingMove);
+                JudgeTile();
+                _grid.SetHazards(_hazards);
+
+                unitOffset += (int)bu.noteLength;
             }
 
-            // 선행 입력 분류 (이동)
-            bool preMoveJudge = _lastMoveTime >= preJudgStart;
-            bool preMovesFail = !preMoveJudge && _lastMoveTime >= preFailStart;
-            // 선행 입력 분류 (공격 프레스)
-            bool preAttackJudge = _lastAttackPressTime >= preJudgStart;
-            bool preAttackFail  = !preAttackJudge && _lastAttackPressTime >= preFailStart;
-
-            bool continuingCharge = _attackHeld; // 이전 비트부터 홀드 중 (선행 릴리즈 처리 후 스냅샷)
-
-            // 판정 / 실패구간 선행 입력 → 슬롯 소진 처리
-            // continuingCharge는 제외: 차지 중에도 이동으로 차지 취소 가능해야 함
-            _beatInputConsumed = preMoveJudge || preMovesFail
-                               || preAttackJudge || preAttackFail;
-
-            _hasPendingMove = preMoveJudge;
-            _pendingMove    = preMoveJudge ? _lastMoveDir : Vector2.zero;
-
-            // 선행 공격 판정: 키가 아직 눌린 상태면 차지 시작, 이미 뗐으면 탭 발사
-            if (preAttackJudge)
-            {
-                if (_attackKeyDown)
-                    _attackHeld = true;
-                else
-                    FireAttack(); // 비트 전 탭 공격 → 즉시 발사
-            }
-
-            // 버퍼 소진
-            _lastMoveTime        = -1f;
-            _lastAttackPressTime = -1f;
-
-            _tileWasDangerAtWindowOpen = _grid.GetDangerAt(_grid.PlayerPosition) != null;
-            _inputWindowOpen = true;
-
-            yield return new WaitForSeconds(_judgmentWindowSec);
-            _inputWindowOpen   = false;
-            _beatInputConsumed = false; // 다음 비트를 위해 초기화
-
-            // 윈도우 종료 시 공격 처리 — 이동과 동일한 타이밍으로 발동
-            if (_attackHeld && !_attackKeyDown)
-            {
-                FireAttack(); // 탭 or 차지 릴리즈: 윈도우 안에서 뗀 경우
-            }
-            else if (!continuingCharge && _attackHeld && _attackKeyDown)
-            {
-                // 새 프레스, 아직 홀드 중 → 탭 유예 시작 (느린 탭과 차지 의도 구분 유예)
-                _tapGraceEndTime = Time.time + _tapGraceSec;
-            }
-            else if (continuingCharge && _attackHeld && _attackKeyDown)
-            {
-                // 차지 유지: 윈도우 종료까지 홀드 = 차지 의도 확정, 마나 후납
-                _player.SpendMana(1);
-                _chargeDamageMultiplier += CHARGE_MULT_PER_BEAT;
-                _chargeBeats++;
-                _tapGraceEndTime = -1f;
-            }
-
-            if (_hasPendingMove) ProcessMovement(_pendingMove);
-
-            JudgeTile();
+            // 장애물 틱은 프레이즈 단위 — 음표 수와 무관
             TickHazards();
             _grid.SetHazards(_hazards);
-
-            _beatInPhase++;
-            if (_beatInPhase >= BEATS_PER_PHASE)
-                TransitionToNextPattern();
+            // 마지막 그리드는 다음 페이즈 첫 ShowShape가 덮을 때까지 유지(깜빡임 방지).
+            // 전투 종료 시점의 정리는 EndBattle에서 처리.
         }
 
         private void ProcessMovement(Vector2 raw)
@@ -304,13 +338,14 @@ namespace BeatHero.Combat
 
             SelectRandomPattern();
             _state = State.CallPhase;
-            _beatInPhase = 0;
         }
 
         private void EndBattle(bool cleared)
         {
             _state = State.BattleEnd;
             _conductor.Stop();
+            // 전투 종료 — 유지되던 마지막 위험 그리드를 비운다(다음 층 미존재 시에도 잔상 방지).
+            _grid.ClearShape();
             if (cleared)
             {
                 _player.ResetMana();
@@ -342,7 +377,7 @@ namespace BeatHero.Combat
 
             // 버퍼는 항상 최신 입력으로 갱신 — 비트 타이밍 판정은 HandleResponseBeat에서
             _lastMoveDir  = dir;
-            _lastMoveTime = Time.time;
+            _lastMoveTime = AudioSettings.dspTime;
 
             // 윈도우가 열린 구간에서만 첫 입력 처리 후 슬롯 소진
             if (!_inputWindowOpen) return;
@@ -358,7 +393,7 @@ namespace BeatHero.Combat
             if (_state != State.ResponsePhase) return;
 
             // 버퍼는 항상 최신 입력으로 갱신
-            _lastAttackPressTime = Time.time;
+            _lastAttackPressTime = AudioSettings.dspTime;
 
             // 윈도우가 열린 구간에서만 첫 입력 처리 후 슬롯 소진
             if (!_inputWindowOpen) return;
@@ -372,7 +407,7 @@ namespace BeatHero.Combat
             _attackKeyDown = false;
             if (!_attackHeld) return;
 
-            _lastAttackReleaseTime = Time.time;
+            _lastAttackReleaseTime = AudioSettings.dspTime;
 
             if (_state != State.ResponsePhase)
             {

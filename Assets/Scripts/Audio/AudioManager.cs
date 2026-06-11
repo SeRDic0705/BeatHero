@@ -1,3 +1,4 @@
+using System.Collections;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -21,11 +22,34 @@ namespace BeatHero.Audio
         private const string PREF_BGM    = "BGMVolume";
         private const string PREF_SFX    = "SFXVolume";
 
+        // DSP 예약용 AudioSource 2개 (교대로 사용해 짧은 음표 간격 폴리포니 대응)
+        private AudioSource[] _scheduledSfxSources;
+        private int           _scheduledSfxIndex;
+
         private void Awake()
         {
             if (Instance != null) { Destroy(gameObject); return; }
             Instance = this;
+            transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
+
+            _scheduledSfxSources = new AudioSource[2];
+            for (int i = 0; i < 2; i++)
+            {
+                var src = gameObject.AddComponent<AudioSource>();
+                src.outputAudioMixerGroup = _sfxGroup;
+                src.playOnAwake = false;
+                _scheduledSfxSources[i] = src;
+            }
+        }
+
+        // AudioMixer 노출 파라미터는 믹서 초기화 다음 프레임부터 접근 가능 —
+        // Start에서 바로 SetFloat하면 "Exposed name does not exist"로 실패한다.
+        private void Start() => StartCoroutine(ApplyVolumesNextFrame());
+
+        private IEnumerator ApplyVolumesNextFrame()
+        {
+            yield return null; // 믹서 초기화 대기(1프레임)
             ApplySavedVolumes();
         }
 
@@ -33,6 +57,16 @@ namespace BeatHero.Audio
         {
             if (clip == null || _sfxSource == null) return;
             _sfxSource.PlayOneShot(clip);
+        }
+
+        // DSP 정확 타이밍으로 SFX 예약 — BGM PlayScheduled와 동일한 오디오 클럭 기준
+        public void PlaySFXScheduled(AudioClip clip, double dspTime)
+        {
+            if (clip == null) return;
+            var src = _scheduledSfxSources[_scheduledSfxIndex & 1];
+            _scheduledSfxIndex++;
+            src.clip = clip;
+            src.PlayScheduled(dspTime);
         }
 
         public void SetMasterVolume(float normalized)
