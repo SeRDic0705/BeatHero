@@ -23,3 +23,4 @@ MonoBehaviour:
     SerializationNodes: []
   floors:
   - {fileID: 11400000, guid: 32ad7af68f6356f418e315b9eb4475e7, type: 2}
+  - {fileID: 11400000, guid: 32ad7af68f6356f418e315b9eb4475e7, type: 2}

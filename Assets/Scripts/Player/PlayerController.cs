@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 namespace BeatHero.Player
@@ -67,6 +68,38 @@ namespace BeatHero.Player
         {
             Mana = 0;
             OnManaChanged?.Invoke(Mana);
+        }
+
+        public IEnumerator RushTo(Vector3 target, float duration)
+        {
+            Vector3 start = transform.position;
+            for (float t = 0f; t < duration; t += Time.deltaTime)
+            {
+                transform.position = Vector3.Lerp(start, target, t / duration);
+                yield return null;
+            }
+            transform.position = target;
+        }
+
+        public IEnumerator ExitRight(float duration)
+        {
+            Vector3 start = transform.position;
+            Vector3 target = ScreenEdgeWorld(1.3f, start);
+            yield return StartCoroutine(RushTo(target, duration));
+        }
+
+        public IEnumerator EnterFromLeft(Vector3 target, float duration)
+        {
+            transform.position = ScreenEdgeWorld(-0.3f, target);
+            yield return StartCoroutine(RushTo(target, duration));
+        }
+
+        private static Vector3 ScreenEdgeWorld(float viewportX, Vector3 reference)
+        {
+            if (Camera.main == null) return reference;
+            float depth = Mathf.Abs(Camera.main.transform.position.z - reference.z);
+            Vector3 edge = Camera.main.ViewportToWorldPoint(new Vector3(viewportX, 0.5f, depth));
+            return new Vector3(edge.x, reference.y, reference.z);
         }
     }
 }

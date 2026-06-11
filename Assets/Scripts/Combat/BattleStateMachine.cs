@@ -27,7 +27,7 @@ namespace BeatHero.Combat
         [SerializeField] private Conductor        _conductor;
         [SerializeField] private GridManager      _grid;
         [SerializeField] private PatternPlayer    _patternPlayer;
-        [SerializeField] private InputReader      _input;
+        private InputReader _input => InputReader.Instance;
         [SerializeField] private PlayerController _player;
         [SerializeField] private PlayerConfig     _playerConfig;
 
@@ -67,20 +67,27 @@ namespace BeatHero.Combat
 
         private void Awake()
         {
-            _conductor.OnBeat    += OnBeat;
-            _input.OnMoveInput   += OnMoveInput;
+            _conductor.OnBeat += OnBeat;
+            _player.OnDeath   += OnPlayerDeath;
+        }
+
+        private void Start()
+        {
+            _input.OnMoveInput      += OnMoveInput;
             _input.OnAttackPressed  += OnAttackPressed;
             _input.OnAttackReleased += OnAttackReleased;
-            _player.OnDeath      += OnPlayerDeath;
         }
 
         private void OnDestroy()
         {
             _conductor.OnBeat       -= OnBeat;
-            _input.OnMoveInput      -= OnMoveInput;
-            _input.OnAttackPressed  -= OnAttackPressed;
-            _input.OnAttackReleased -= OnAttackReleased;
             _player.OnDeath         -= OnPlayerDeath;
+            if (_input != null)
+            {
+                _input.OnMoveInput      -= OnMoveInput;
+                _input.OnAttackPressed  -= OnAttackPressed;
+                _input.OnAttackReleased -= OnAttackReleased;
+            }
         }
 
         // 1단계: 현재 층에 등장할 몬스터·bpm·bgm·패턴을 미리 세팅/로드. 클럭은 아직 시작 안 함.

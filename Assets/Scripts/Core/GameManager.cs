@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using BeatHero.Audio;
 using BeatHero.Combat;
 using BeatHero.Data;
+using BeatHero.Player;
 using UnityEngine;
 
 namespace BeatHero.Core
@@ -83,18 +85,63 @@ namespace BeatHero.Core
 
         private IEnumerator CompleteFloorRoutine()
         {
-            void Advance()
+            var player      = UnityEngine.Object.FindAnyObjectByType<PlayerController>();
+            var monsterView = UnityEngine.Object.FindAnyObjectByType<MonsterView>();
+
+            InputReader.Instance?.SwitchToUIMap();
+
+            // 최후의 일격 전진
+            if (player != null && monsterView != null)
+                yield return StartCoroutine(player.RushTo(monsterView.transform.position, 1f));
+
+            // 사망 SFX
+            AudioManager.Instance?.PlaySFX(_battle.CurrentMonster?.deathSfx);
+
+            // 오른쪽 퇴장 + 아이리스 닫힘 동시
+            if (SceneLoader.Instance != null && player != null)
             {
-                CurrentFloor++;
-                OnFloorCleared?.Invoke();
-                OnFloorChanged?.Invoke(CurrentFloor);
-                StartBattleForCurrentFloor();
+                var exitCoroutine  = StartCoroutine(player.ExitRight(1f));
+                var wipeOutRoutine = StartCoroutine(SceneLoader.Instance.WipeOut(1f));
+                yield return exitCoroutine;
+                yield return wipeOutRoutine;
             }
 
-            if (SceneLoader.Instance != null)
-                yield return SceneLoader.Instance.DoTransition(Advance);
-            else
-                Advance();
+            // 암전 — 다음 층 세팅
+            CurrentFloor++;
+            OnFloorCleared?.Invoke();
+            OnFloorChanged?.Invoke(CurrentFloor);
+            var monster = _floorData.GetMonster(CurrentFloor);
+            if (monster != null)
+                _battle.SetFloorData(monster); // 내부에서 player.transform.position = centerPos
+
+            // centerPos 캡처 후 플레이어 왼쪽 밖으로 배치
+            if (player != null)
+            {
+                Vector3 centerPos = player.transform.position;
+
+                // 아이리스 열림 + 왼쪽에서 등장 동시
+                if (SceneLoader.Instance != null)
+                {
+                    player.transform.position = GetLeftEdge(player.transform.position);
+                    var enterCoroutine = StartCoroutine(player.EnterFromLeft(centerPos, 1f));
+                    var wipeInRoutine  = StartCoroutine(SceneLoader.Instance.WipeIn(1f));
+                    yield return enterCoroutine;
+                    yield return wipeInRoutine;
+                }
+            }
+
+            InputReader.Instance?.SwitchToGameMap();
+
+            if (monster != null)
+                _battle.StartFloor();
+        }
+
+        private static Vector3 GetLeftEdge(Vector3 reference)
+        {
+            if (Camera.main == null) return reference;
+            float depth = Mathf.Abs(Camera.main.transform.position.z - reference.z);
+            Vector3 edge = Camera.main.ViewportToWorldPoint(new Vector3(-0.3f, 0.5f, depth));
+            return new Vector3(edge.x, reference.y, reference.z);
         }
 
         public void RestartRun()
