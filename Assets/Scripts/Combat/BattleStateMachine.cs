@@ -33,6 +33,7 @@ namespace BeatHero.Combat
 
         public event System.Action<MonsterData> OnBattleStarted;
         public event System.Action<int, int> OnMonsterHpChanged; // (current, max)
+        public event System.Action OnBeatUnitFired;
 
         public MonsterData CurrentMonster => _monster;
         private MonsterData     _monster;
@@ -156,6 +157,7 @@ namespace BeatHero.Combat
                 if (AudioSettings.dspTime < noteStartDsp)
                     yield return new WaitUntil(() => AudioSettings.dspTime >= noteStartDsp);
 
+                OnBeatUnitFired?.Invoke();
                 _grid.ShowShape(bu.gridEffectShape);
 
                 unitOffset += (int)bu.noteLength;
@@ -175,6 +177,7 @@ namespace BeatHero.Combat
                 if (AudioSettings.dspTime < noteStartDsp)
                     yield return new WaitUntil(() => AudioSettings.dspTime >= noteStartDsp);
 
+                OnBeatUnitFired?.Invoke();
                 _grid.ShowShape(bu.gridEffectShape);
 
                 double beatTime     = noteStartDsp;

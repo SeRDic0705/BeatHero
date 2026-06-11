@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -13,7 +14,7 @@ namespace BeatHero.Data
         public GridType gridType;
 
         [BoxGroup("Presentation")]
-        public Sprite sprite;
+        public List<Sprite> sprites;
         [BoxGroup("Presentation")]
         public RuntimeAnimatorController animator;
         [BoxGroup("Presentation")]
