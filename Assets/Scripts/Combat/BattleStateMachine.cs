@@ -34,6 +34,7 @@ namespace BeatHero.Combat
         public event System.Action<MonsterData> OnBattleStarted;
         public event System.Action<int, int> OnMonsterHpChanged; // (current, max)
         public event System.Action OnBeatUnitFired;
+        public event System.Action OnEffectiveBeatFired; // ResponsePhase + gridEffectShape != null 인 비트만
         public event System.Action<CellEffectFeedback, Vector3> OnMonsterCellEffectFired;
 
         public MonsterData CurrentMonster => _monster;
@@ -189,6 +190,7 @@ namespace BeatHero.Combat
                     yield return new WaitUntil(() => AudioSettings.dspTime >= noteStartDsp);
 
                 OnBeatUnitFired?.Invoke();
+                if (bu.gridEffectShape != null) OnEffectiveBeatFired?.Invoke();
                 _grid.UpdateDangerMap(bu.gridEffectShape); // 타일 색상 변경 없이 판정맵만 갱신
                 PlayShapeFeedbacks(bu.gridEffectShape);
 
@@ -353,6 +355,7 @@ namespace BeatHero.Combat
 
         private void EndBattle(bool cleared)
         {
+            if (_state == State.BattleEnd) return;
             _state = State.BattleEnd;
             _conductor.Stop();
             // 전투 종료 — 유지되던 마지막 위험 그리드를 비운다(다음 층 미존재 시에도 잔상 방지).
