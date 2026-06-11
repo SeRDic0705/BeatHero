@@ -14,6 +14,7 @@ namespace BeatHero.UI
         {
             _startButton.onClick.AddListener(OnStartPressed);
             _settingsButton.onClick.AddListener(OnSettingsPressed);
+            InputReader.Instance.SwitchToUIMap();
         }
 
         private void OnDestroy()
