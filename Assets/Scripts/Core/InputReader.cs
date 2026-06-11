@@ -24,6 +24,7 @@ namespace BeatHero.Core
 
             _actions = new InputSystem_Actions();
             _actions.Game.SetCallbacks(this);
+            _actions.Game.Enable();
         }
 
         private void OnDestroy() => _actions?.Disable();
