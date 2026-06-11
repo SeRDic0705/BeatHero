@@ -20,4 +20,4 @@ MonoBehaviour:
   - {fileID: 454991810, guid: f4d2477fd62a199459780452843ca04d, type: 3}
   - {fileID: -599329564, guid: f4d2477fd62a199459780452843ca04d, type: 3}
   - {fileID: -1073165655, guid: f4d2477fd62a199459780452843ca04d, type: 3}
-  vfxFps: 12
+  vfxFps: 6
