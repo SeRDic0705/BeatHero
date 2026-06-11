@@ -66,6 +66,22 @@ namespace BeatHero.Combat
             RefreshVisuals();
         }
 
+        // ResponsePhase용: 타일 색상 변경 없이 _dangerMap만 갱신 (시각 피드백은 VFX가 담당)
+        public void UpdateDangerMap(GridEffectShape shape)
+        {
+            _dangerMap = new CellEffect[GridWidth, GridHeight];
+            if (shape == null) return;
+
+            if (shape is GridEffectShape3x3 s3 && GridWidth == 3)
+                for (int x = 0; x < 3; x++)
+                    for (int y = 0; y < 3; y++)
+                        _dangerMap[x, y] = s3.cells[x, y];
+            else if (shape is GridEffectShape5x5 s5 && GridWidth == 5)
+                for (int x = 0; x < 5; x++)
+                    for (int y = 0; y < 5; y++)
+                        _dangerMap[x, y] = s5.cells[x, y];
+        }
+
         public void SetHazards(List<ActiveHazard> hazards)
         {
             _hazards = hazards;
@@ -152,8 +168,8 @@ namespace BeatHero.Combat
                         sr.color = COLOR_HAZARD;
                     else if (_dangerMap[x, y] is ShieldEffect)
                         sr.color = COLOR_SHIELD;
-                    else if (_dangerMap[x, y] != null)
-                        sr.color = _isResponsePhase ? COLOR_DANGER_RESPONSE : COLOR_DANGER_CALL;
+                    else if (_dangerMap[x, y] != null && !_isResponsePhase)
+                        sr.color = COLOR_DANGER_CALL;
                     else
                         sr.color = COLOR_NORMAL;
                 }

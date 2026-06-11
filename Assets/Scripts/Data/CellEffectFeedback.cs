@@ -6,6 +6,7 @@ namespace BeatHero.Data
     public class CellEffectFeedback : ScriptableObject
     {
         public AudioClip activateSfx;
-        public GameObject vfxPrefab;
+        public Sprite[]  vfxFrames;
+        public float     vfxFps = 12f;
     }
 }

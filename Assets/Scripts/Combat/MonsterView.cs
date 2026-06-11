@@ -1,11 +1,14 @@
+using System.Collections.Generic;
+using BeatHero.Audio;
 using BeatHero.Data;
 using UnityEngine;
 
 namespace BeatHero.Combat
 {
     // 씬에 배치된 몬스터 GameObject의 비주얼 담당.
-    // BattleStateMachine.OnBattleStarted 구독 → 층 전환마다 스프라이트/애니메이터 자동 교체.
-    // BattleStateMachine.OnBeatUnitFired 구독 → BeatUnit 발화마다 스프라이트 순환 + 팝 이동.
+    // OnBattleStarted  → 층 전환마다 스프라이트/애니메이터 교체.
+    // OnBeatUnitFired  → BeatUnit 발화마다 스프라이트 순환 + 팝 이동.
+    // OnMonsterCellEffectFired → CellEffect 타입별 SFX + VFX 재생.
     [RequireComponent(typeof(SpriteRenderer))]
     public class MonsterView : MonoBehaviour
     {
@@ -19,6 +22,7 @@ namespace BeatHero.Combat
         private int         _spriteIndex;
         private Vector3     _baseLocalPos;
         private bool        _yFlip;
+        private readonly HashSet<CellEffectFeedback> _sfxPlayedThisBeat = new();
 
         private void Awake()
         {
@@ -28,8 +32,9 @@ namespace BeatHero.Combat
             _battle = Object.FindAnyObjectByType<BattleStateMachine>();
             if (_battle != null)
             {
-                _battle.OnBattleStarted += SetMonster;
-                _battle.OnBeatUnitFired += AdvanceSprite;
+                _battle.OnBattleStarted        += SetMonster;
+                _battle.OnBeatUnitFired        += AdvanceSprite;
+                _battle.OnMonsterCellEffectFired += PlayCellEffectFeedback;
             }
         }
 
@@ -43,8 +48,9 @@ namespace BeatHero.Combat
         {
             if (_battle != null)
             {
-                _battle.OnBattleStarted -= SetMonster;
-                _battle.OnBeatUnitFired -= AdvanceSprite;
+                _battle.OnBattleStarted          -= SetMonster;
+                _battle.OnBeatUnitFired          -= AdvanceSprite;
+                _battle.OnMonsterCellEffectFired -= PlayCellEffectFeedback;
             }
         }
 
@@ -69,6 +75,15 @@ namespace BeatHero.Combat
 
             _yFlip = !_yFlip;
             transform.localPosition = _baseLocalPos + Vector3.up * (_yFlip ? _popUnits : -_popUnits);
+            _sfxPlayedThisBeat.Clear();
+        }
+
+        private void PlayCellEffectFeedback(CellEffectFeedback feedback, Vector3 worldPos)
+        {
+            if (feedback.vfxFrames != null && feedback.vfxFrames.Length > 0)
+                VFXPool.Instance?.Play(feedback.vfxFrames, feedback.vfxFps, worldPos);
+            if (_sfxPlayedThisBeat.Add(feedback))
+                AudioManager.Instance?.PlaySFX(feedback.activateSfx);
         }
     }
 }

@@ -34,6 +34,7 @@ namespace BeatHero.Combat
         public event System.Action<MonsterData> OnBattleStarted;
         public event System.Action<int, int> OnMonsterHpChanged; // (current, max)
         public event System.Action OnBeatUnitFired;
+        public event System.Action<CellEffectFeedback, Vector3> OnMonsterCellEffectFired;
 
         public MonsterData CurrentMonster => _monster;
         private MonsterData     _monster;
@@ -151,7 +152,9 @@ namespace BeatHero.Combat
                 double noteStartDsp = phraseStartDsp + secPerUnit * unitOffset;
 
                 // WaitUntil 전에 SFX 예약 — 리드타임 최대화로 DSP 정확도 확보
-                AudioManager.Instance?.PlaySFXScheduled(_callBeatSfx, noteStartDsp);
+                // gridEffectShape == null이면 빈 비트이므로 효과음 스킵
+                if (bu.gridEffectShape != null)
+                    AudioManager.Instance?.PlaySFXScheduled(_callBeatSfx, noteStartDsp);
 
                 // 이미 지난 시점이면 동일 프레임 즉시 실행, 아직 안 됐을 때만 대기
                 if (AudioSettings.dspTime < noteStartDsp)
@@ -168,6 +171,7 @@ namespace BeatHero.Combat
         private IEnumerator HandleResponsePhrase(double phraseStartDsp)
         {
             _grid.SetResponsePhase(true);
+            _grid.ClearShape(); // CallPhase 마지막 빨간 장판 제거
             double secPerUnit = _conductor.SecPerBeat / PatternPlayer.UNITS_PER_BEAT;
             int unitOffset = 0;
 
@@ -178,7 +182,8 @@ namespace BeatHero.Combat
                     yield return new WaitUntil(() => AudioSettings.dspTime >= noteStartDsp);
 
                 OnBeatUnitFired?.Invoke();
-                _grid.ShowShape(bu.gridEffectShape);
+                _grid.UpdateDangerMap(bu.gridEffectShape); // 타일 색상 변경 없이 판정맵만 갱신
+                PlayShapeFeedbacks(bu.gridEffectShape);
 
                 double beatTime     = noteStartDsp;
                 double preJudgStart = beatTime - _judgmentWindowSec;
@@ -303,7 +308,6 @@ namespace BeatHero.Combat
             {
                 _player.GainShield();
             }
-            AudioManager.Instance?.PlaySFX(effect.feedback?.activateSfx);
         }
 
         private int CalcMonsterDamage()
@@ -442,6 +446,17 @@ namespace BeatHero.Combat
         }
 
         private void CancelCharge() => ResetCharge();
+
+        private void PlayShapeFeedbacks(GridEffectShape shape)
+        {
+            if (shape == null) return;
+            foreach (var (pos, effect) in shape.AllCellsWithPosition())
+            {
+                if (effect == null) continue;
+                if (!_monster.effectFeedbacks.TryGetValue(effect, out var fb) || fb == null) continue;
+                OnMonsterCellEffectFired?.Invoke(fb, _grid.GetTileWorldPosition(pos));
+            }
+        }
 
         private void ResetCharge()
         {
