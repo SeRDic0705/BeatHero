@@ -16,6 +16,8 @@ namespace BeatHero.Data
         [BoxGroup("Presentation")]
         public List<Sprite> sprites;
         [BoxGroup("Presentation")]
+        public Dictionary<CellEffect, CellEffectFeedback> effectFeedbacks = new();
+        [BoxGroup("Presentation")]
         public RuntimeAnimatorController animator;
         [BoxGroup("Presentation")]
         public AudioClip hitSfx;
