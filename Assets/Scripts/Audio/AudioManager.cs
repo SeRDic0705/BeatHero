@@ -1,3 +1,4 @@
+using System.Collections;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -42,7 +43,15 @@ namespace BeatHero.Audio
             }
         }
 
-        private void Start() => ApplySavedVolumes();
+        // AudioMixer 노출 파라미터는 믹서 초기화 다음 프레임부터 접근 가능 —
+        // Start에서 바로 SetFloat하면 "Exposed name does not exist"로 실패한다.
+        private void Start() => StartCoroutine(ApplyVolumesNextFrame());
+
+        private IEnumerator ApplyVolumesNextFrame()
+        {
+            yield return null; // 믹서 초기화 대기(1프레임)
+            ApplySavedVolumes();
+        }
 
         public void PlaySFX(AudioClip clip)
         {
