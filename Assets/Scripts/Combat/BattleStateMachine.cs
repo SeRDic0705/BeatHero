@@ -413,9 +413,21 @@ namespace BeatHero.Combat
             {
                 _attackHeld = false;
                 CancelCharge();
+                return;
             }
-            // ResponsePhase: _attackHeld 유지, HandleResponseBeat에서 처리
-            // 윈도우 안/밖 모두 window-close 또는 사전버퍼 체크에서 발동
+
+            // 유효 구간 안이면 즉시 발동 — window-close 대기 없이 SFX·HP 반영
+            if (_inputWindowOpen)
+            {
+                FireAttack();
+                return;
+            }
+            if (_tapGraceEndTime > 0.0 && AudioSettings.dspTime <= _tapGraceEndTime)
+            {
+                FireAttack();
+                return;
+            }
+            // 그 외: 다음 비트 pre-buffer 또는 window-close 안전망에서 처리
         }
 
         private void FireAttack()
