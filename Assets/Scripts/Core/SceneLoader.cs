@@ -36,6 +36,9 @@ namespace BeatHero.Core
             }
         }
 
+        // 씬 로드 후 오프닝 애니메이션 완료 시 발생 — GameManager가 여기서 게임 시작
+        public event Action OnSceneOpened;
+
         public void LoadGame()  => StartCoroutine(LoadWithWipe(SCENE_GAME));
         public void LoadTitle() => StartCoroutine(LoadWithWipe(SCENE_TITLE));
 
@@ -52,6 +55,8 @@ namespace BeatHero.Core
             yield return StartCoroutine(AnimateWipe(1f, 0f));
             yield return SceneManager.LoadSceneAsync(sceneName);
             yield return StartCoroutine(AnimateWipe(0f, 1f));
+            OnSceneOpened?.Invoke();
+            OnSceneOpened = null; // 한 번만 발동
         }
 
         private IEnumerator AnimateWipe(float fromRadius, float toRadius)

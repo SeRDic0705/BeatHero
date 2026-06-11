@@ -35,7 +35,12 @@ namespace BeatHero.Core
 
         private void Start()
         {
-            if (_battle != null && _floorData != null)
+            if (_battle == null || _floorData == null) return;
+
+            // SceneLoader를 통해 진입한 경우 → 오프닝 완료 후 시작
+            if (SceneLoader.Instance != null)
+                SceneLoader.Instance.OnSceneOpened += () => StartRun(100);
+            else
                 StartRun(100);
         }
 
