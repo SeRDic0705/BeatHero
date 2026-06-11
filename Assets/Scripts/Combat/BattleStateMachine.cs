@@ -152,7 +152,9 @@ namespace BeatHero.Combat
                 double noteStartDsp = phraseStartDsp + secPerUnit * unitOffset;
 
                 // WaitUntil 전에 SFX 예약 — 리드타임 최대화로 DSP 정확도 확보
-                AudioManager.Instance?.PlaySFXScheduled(_callBeatSfx, noteStartDsp);
+                // gridEffectShape == null이면 빈 비트이므로 효과음 스킵
+                if (bu.gridEffectShape != null)
+                    AudioManager.Instance?.PlaySFXScheduled(_callBeatSfx, noteStartDsp);
 
                 // 이미 지난 시점이면 동일 프레임 즉시 실행, 아직 안 됐을 때만 대기
                 if (AudioSettings.dspTime < noteStartDsp)
