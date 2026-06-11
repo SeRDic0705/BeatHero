@@ -7,6 +7,6 @@ namespace BeatHero.Data
     {
         public AudioClip activateSfx;
         public Sprite[]  vfxFrames;
-        public float     vfxFps = 12f;
+        public float     vfxFps = 24f;
     }
 }
