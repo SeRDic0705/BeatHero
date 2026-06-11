@@ -24,9 +24,7 @@ MonoBehaviour:
   beatUnits:
   - noteLength: 12
     gridEffectShape: {fileID: 11400000, guid: a4c0f2f5d4de20f4da52caae5122e6c1, type: 2}
-  - noteLength: 3
-    gridEffectShape: {fileID: 11400000, guid: cc55d15e061a91e48aa4415d95ab7b0c, type: 2}
-  - noteLength: 3
+  - noteLength: 6
     gridEffectShape: {fileID: 11400000, guid: 5ef8cd0f277e32d42a07f7bdce2ab04a, type: 2}
   - noteLength: 6
     gridEffectShape: {fileID: 0}
