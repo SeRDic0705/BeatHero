@@ -55,7 +55,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  maxHp: 100
+  maxHp: 10
   attackPower: 10
   gridType: 0
   sprites:
