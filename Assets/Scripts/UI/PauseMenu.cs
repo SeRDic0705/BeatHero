@@ -1,6 +1,5 @@
 using BeatHero.Core;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace BeatHero.UI
@@ -22,6 +21,7 @@ namespace BeatHero.UI
             _settingsButton.onClick.AddListener(OpenSettings);
             _mainMenuButton.onClick.AddListener(GoToMainMenu);
             _menuRoot.SetActive(false);
+            InputReader.Instance.OnPausePressed += Pause;
         }
 
         private void OnDestroy()
@@ -29,15 +29,8 @@ namespace BeatHero.UI
             _resumeButton.onClick.RemoveAllListeners();
             _settingsButton.onClick.RemoveAllListeners();
             _mainMenuButton.onClick.RemoveAllListeners();
-        }
-
-        private void Update()
-        {
-            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
-            {
-                if (_isPaused) Resume();
-                else Pause();
-            }
+            if (InputReader.Instance != null)
+                InputReader.Instance.OnPausePressed -= Pause;
         }
 
         private void Pause()
@@ -46,6 +39,7 @@ namespace BeatHero.UI
             _menuRoot.SetActive(true);
             _conductor?.Pause();
             Time.timeScale = 0f;
+            InputReader.Instance.SwitchToUIMap();
         }
 
         private void Resume()
@@ -55,6 +49,7 @@ namespace BeatHero.UI
             _menuRoot.SetActive(false);
             _conductor?.Resume();
             Time.timeScale = 1f;
+            InputReader.Instance.SwitchToGameMap();
         }
 
         private void OpenSettings()
