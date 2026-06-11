@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using BeatHero.Combat;
 using BeatHero.Data;
 using UnityEngine;
@@ -9,15 +10,15 @@ namespace BeatHero.Core
     {
         public static GameManager Instance { get; private set; }
 
-        public int CurrentFloor { get; private set; }
-        public int PlayerHp { get; private set; }
-        public int PlayerMaxHp { get; private set; }
+        public int CurrentFloor  { get; private set; }
+        public int PlayerHp      { get; private set; }
+        public int PlayerMaxHp   { get; private set; }
 
         public event Action<int> OnFloorChanged;
-        public event Action OnGameOver;
-        public event Action OnFloorCleared;
+        public event Action      OnGameOver;
+        public event Action      OnFloorCleared;
 
-        [SerializeField] private FloorData _floorData;
+        [SerializeField] private FloorData          _floorData;
         [SerializeField] private BattleStateMachine _battle;
 
         private void Awake()
@@ -34,14 +35,19 @@ namespace BeatHero.Core
 
         private void Start()
         {
-            if (_battle != null && _floorData != null)
+            if (_battle == null || _floorData == null) return;
+
+            // SceneLoader를 통해 진입한 경우 → 오프닝 완료 후 시작
+            if (SceneLoader.Instance != null)
+                SceneLoader.Instance.OnSceneOpened += () => StartRun(100);
+            else
                 StartRun(100);
         }
 
         public void StartRun(int maxHp)
         {
             PlayerMaxHp = maxHp;
-            PlayerHp = maxHp;
+            PlayerHp    = maxHp;
             CurrentFloor = 1;
             OnFloorChanged?.Invoke(CurrentFloor);
             StartBattleForCurrentFloor();
@@ -53,7 +59,6 @@ namespace BeatHero.Core
             var monster = _floorData.GetMonster(CurrentFloor);
             if (monster == null) return;
 
-            // 1) 층 데이터 세팅·로드 → 2) 층 시작(클럭 가동)
             _battle.SetFloorData(monster);
             _battle.StartFloor();
         }
@@ -72,15 +77,36 @@ namespace BeatHero.Core
 
         public void CompleteFloor()
         {
-            CurrentFloor++;
-            OnFloorCleared?.Invoke();
-            OnFloorChanged?.Invoke(CurrentFloor);
-            StartBattleForCurrentFloor();
+            StartCoroutine(CompleteFloorRoutine());
+        }
+
+        private IEnumerator CompleteFloorRoutine()
+        {
+            void Advance()
+            {
+                CurrentFloor++;
+                OnFloorCleared?.Invoke();
+                OnFloorChanged?.Invoke(CurrentFloor);
+                StartBattleForCurrentFloor();
+            }
+
+            if (SceneLoader.Instance != null)
+                yield return SceneLoader.Instance.DoTransition(Advance);
+            else
+                Advance();
         }
 
         public void RestartRun()
         {
-            StartRun(PlayerMaxHp);
+            StartCoroutine(RestartRunRoutine());
+        }
+
+        private IEnumerator RestartRunRoutine()
+        {
+            if (SceneLoader.Instance != null)
+                yield return SceneLoader.Instance.DoTransition(() => StartRun(PlayerMaxHp));
+            else
+                StartRun(PlayerMaxHp);
         }
     }
 }
