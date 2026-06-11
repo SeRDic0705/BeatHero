@@ -5,16 +5,20 @@ namespace BeatHero.Combat
 {
     // 씬에 배치된 몬스터 GameObject의 비주얼 담당.
     // BattleStateMachine.OnBattleStarted 구독 → 층 전환마다 스프라이트/애니메이터 자동 교체.
-    // BattleStateMachine.OnBeatUnitFired 구독 → BeatUnit 발화마다 스프라이트 순환.
+    // BattleStateMachine.OnBeatUnitFired 구독 → BeatUnit 발화마다 스프라이트 순환 + 팝 이동.
     [RequireComponent(typeof(SpriteRenderer))]
     public class MonsterView : MonoBehaviour
     {
+        [SerializeField] private float _popUnits = 0.2f;
+
         private SpriteRenderer      _renderer;
         private Animator            _animator;
         private BattleStateMachine  _battle;
 
         private MonsterData _currentMonster;
         private int         _spriteIndex;
+        private Vector3     _baseLocalPos;
+        private bool        _yFlip;
 
         private void Awake()
         {
@@ -46,8 +50,10 @@ namespace BeatHero.Combat
 
         private void SetMonster(MonsterData data)
         {
-            _currentMonster = data;
-            _spriteIndex    = 0;
+            _currentMonster  = data;
+            _spriteIndex     = 0;
+            _baseLocalPos    = transform.localPosition;
+            _yFlip           = false;
             _renderer.sprite = data.sprites.Count > 0 ? data.sprites[0] : null;
 
             if (_animator != null)
@@ -57,8 +63,12 @@ namespace BeatHero.Combat
         private void AdvanceSprite()
         {
             if (_currentMonster == null || _currentMonster.sprites.Count == 0) return;
+
             _renderer.sprite = _currentMonster.sprites[_spriteIndex];
             _spriteIndex = (_spriteIndex + 1) % _currentMonster.sprites.Count;
+
+            _yFlip = !_yFlip;
+            transform.localPosition = _baseLocalPos + Vector3.up * (_yFlip ? _popUnits : -_popUnits);
         }
     }
 }
