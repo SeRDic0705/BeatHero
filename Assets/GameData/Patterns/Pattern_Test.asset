@@ -25,9 +25,9 @@ MonoBehaviour:
   - noteLength: 12
     gridEffectShape: {fileID: 11400000, guid: a4c0f2f5d4de20f4da52caae5122e6c1, type: 2}
   - noteLength: 6
-    gridEffectShape: {fileID: 0}
-  - noteLength: 6
     gridEffectShape: {fileID: 11400000, guid: 5ef8cd0f277e32d42a07f7bdce2ab04a, type: 2}
+  - noteLength: 6
+    gridEffectShape: {fileID: 0}
   - noteLength: 12
     gridEffectShape: {fileID: 11400000, guid: a4c0f2f5d4de20f4da52caae5122e6c1, type: 2}
   - noteLength: 12
