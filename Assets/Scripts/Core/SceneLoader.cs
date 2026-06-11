@@ -45,21 +45,24 @@ namespace BeatHero.Core
         // 씬 이동 없는 와이프 전환 — 층 클리어·게임 오버 등에서 사용
         public IEnumerator DoTransition(Action onMidpoint)
         {
-            yield return StartCoroutine(AnimateWipe(1f, 0f));
+            yield return StartCoroutine(WipeOut());
             onMidpoint?.Invoke();
-            yield return StartCoroutine(AnimateWipe(0f, 1f));
+            yield return StartCoroutine(WipeIn());
         }
+
+        public IEnumerator WipeOut(float duration = WIPE_DURATION) => AnimateWipe(1f, 0f, duration);
+        public IEnumerator WipeIn(float duration = WIPE_DURATION)  => AnimateWipe(0f, 1f, duration);
 
         private IEnumerator LoadWithWipe(string sceneName)
         {
-            yield return StartCoroutine(AnimateWipe(1f, 0f));
+            yield return StartCoroutine(WipeOut());
             yield return SceneManager.LoadSceneAsync(sceneName);
-            yield return StartCoroutine(AnimateWipe(0f, 1f));
+            yield return StartCoroutine(WipeIn());
             OnSceneOpened?.Invoke();
             OnSceneOpened = null; // 한 번만 발동
         }
 
-        private IEnumerator AnimateWipe(float fromRadius, float toRadius)
+        private IEnumerator AnimateWipe(float fromRadius, float toRadius, float duration = WIPE_DURATION)
         {
             if (_wipeImage == null) yield break;
 
@@ -67,10 +70,10 @@ namespace BeatHero.Core
             SetRadius(fromRadius);
 
             float t = 0f;
-            while (t < WIPE_DURATION)
+            while (t < duration)
             {
                 t += Time.unscaledDeltaTime;
-                SetRadius(Mathf.Lerp(fromRadius, toRadius, Mathf.Clamp01(t / WIPE_DURATION)));
+                SetRadius(Mathf.Lerp(fromRadius, toRadius, Mathf.Clamp01(t / duration)));
                 yield return null;
             }
 
