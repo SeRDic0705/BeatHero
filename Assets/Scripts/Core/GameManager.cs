@@ -46,6 +46,7 @@ namespace BeatHero.Core
 
         public void StartRun(int maxHp)
         {
+            InputReader.Instance?.SwitchToGameMap();
             PlayerMaxHp = maxHp;
             PlayerHp    = maxHp;
             CurrentFloor = 1;
