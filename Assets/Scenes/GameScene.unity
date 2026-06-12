@@ -473,17 +473,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 130623436}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1454943528}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1670939497}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0.55822, y: 0.20054}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!1 &157940607
@@ -5894,7 +5894,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1338578491
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7091,6 +7091,7 @@ Transform:
   - {fileID: 405143906}
   - {fileID: 1338578495}
   - {fileID: 1839094256}
+  - {fileID: 130623441}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1692978738
@@ -7898,6 +7899,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SettingsPanelCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 6418944304816338623, guid: 4c814f1bb0be68b45a36ca8dc1ac5d23, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6516524337888141090, guid: 4c814f1bb0be68b45a36ca8dc1ac5d23, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -8640,5 +8645,4 @@ SceneRoots:
   - {fileID: 1913769040}
   - {fileID: 1670939497}
   - {fileID: 320389206}
-  - {fileID: 130623441}
   - {fileID: 9000000003}
