@@ -91,7 +91,7 @@ namespace BeatHero.Core
             StartCoroutine(CompleteFloorRoutine());
         }
 
-        private bool IsBossFloor(int floor) => floor % 10 == 0;
+        private bool IsBossFloor(int floor) => _floorData.GetMonster(floor) is Data.BossMonsterData;
         private bool IsFinalFloor(int floor) => _floorData != null && floor == _floorData.floors.Count;
 
         private IEnumerator CompleteFloorRoutine()
