@@ -27,6 +27,11 @@ namespace BeatHero.Core
         [SerializeField] private BattleStateMachine _battle;
         [SerializeField] private ResultScreen       _resultScreen;
 
+        [Header("Transition Timing")]
+        [SerializeField] private float _rushDuration  = 1f;
+        [SerializeField] private float _exitDuration  = 1f;
+        [SerializeField] private float _enterDuration = 1f;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -104,7 +109,7 @@ namespace BeatHero.Core
 
             // 최후의 일격 전진
             if (player != null && monsterView != null)
-                yield return StartCoroutine(player.RushTo(monsterView.transform.position, 1f));
+                yield return StartCoroutine(player.RushTo(monsterView.transform.position, _rushDuration));
 
             // 사망 SFX
             AudioManager.Instance?.PlaySFX(_battle.CurrentMonster?.deathSfx);
@@ -112,8 +117,8 @@ namespace BeatHero.Core
             // 오른쪽 퇴장 + 아이리스 닫힘 동시
             if (SceneLoader.Instance != null && player != null)
             {
-                var exitCoroutine  = StartCoroutine(player.ExitRight(1f));
-                var wipeOutRoutine = StartCoroutine(SceneLoader.Instance.WipeOut(1f));
+                var exitCoroutine  = StartCoroutine(player.ExitRight(_exitDuration));
+                var wipeOutRoutine = StartCoroutine(SceneLoader.Instance.WipeOut(_exitDuration));
                 yield return exitCoroutine;
                 yield return wipeOutRoutine;
             }
@@ -157,8 +162,8 @@ namespace BeatHero.Core
 
                 if (SceneLoader.Instance != null)
                 {
-                    var enterCoroutine = StartCoroutine(player.EnterFromLeft(centerPos, 1f));
-                    var wipeInRoutine  = StartCoroutine(SceneLoader.Instance.WipeIn(1f));
+                    var enterCoroutine = StartCoroutine(player.EnterFromLeft(centerPos, _enterDuration));
+                    var wipeInRoutine  = StartCoroutine(SceneLoader.Instance.WipeIn(_enterDuration));
                     yield return enterCoroutine;
                     yield return wipeInRoutine;
                 }
