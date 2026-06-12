@@ -28,9 +28,10 @@ namespace BeatHero.Core
         [SerializeField] private ResultScreen       _resultScreen;
 
         [Header("Transition Timing")]
-        [SerializeField] private float _rushDuration  = 1f;
-        [SerializeField] private float _exitDuration  = 1f;
-        [SerializeField] private float _enterDuration = 1f;
+        [SerializeField] private float _rushDuration       = 1f;
+        [SerializeField] private float _exitDuration       = 1f;
+        [SerializeField] private float _blackoutMinWait    = 0.5f;
+        [SerializeField] private float _enterDuration      = 1f;
 
         private void Awake()
         {
@@ -153,6 +154,9 @@ namespace BeatHero.Core
                     onConfirm: () => confirmed = true);
                 yield return new WaitUntil(() => confirmed);
             }
+
+            // 암전 최소 대기
+            yield return new WaitForSeconds(_blackoutMinWait);
 
             // centerPos 캡처 후 왼쪽 등장 + 아이리스 열림
             if (player != null)
