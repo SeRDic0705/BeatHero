@@ -1,4 +1,6 @@
+using System.Collections;
 using BeatHero.Core;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,8 +13,9 @@ namespace BeatHero.UI
         [SerializeField] private Button        _resumeButton;
         [SerializeField] private Button        _settingsButton;
         [SerializeField] private Button        _mainMenuButton;
-        [SerializeField] private SettingsPanel _settingsPanel;
-        [SerializeField] private Conductor     _conductor;
+        [SerializeField] private SettingsPanel    _settingsPanel;
+        [SerializeField] private Conductor        _conductor;
+        [SerializeField] private TextMeshProUGUI  _countdownText;
 
         private void Awake()
         {
@@ -37,10 +40,19 @@ namespace BeatHero.UI
             InputReader.Instance?.SwitchToUIMap();
         }
 
-        public void Close()
+        public void Close() => StartCoroutine(CloseWithCountdown());
+
+        private IEnumerator CloseWithCountdown()
         {
             _settingsPanel?.Hide();
             _menuRoot.SetActive(false);
+            _countdownText.gameObject.SetActive(true);
+            for (int i = 3; i >= 1; i--)
+            {
+                _countdownText.text = i.ToString();
+                yield return new WaitForSecondsRealtime(1f);
+            }
+            _countdownText.gameObject.SetActive(false);
             _conductor?.Resume();
             Time.timeScale = 1f;
             InputReader.Instance?.SwitchToGameMap();

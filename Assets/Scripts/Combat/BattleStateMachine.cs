@@ -48,6 +48,9 @@ namespace BeatHero.Combat
         private State _state = State.Idle;
         private bool  _phraseRunning;
 
+        private bool   _paused;
+        private double _pauseDelta;
+
         // 입력 윈도우
         private bool    _inputWindowOpen;
         private bool    _attackHeld;
@@ -68,8 +71,10 @@ namespace BeatHero.Combat
 
         private void Awake()
         {
-            _conductor.OnBeat += OnBeat;
-            _player.OnDeath   += OnPlayerDeath;
+            _conductor.OnBeat    += OnBeat;
+            _conductor.OnPaused  += OnConductorPaused;
+            _conductor.OnResumed += OnConductorResumed;
+            _player.OnDeath      += OnPlayerDeath;
         }
 
         private void Start()
@@ -81,8 +86,10 @@ namespace BeatHero.Combat
 
         private void OnDestroy()
         {
-            _conductor.OnBeat       -= OnBeat;
-            _player.OnDeath         -= OnPlayerDeath;
+            _conductor.OnBeat    -= OnBeat;
+            _conductor.OnPaused  -= OnConductorPaused;
+            _conductor.OnResumed -= OnConductorResumed;
+            _player.OnDeath      -= OnPlayerDeath;
             if (_input != null)
             {
                 _input.OnMoveInput      -= OnMoveInput;
@@ -164,9 +171,9 @@ namespace BeatHero.Combat
                 if (bu.gridEffectShape != null)
                     AudioManager.Instance?.PlaySFXScheduled(_callBeatSfx, noteStartDsp);
 
-                // 이미 지난 시점이면 동일 프레임 즉시 실행, 아직 안 됐을 때만 대기
-                if (AudioSettings.dspTime < noteStartDsp)
-                    yield return new WaitUntil(() => AudioSettings.dspTime >= noteStartDsp);
+                // _pauseDelta = 누적 일시정지 시간. noteStartDsp는 원래 절대시각이므로
+                // noteStartDsp + _pauseDelta = 프레이즈 경계 포함 모든 일시정지 반영한 목표 시각.
+                yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= noteStartDsp + _pauseDelta);
 
                 OnBeatUnitFired?.Invoke();
                 _grid.ShowShape(bu.gridEffectShape);
@@ -186,8 +193,7 @@ namespace BeatHero.Combat
             foreach (var bu in _patternPlayer.CurrentPattern.beatUnits)
             {
                 double noteStartDsp = phraseStartDsp + secPerUnit * unitOffset;
-                if (AudioSettings.dspTime < noteStartDsp)
-                    yield return new WaitUntil(() => AudioSettings.dspTime >= noteStartDsp);
+                yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= noteStartDsp + _pauseDelta);
 
                 OnBeatUnitFired?.Invoke();
                 if (bu.gridEffectShape != null) OnEffectiveBeatFired?.Invoke();
@@ -233,8 +239,7 @@ namespace BeatHero.Combat
 
                 // 판정 윈도우 닫힘 = 비트 + 판정구간 반폭 (DSP 절대시각 기준)
                 double windowCloseDsp = noteStartDsp + _judgmentWindowSec;
-                if (AudioSettings.dspTime < windowCloseDsp)
-                    yield return new WaitUntil(() => AudioSettings.dspTime >= windowCloseDsp);
+                yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= windowCloseDsp + _pauseDelta);
                 _inputWindowOpen   = false;
                 _beatInputConsumed = false;
 
@@ -476,6 +481,9 @@ namespace BeatHero.Combat
             _lastAttackReleaseTime  = -1f;
             _tapGraceEndTime        = -1f;
         }
+
+        private void OnConductorPaused()                     => _paused = true;
+        private void OnConductorResumed(double d) { _pauseDelta += d; _paused = false; }
 
         private void OnPlayerDeath()
         {
