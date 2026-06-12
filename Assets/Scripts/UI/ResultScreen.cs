@@ -31,6 +31,7 @@ namespace BeatHero.UI
         public void Show(Mode mode, int clearedFloors, int totalBeats,
                          Action onConfirm = null, Action onRetry = null, Action onTitle = null)
         {
+            gameObject.SetActive(true);
             _onConfirm = onConfirm;
             _onRetry   = onRetry;
             _onTitle   = onTitle;
@@ -57,6 +58,7 @@ namespace BeatHero.UI
         public void Hide()
         {
             _panel.SetActive(false);
+            gameObject.SetActive(false);
         }
 
         // 버튼 OnClick에서 호출
