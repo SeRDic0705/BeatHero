@@ -4,6 +4,7 @@ using BeatHero.Audio;
 using BeatHero.Combat;
 using BeatHero.Data;
 using BeatHero.Player;
+using BeatHero.UI;
 using UnityEngine;
 
 namespace BeatHero.Core
@@ -16,12 +17,21 @@ namespace BeatHero.Core
         public int PlayerHp      { get; private set; }
         public int PlayerMaxHp   { get; private set; }
 
+        public int TotalBeats { get; private set; }
+
         public event Action<int> OnFloorChanged;
         public event Action      OnGameOver;
         public event Action      OnFloorCleared;
 
         [SerializeField] private FloorData          _floorData;
         [SerializeField] private BattleStateMachine _battle;
+        [SerializeField] private ResultScreen       _resultScreen;
+
+        [Header("Transition Timing")]
+        [SerializeField] private float _rushDuration       = 1f;
+        [SerializeField] private float _exitDuration       = 1f;
+        [SerializeField] private float _blackoutMinWait    = 0.5f;
+        [SerializeField] private float _enterDuration      = 1f;
 
         private void Awake()
         {
@@ -33,6 +43,9 @@ namespace BeatHero.Core
             Instance = this;
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
+
+            if (_battle != null)
+                _battle.OnEffectiveBeatFired += () => TotalBeats++;
         }
 
         private void Start()
@@ -49,8 +62,9 @@ namespace BeatHero.Core
         public void StartRun(int maxHp)
         {
             InputReader.Instance?.SwitchToGameMap();
-            PlayerMaxHp = maxHp;
-            PlayerHp    = maxHp;
+            PlayerMaxHp  = maxHp;
+            PlayerHp     = maxHp;
+            TotalBeats   = 0;
             CurrentFloor = 1;
             OnFloorChanged?.Invoke(CurrentFloor);
             StartBattleForCurrentFloor();
@@ -83,16 +97,20 @@ namespace BeatHero.Core
             StartCoroutine(CompleteFloorRoutine());
         }
 
+        private bool IsBossFloor(int floor) => _floorData.GetMonster(floor) is Data.BossMonsterData;
+        private bool IsFinalFloor(int floor) => _floorData != null && floor == _floorData.floors.Count;
+
         private IEnumerator CompleteFloorRoutine()
         {
-            var player      = UnityEngine.Object.FindAnyObjectByType<PlayerController>();
-            var monsterView = UnityEngine.Object.FindAnyObjectByType<MonsterView>();
+            int completedFloor = CurrentFloor;
+            var player         = UnityEngine.Object.FindAnyObjectByType<PlayerController>();
+            var monsterView    = UnityEngine.Object.FindAnyObjectByType<MonsterView>();
 
             InputReader.Instance?.SwitchToUIMap();
 
             // 최후의 일격 전진
             if (player != null && monsterView != null)
-                yield return StartCoroutine(player.RushTo(monsterView.transform.position, 1f));
+                yield return StartCoroutine(player.RushTo(monsterView.transform.position, _rushDuration));
 
             // 사망 SFX
             AudioManager.Instance?.PlaySFX(_battle.CurrentMonster?.deathSfx);
@@ -100,10 +118,24 @@ namespace BeatHero.Core
             // 오른쪽 퇴장 + 아이리스 닫힘 동시
             if (SceneLoader.Instance != null && player != null)
             {
-                var exitCoroutine  = StartCoroutine(player.ExitRight(1f));
-                var wipeOutRoutine = StartCoroutine(SceneLoader.Instance.WipeOut(1f));
+                var exitCoroutine  = StartCoroutine(player.ExitRight(_exitDuration));
+                var wipeOutRoutine = StartCoroutine(SceneLoader.Instance.WipeOut(_exitDuration));
                 yield return exitCoroutine;
                 yield return wipeOutRoutine;
+            }
+
+            // 최종 클리어
+            if (IsFinalFloor(completedFloor))
+            {
+                OnFloorCleared?.Invoke();
+                if (_resultScreen != null)
+                {
+                    bool done = false;
+                    _resultScreen.Show(ResultScreen.Mode.FinalClear, completedFloor, TotalBeats,
+                        onTitle: () => { done = true; SceneLoader.Instance?.LoadTitle(); });
+                    yield return new WaitUntil(() => done);
+                }
+                yield break;
             }
 
             // 암전 — 다음 층 세팅
@@ -112,19 +144,30 @@ namespace BeatHero.Core
             OnFloorChanged?.Invoke(CurrentFloor);
             var monster = _floorData.GetMonster(CurrentFloor);
             if (monster != null)
-                _battle.SetFloorData(monster); // 내부에서 player.transform.position = centerPos
+                _battle.SetFloorData(monster);
 
-            // centerPos 캡처 후 플레이어 왼쪽 밖으로 배치
+            // 보스 클리어 결과창 (암전 중 표시)
+            if (IsBossFloor(completedFloor) && _resultScreen != null)
+            {
+                bool confirmed = false;
+                _resultScreen.Show(ResultScreen.Mode.BossClear, completedFloor, TotalBeats,
+                    onConfirm: () => confirmed = true);
+                yield return new WaitUntil(() => confirmed);
+            }
+
+            // 암전 최소 대기
+            yield return new WaitForSeconds(_blackoutMinWait);
+
+            // centerPos 캡처 후 왼쪽 등장 + 아이리스 열림
             if (player != null)
             {
                 Vector3 centerPos = player.transform.position;
+                player.transform.position = GetLeftEdge(player.transform.position);
 
-                // 아이리스 열림 + 왼쪽에서 등장 동시
                 if (SceneLoader.Instance != null)
                 {
-                    player.transform.position = GetLeftEdge(player.transform.position);
-                    var enterCoroutine = StartCoroutine(player.EnterFromLeft(centerPos, 1f));
-                    var wipeInRoutine  = StartCoroutine(SceneLoader.Instance.WipeIn(1f));
+                    var enterCoroutine = StartCoroutine(player.EnterFromLeft(centerPos, _enterDuration));
+                    var wipeInRoutine  = StartCoroutine(SceneLoader.Instance.WipeIn(_enterDuration));
                     yield return enterCoroutine;
                     yield return wipeInRoutine;
                 }
@@ -151,10 +194,37 @@ namespace BeatHero.Core
 
         private IEnumerator RestartRunRoutine()
         {
-            if (SceneLoader.Instance != null)
-                yield return SceneLoader.Instance.DoTransition(() => StartRun(PlayerMaxHp));
+            OnGameOver?.Invoke();
+            InputReader.Instance?.SwitchToUIMap();
+
+            if (_resultScreen != null)
+            {
+                bool chosen = false;
+                bool retry  = false;
+                _resultScreen.Show(ResultScreen.Mode.GameOver, CurrentFloor, TotalBeats,
+                    onRetry: () => { chosen = true; retry = true; },
+                    onTitle: () => { chosen = true; retry = false; });
+                yield return new WaitUntil(() => chosen);
+
+                if (retry)
+                {
+                    if (SceneLoader.Instance != null)
+                        yield return SceneLoader.Instance.DoTransition(() => StartRun(PlayerMaxHp));
+                    else
+                        StartRun(PlayerMaxHp);
+                }
+                else
+                {
+                    SceneLoader.Instance?.LoadTitle();
+                }
+            }
             else
-                StartRun(PlayerMaxHp);
+            {
+                if (SceneLoader.Instance != null)
+                    yield return SceneLoader.Instance.DoTransition(() => StartRun(PlayerMaxHp));
+                else
+                    StartRun(PlayerMaxHp);
+            }
         }
     }
 }
