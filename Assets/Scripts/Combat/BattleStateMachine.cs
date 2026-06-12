@@ -24,12 +24,13 @@ namespace BeatHero.Combat
         [SerializeField] private AudioClip _callBeatSfx;
 
         [Header("Dependencies")]
-        [SerializeField] private Conductor        _conductor;
-        [SerializeField] private GridManager      _grid;
-        [SerializeField] private PatternPlayer    _patternPlayer;
+        [SerializeField] private Conductor                  _conductor;
+        [SerializeField] private GridManager                _grid;
+        [SerializeField] private PatternPlayer              _patternPlayer;
         private InputReader _input => InputReader.Instance;
-        [SerializeField] private PlayerController _player;
-        [SerializeField] private PlayerConfig     _playerConfig;
+        [SerializeField] private PlayerController           _player;
+        [SerializeField] private PlayerAnimationController  _playerAnim;
+        [SerializeField] private PlayerConfig               _playerConfig;
 
         public event System.Action<MonsterData> OnBattleStarted;
         public event System.Action<int, int> OnMonsterHpChanged; // (current, max)
@@ -227,7 +228,7 @@ namespace BeatHero.Combat
 
                 if (preAttackJudge)
                 {
-                    if (_attackKeyDown) _attackHeld = true;
+                    if (_attackKeyDown) { _attackHeld = true; _playerAnim?.SetCharging(true); }
                     else FireAttack();
                 }
 
@@ -419,6 +420,7 @@ namespace BeatHero.Combat
             if (_beatInputConsumed) return;
             _beatInputConsumed = true;
             _attackHeld = true;
+            _playerAnim?.SetCharging(true);
         }
 
         private void OnAttackReleased()
@@ -452,6 +454,7 @@ namespace BeatHero.Combat
         private void FireAttack()
         {
             _hasPendingMove = false; // 공격 발동 → 같은 비트 이동 무효
+            _playerAnim?.TriggerAttack();
             _player.SpendMana(1);
             int dmg = Mathf.RoundToInt(_playerConfig.attackPower * _chargeDamageMultiplier);
             _monsterHp = Mathf.Max(0, _monsterHp - dmg);
@@ -480,6 +483,7 @@ namespace BeatHero.Combat
             _chargeDamageMultiplier = 1f;
             _lastAttackReleaseTime  = -1f;
             _tapGraceEndTime        = -1f;
+            _playerAnim?.SetCharging(false);
         }
 
         private void OnConductorPaused()                     => _paused = true;
