@@ -1189,6 +1189,8 @@ GameObject:
   - component: {fileID: 267482736}
   - component: {fileID: 267482735}
   - component: {fileID: 267482737}
+  - component: {fileID: 267482739}
+  - component: {fileID: 267482738}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1208,6 +1210,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b8a29a29da4e8b41a95d600dd28ef1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: BeatHero::BeatHero.Player.PlayerController
+  _anim: {fileID: 267482738}
 --- !u!4 &267482736
 Transform:
   m_ObjectHideFlags: 0
@@ -1270,7 +1273,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_MaskInteraction: 0
   m_Sprite: {fileID: 3246695597259797208, guid: 0c892d541b1e4a541b4769f3e7c772f0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -1282,6 +1285,41 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &267482738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 267482734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e93406b8949ac7346b36730f176f0a84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BeatHero::BeatHero.Player.PlayerAnimationController
+  _animator: {fileID: 267482739}
+--- !u!95 &267482739
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 267482734}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: f8ebf667f37e4134a83167b4b9688480, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &292098611
 GameObject:
   m_ObjectHideFlags: 0
@@ -7090,6 +7128,7 @@ MonoBehaviour:
   _grid: {fileID: 1667971344}
   _patternPlayer: {fileID: 1667971343}
   _player: {fileID: 267482735}
+  _playerAnim: {fileID: 267482738}
   _playerConfig: {fileID: 11400000, guid: c704b1b7d0e7e2741bb333e4be846ce4, type: 2}
 --- !u!4 &1667971346
 Transform:
@@ -8738,7 +8777,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -8748,7 +8787,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "3"
+  m_text: 3
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 673683c9370703445ab1d7c7d65526ef, type: 2}
   m_sharedMaterial: {fileID: 96775584089730298, guid: 673683c9370703445ab1d7c7d65526ef, type: 2}
