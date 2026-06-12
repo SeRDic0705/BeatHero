@@ -161,7 +161,6 @@ namespace BeatHero.Combat
             _grid.SetResponsePhase(false);
             double secPerUnit = _conductor.SecPerBeat / PatternPlayer.UNITS_PER_BEAT;
             int unitOffset = 0;
-            double phrasePauseDelta = _pauseDelta;
 
             foreach (var bu in _patternPlayer.CurrentPattern.beatUnits)
             {
@@ -172,8 +171,9 @@ namespace BeatHero.Combat
                 if (bu.gridEffectShape != null)
                     AudioManager.Instance?.PlaySFXScheduled(_callBeatSfx, noteStartDsp);
 
-                // 일시정지 중 대기 + 재개 후 누적 오프셋 보정
-                yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= noteStartDsp + (_pauseDelta - phrasePauseDelta));
+                // _pauseDelta = 누적 일시정지 시간. noteStartDsp는 원래 절대시각이므로
+                // noteStartDsp + _pauseDelta = 프레이즈 경계 포함 모든 일시정지 반영한 목표 시각.
+                yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= noteStartDsp + _pauseDelta);
 
                 OnBeatUnitFired?.Invoke();
                 _grid.ShowShape(bu.gridEffectShape);
@@ -189,12 +189,11 @@ namespace BeatHero.Combat
             _grid.ClearShape(); // CallPhase 마지막 빨간 장판 제거
             double secPerUnit = _conductor.SecPerBeat / PatternPlayer.UNITS_PER_BEAT;
             int unitOffset = 0;
-            double phrasePauseDelta = _pauseDelta;
 
             foreach (var bu in _patternPlayer.CurrentPattern.beatUnits)
             {
                 double noteStartDsp = phraseStartDsp + secPerUnit * unitOffset;
-                yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= noteStartDsp + (_pauseDelta - phrasePauseDelta));
+                yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= noteStartDsp + _pauseDelta);
 
                 OnBeatUnitFired?.Invoke();
                 if (bu.gridEffectShape != null) OnEffectiveBeatFired?.Invoke();
@@ -240,7 +239,7 @@ namespace BeatHero.Combat
 
                 // 판정 윈도우 닫힘 = 비트 + 판정구간 반폭 (DSP 절대시각 기준)
                 double windowCloseDsp = noteStartDsp + _judgmentWindowSec;
-                yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= windowCloseDsp + (_pauseDelta - phrasePauseDelta));
+                yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= windowCloseDsp + _pauseDelta);
                 _inputWindowOpen   = false;
                 _beatInputConsumed = false;
 
