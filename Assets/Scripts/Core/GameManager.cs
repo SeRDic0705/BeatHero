@@ -132,8 +132,10 @@ namespace BeatHero.Core
                 {
                     bool done = false;
                     _resultScreen.Show(ResultScreen.Mode.FinalClear, completedFloor, TotalBeats,
-                        onTitle: () => { done = true; SceneLoader.Instance?.LoadTitle(); });
+                        onTitle: () => { done = true; });
+
                     yield return new WaitUntil(() => done);
+                    SceneLoader.Instance?.LoadTitle();
                 }
                 yield break;
             }
