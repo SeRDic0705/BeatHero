@@ -28,8 +28,16 @@ namespace BeatHero.UI
         private const string PREF_RESOLUTION = "ResolutionIndex";
         private const string PREF_FULLSCREEN = "Fullscreen";
 
-        private void Start()
+        [Header("Canvas")]
+        [SerializeField] private GameObject _canvasRoot;
+
+        private bool _initialized;
+
+        private void EnsureInitialized()
         {
+            if (_initialized) return;
+            _initialized = true;
+
             BuildResolutionDropdown();
             LoadSettings();
 
@@ -45,12 +53,20 @@ namespace BeatHero.UI
             });
 
             if (_closeButton != null) _closeButton.onClick.AddListener(Hide);
-
-            gameObject.SetActive(false);
         }
 
-        public void Show() => gameObject.SetActive(true);
-        public void Hide() => gameObject.SetActive(false);
+        public void Show()
+        {
+            if (_canvasRoot != null) _canvasRoot.SetActive(true);
+            EnsureInitialized();
+            gameObject.SetActive(true);
+        }
+
+        public void Hide()
+        {
+            gameObject.SetActive(false);
+            if (_canvasRoot != null) _canvasRoot.SetActive(false);
+        }
 
         private void BuildResolutionDropdown()
         {
