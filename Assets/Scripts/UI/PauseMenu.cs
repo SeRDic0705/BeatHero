@@ -4,24 +4,22 @@ using UnityEngine.UI;
 
 namespace BeatHero.UI
 {
+    // PauseMenuCanvas 위에 있는 순수 View. 이벤트 구독은 PauseController가 담당.
     public class PauseMenu : MonoBehaviour
     {
-        [SerializeField] private GameObject _menuRoot;
-        [SerializeField] private Button _resumeButton;
-        [SerializeField] private Button _settingsButton;
-        [SerializeField] private Button _mainMenuButton;
+        [SerializeField] private GameObject    _menuRoot;
+        [SerializeField] private Button        _resumeButton;
+        [SerializeField] private Button        _settingsButton;
+        [SerializeField] private Button        _mainMenuButton;
         [SerializeField] private SettingsPanel _settingsPanel;
-        [SerializeField] private Conductor _conductor;
+        [SerializeField] private Conductor     _conductor;
 
-        private bool _isPaused;
-
-        private void Start()
+        private void Awake()
         {
-            _resumeButton.onClick.AddListener(Resume);
+            _resumeButton.onClick.AddListener(Close);
             _settingsButton.onClick.AddListener(OpenSettings);
             _mainMenuButton.onClick.AddListener(GoToMainMenu);
             _menuRoot.SetActive(false);
-            InputReader.Instance.OnPausePressed += Pause;
         }
 
         private void OnDestroy()
@@ -29,32 +27,29 @@ namespace BeatHero.UI
             _resumeButton.onClick.RemoveAllListeners();
             _settingsButton.onClick.RemoveAllListeners();
             _mainMenuButton.onClick.RemoveAllListeners();
-            if (InputReader.Instance != null)
-                InputReader.Instance.OnPausePressed -= Pause;
         }
 
-        private void Pause()
+        public void Open()
         {
-            _isPaused = true;
             _menuRoot.SetActive(true);
             _conductor?.Pause();
             Time.timeScale = 0f;
-            InputReader.Instance.SwitchToUIMap();
+            InputReader.Instance?.SwitchToUIMap();
         }
 
-        private void Resume()
+        public void Close()
         {
-            _isPaused = false;
             _settingsPanel?.Hide();
             _menuRoot.SetActive(false);
             _conductor?.Resume();
             Time.timeScale = 1f;
-            InputReader.Instance.SwitchToGameMap();
+            InputReader.Instance?.SwitchToGameMap();
+            gameObject.SetActive(false);
         }
 
         private void OpenSettings()
         {
-            if (_settingsPanel != null) _settingsPanel.Show();
+            _settingsPanel?.Show();
         }
 
         private void GoToMainMenu()
