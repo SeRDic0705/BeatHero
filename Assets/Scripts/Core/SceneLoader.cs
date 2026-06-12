@@ -59,7 +59,6 @@ namespace BeatHero.Core
             yield return SceneManager.LoadSceneAsync(sceneName);
             yield return StartCoroutine(WipeIn());
             OnSceneOpened?.Invoke();
-            OnSceneOpened = null; // 한 번만 발동
         }
 
         private IEnumerator AnimateWipe(float fromRadius, float toRadius, float duration = WIPE_DURATION)

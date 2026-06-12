@@ -50,17 +50,31 @@ namespace BeatHero.Core
 
         private void Start()
         {
-            if (_battle == null || _floorData == null) return;
-
-            // SceneLoader를 통해 진입한 경우 → 오프닝 완료 후 시작
             if (SceneLoader.Instance != null)
-                SceneLoader.Instance.OnSceneOpened += () => StartRun(100);
-            else
+                SceneLoader.Instance.OnSceneOpened += OnSceneOpened;
+            else if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "GameScene")
+                StartRun(100);
+        }
+
+        private void OnSceneOpened()
+        {
+            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "GameScene")
                 StartRun(100);
         }
 
         public void StartRun(int maxHp)
         {
+            // DontDestroyOnLoad이므로 씬 재로드 후 씬-로컬 레퍼런스가 파괴됨 → 다시 찾아 갱신
+            // FindObjectsInactive.Include 필수 — ResultCanvas는 기본값 inactive이므로 Exclude하면 못 찾음
+            if (_battle == null)
+            {
+                _battle = UnityEngine.Object.FindAnyObjectByType<BattleStateMachine>(FindObjectsInactive.Include);
+                if (_battle != null)
+                    _battle.OnEffectiveBeatFired += () => TotalBeats++;
+            }
+            if (_resultScreen == null)
+                _resultScreen = UnityEngine.Object.FindAnyObjectByType<ResultScreen>(FindObjectsInactive.Include);
+
             InputReader.Instance?.SwitchToGameMap();
             PlayerMaxHp  = maxHp;
             PlayerHp     = maxHp;
