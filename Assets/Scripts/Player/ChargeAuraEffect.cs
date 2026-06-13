@@ -86,18 +86,16 @@ namespace BeatHero.Player
             var scale = ImpactScales[Mathf.Clamp(stage, 0, ImpactScales.Length - 1)];
             _impactAura.transform.localScale = Vector3.one * scale;
 
-            var main = _impactAura.main;
-            main.loop = false;
-            // 8분음표 1개 길이로 duration 설정
-            if (_conductor != null)
-                main.duration = (float)(_conductor.SecPerBeat * 0.5);
-
             if (!_impactActive)
             {
                 _impactActive = true;
                 _lastEighthNote = -1;
-                // 즉시 1회 재생 — 다음 8분음표 경계는 Update에서 처리
+                // Stop 후에 duration 설정 (재생 중 설정 불가)
                 _impactAura.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                var main = _impactAura.main;
+                main.loop = false;
+                if (_conductor != null)
+                    main.duration = (float)(_conductor.SecPerBeat * 0.5);
                 _impactAura.Play();
             }
         }
