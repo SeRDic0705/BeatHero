@@ -228,8 +228,8 @@ namespace BeatHero.Combat
 
                 if (preAttackJudge)
                 {
-                    if (_attackKeyDown) { _attackHeld = true; _playerAnim?.SetChargeStage(1); }
-                    else FireAttack();
+                    if (_attackKeyDown && _player.Mana > 0) { _attackHeld = true; _playerAnim?.SetChargeStage(1); }
+                    else if (!_attackKeyDown) FireAttack();
                 }
 
                 _lastMoveTime        = -1.0;
@@ -250,10 +250,12 @@ namespace BeatHero.Combat
                     _tapGraceEndTime = AudioSettings.dspTime + _tapGraceSec;
                 else if (continuingCharge && _attackHeld && _attackKeyDown)
                 {
-                    _player.SpendMana(1);
-                    _chargeDamageMultiplier += CHARGE_MULT_PER_BEAT;
-                    _chargeBeats++;
-                    _playerAnim?.SetChargeStage(Mathf.Min(_chargeBeats, 3) + 1);
+                    if (_player.SpendMana(1))
+                    {
+                        _chargeDamageMultiplier += CHARGE_MULT_PER_BEAT;
+                        _chargeBeats++;
+                        _playerAnim?.SetChargeStage(Mathf.Min(_chargeBeats, 3) + 1);
+                    }
                     _tapGraceEndTime = -1f;
                 }
 
@@ -419,6 +421,7 @@ namespace BeatHero.Combat
             // 윈도우가 열린 구간에서만 첫 입력 처리 후 슬롯 소진
             if (!_inputWindowOpen) return;
             if (_beatInputConsumed) return;
+            if (_player.Mana <= 0) return; // 마나 부족 시 차지 시작 불가
             _beatInputConsumed = true;
             _attackHeld = true;
             _playerAnim?.SetChargeStage(1);
@@ -454,9 +457,9 @@ namespace BeatHero.Combat
 
         private void FireAttack()
         {
+            if (!_player.SpendMana(1)) return; // 마나 부족 시 공격 불가
             _hasPendingMove = false; // 공격 발동 → 같은 비트 이동 무효
             _playerAnim?.TriggerAttack();
-            _player.SpendMana(1);
             int dmg = Mathf.RoundToInt(_playerConfig.attackPower * _chargeDamageMultiplier);
             _monsterHp = Mathf.Max(0, _monsterHp - dmg);
             OnMonsterHpChanged?.Invoke(_monsterHp, _monster.maxHp);
