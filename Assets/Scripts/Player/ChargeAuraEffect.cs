@@ -13,7 +13,7 @@ namespace BeatHero.Player
     }
 
     // 차지 단계별 후광 파티클 제어
-    // GatherParticles(1+) + ImpactAura BPM-synced(1+, 마디 경계마다 재트리거)
+    // GatherParticles(1+) + ImpactAura 8분음표 싱크(1+, 마디당 8회 재트리거)
     public class ChargeAuraEffect : MonoBehaviour
     {
         [Header("Particle Systems")]
@@ -35,10 +35,20 @@ namespace BeatHero.Player
         private static readonly float[] ImpactScales = { 0f, 0.25f, 0.45f, 0.70f, 1.0f };
 
         private bool _impactActive;
+        private int  _lastEighthNote = -1;
 
-        private void OnDestroy()
+        private void Update()
         {
-            UnsubscribeBeat();
+            if (!_impactActive || _conductor == null || _impactAura == null) return;
+
+            // 8분음표 경계 감지: SongPositionInBeats * 2 의 정수 변화
+            int currentEighth = (int)(_conductor.SongPositionInBeats * 2);
+            if (currentEighth != _lastEighthNote)
+            {
+                _lastEighthNote = currentEighth;
+                _impactAura.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                _impactAura.Play();
+            }
         }
 
         public void SetStage(int stage)
@@ -68,7 +78,7 @@ namespace BeatHero.Player
             if (stage <= 0)
             {
                 _impactActive = false;
-                UnsubscribeBeat();
+                _lastEighthNote = -1;
                 _impactAura.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
                 return;
             }
@@ -76,43 +86,20 @@ namespace BeatHero.Player
             var scale = ImpactScales[Mathf.Clamp(stage, 0, ImpactScales.Length - 1)];
             _impactAura.transform.localScale = Vector3.one * scale;
 
-            // BPM duration 설정 (Conductor 없으면 기본 1.5s 유지)
             var main = _impactAura.main;
             main.loop = false;
+            // 8분음표 1개 길이로 duration 설정
             if (_conductor != null)
-                main.duration = (float)(_conductor.SecPerBeat * 4);
+                main.duration = (float)(_conductor.SecPerBeat * 0.5);
 
             if (!_impactActive)
             {
                 _impactActive = true;
-                SubscribeBeat();
-                // 즉시 1회 재생 (다음 마디 경계까지 기다리지 않음)
+                _lastEighthNote = -1;
+                // 즉시 1회 재생 — 다음 8분음표 경계는 Update에서 처리
                 _impactAura.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
                 _impactAura.Play();
             }
-        }
-
-        private void OnBeat(int beat)
-        {
-            if (!_impactActive || _impactAura == null) return;
-            // 4박(마디) 경계마다 재트리거 → 비트바 메트로놈과 위상 동기화
-            if (beat % 4 == 0)
-            {
-                _impactAura.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-                _impactAura.Play();
-            }
-        }
-
-        private void SubscribeBeat()
-        {
-            if (_conductor != null)
-                _conductor.OnBeat += OnBeat;
-        }
-
-        private void UnsubscribeBeat()
-        {
-            if (_conductor != null)
-                _conductor.OnBeat -= OnBeat;
         }
     }
 }
