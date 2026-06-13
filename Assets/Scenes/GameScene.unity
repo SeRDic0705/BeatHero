@@ -1137,7 +1137,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8038344524183138614, guid: 0277167a12290af47801444830a2be97, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 8038344524183138614, guid: 0277167a12290af47801444830a2be97, type: 3}
       propertyPath: m_LocalRotation.w
@@ -5339,6 +5339,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: BeatHero::BeatHero.Player.ChargeAuraEffect
   _gatherParticles: {fileID: 1604548190}
   _impactAura: {fileID: 257925978}
+  _conductor: {fileID: 2136934201}
   _gatherConfigs:
   - color: {r: 1, g: 1, b: 0.7, a: 0.7}
     startSize: 0.06
@@ -6981,7 +6982,7 @@ Transform:
   m_GameObject: {fileID: 1604548187}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
