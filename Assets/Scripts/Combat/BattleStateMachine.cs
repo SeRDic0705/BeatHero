@@ -495,6 +495,8 @@ namespace BeatHero.Combat
 
         private void OnPlayerDeath()
         {
+            StopAllCoroutines(); // 프레이즈 루프 즉시 종료
+            _phraseRunning = false;
             _state = State.BattleEnd;
             _conductor.Stop();
             GameManager.Instance.RestartRun();

@@ -213,6 +213,10 @@ namespace BeatHero.Core
             OnGameOver?.Invoke();
             InputReader.Instance?.SwitchToUIMap();
 
+            // 아이리스 닫힘 — 클리어 흐름과 동일하게 암전 후 결과창 표시
+            if (SceneLoader.Instance != null)
+                yield return SceneLoader.Instance.WipeOut(_exitDuration);
+
             if (_resultScreen != null)
             {
                 bool chosen = false;
@@ -224,10 +228,11 @@ namespace BeatHero.Core
 
                 if (retry)
                 {
+                    // 암전 중 게임 리셋 후 아이리스 열림
+                    // BGM은 Conductor의 1마디 리드타임 덕분에 WipeIn과 자연스럽게 맞춰짐
+                    StartRun(PlayerMaxHp);
                     if (SceneLoader.Instance != null)
-                        yield return SceneLoader.Instance.DoTransition(() => StartRun(PlayerMaxHp));
-                    else
-                        StartRun(PlayerMaxHp);
+                        yield return SceneLoader.Instance.WipeIn(_enterDuration);
                 }
                 else
                 {
@@ -236,10 +241,9 @@ namespace BeatHero.Core
             }
             else
             {
+                StartRun(PlayerMaxHp);
                 if (SceneLoader.Instance != null)
-                    yield return SceneLoader.Instance.DoTransition(() => StartRun(PlayerMaxHp));
-                else
-                    StartRun(PlayerMaxHp);
+                    yield return SceneLoader.Instance.WipeIn(_enterDuration);
             }
         }
     }
