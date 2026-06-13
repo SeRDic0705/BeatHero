@@ -27,9 +27,9 @@ namespace BeatHero.Player
         [SerializeField] private AuraLayerConfig[] _gatherConfigs = new AuraLayerConfig[4]
         {
             new() { color = new Color(1f, 1f,    0.7f, 0.70f), startSize = 0.06f, emissionRate = 10f },
-            new() { color = new Color(1f, 0.95f, 0.4f, 0.85f), startSize = 0.07f, emissionRate = 18f },
-            new() { color = new Color(1f, 0.90f, 0.2f, 1.00f), startSize = 0.09f, emissionRate = 28f },
-            new() { color = new Color(1f, 1f,    0.5f, 1.00f), startSize = 0.11f, emissionRate = 40f },
+            new() { color = new Color(1f, 0.95f, 0.4f, 0.85f), startSize = 0.06f, emissionRate = 18f },
+            new() { color = new Color(1f, 0.90f, 0.2f, 1.00f), startSize = 0.06f, emissionRate = 28f },
+            new() { color = new Color(1f, 1f,    0.5f, 1.00f), startSize = 0.06f, emissionRate = 40f },
         };
 
         private static readonly float[] ImpactScales = { 0f, 0.25f, 0.45f, 0.70f, 1.0f };
