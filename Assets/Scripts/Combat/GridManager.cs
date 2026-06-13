@@ -140,6 +140,8 @@ namespace BeatHero.Combat
                         ? Instantiate(_tilePrefab, transform.position + pos, Quaternion.identity, transform)
                         : CreateDefaultTile(pos);
                     _tiles[x, y] = tile;
+                    var tileSr = tile.GetComponent<SpriteRenderer>();
+                    if (tileSr != null) tileSr.sortingOrder = -1;
                 }
         }
 
