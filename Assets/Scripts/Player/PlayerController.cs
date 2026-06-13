@@ -14,6 +14,8 @@ namespace BeatHero.Player
         public int Mana    { get; private set; }
         public bool HasShield { get; private set; }
 
+        [SerializeField] private PlayerAnimationController _anim;
+
         public event Action<int, int> OnHpChanged;   // (current, max)
         public event Action<int>      OnManaChanged;  // current
         public event Action           OnDeath;
@@ -39,7 +41,15 @@ namespace BeatHero.Player
             }
             Hp = Mathf.Max(0, Hp - amount);
             OnHpChanged?.Invoke(Hp, MaxHp);
-            if (Hp <= 0) OnDeath?.Invoke();
+            if (Hp <= 0)
+            {
+                _anim?.TriggerDeath();
+                OnDeath?.Invoke();
+            }
+            else
+            {
+                _anim?.TriggerHurt();
+            }
         }
 
         // 차지 취소·피격 시 호출해서 외부에서도 차지 취소 데미지 반영 가능
@@ -72,6 +82,7 @@ namespace BeatHero.Player
 
         public IEnumerator RushTo(Vector3 target, float duration)
         {
+            _anim?.SetRunning(true);
             Vector3 start = transform.position;
             for (float t = 0f; t < duration; t += Time.deltaTime)
             {
@@ -79,6 +90,7 @@ namespace BeatHero.Player
                 yield return null;
             }
             transform.position = target;
+            _anim?.SetRunning(false);
         }
 
         public IEnumerator ExitRight(float duration)
