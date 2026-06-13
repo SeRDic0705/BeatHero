@@ -1,4 +1,5 @@
 using System;
+using BeatHero.Core;
 using UnityEngine;
 
 namespace BeatHero.Player
@@ -12,12 +13,15 @@ namespace BeatHero.Player
     }
 
     // 차지 단계별 후광 파티클 제어
-    // GatherParticles(1+) + ImpactAura looping(1+, 단계별 스케일)
+    // GatherParticles(1+) + ImpactAura BPM-synced(1+, 마디 경계마다 재트리거)
     public class ChargeAuraEffect : MonoBehaviour
     {
         [Header("Particle Systems")]
         [SerializeField] private ParticleSystem _gatherParticles;
         [SerializeField] private ParticleSystem _impactAura;
+
+        [Header("BPM Sync")]
+        [SerializeField] private Conductor _conductor;
 
         [Header("Gather (stage 1+)")]
         [SerializeField] private AuraLayerConfig[] _gatherConfigs = new AuraLayerConfig[4]
@@ -28,13 +32,19 @@ namespace BeatHero.Player
             new() { color = new Color(1f, 1f,    0.5f, 1.00f), startSize = 0.11f, emissionRate = 40f },
         };
 
-        // 차지 단계별 ImpactAura localScale
         private static readonly float[] ImpactScales = { 0f, 0.25f, 0.45f, 0.70f, 1.0f };
+
+        private bool _impactActive;
+
+        private void OnDestroy()
+        {
+            UnsubscribeBeat();
+        }
 
         public void SetStage(int stage)
         {
             ApplyGather(_gatherParticles, stage >= 1, _gatherConfigs, stage - 1);
-            ApplyImpact(_impactAura, stage);
+            ApplyImpact(stage);
         }
 
         private static void ApplyGather(ParticleSystem ps, bool active, AuraLayerConfig[] configs, int idx)
@@ -51,19 +61,58 @@ namespace BeatHero.Player
             if (!ps.isPlaying) ps.Play();
         }
 
-        private static void ApplyImpact(ParticleSystem ps, int stage)
+        private void ApplyImpact(int stage)
         {
-            if (ps == null) return;
+            if (_impactAura == null) return;
+
             if (stage <= 0)
             {
-                ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                _impactActive = false;
+                UnsubscribeBeat();
+                _impactAura.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
                 return;
             }
+
             var scale = ImpactScales[Mathf.Clamp(stage, 0, ImpactScales.Length - 1)];
-            ps.transform.localScale = Vector3.one * scale;
-            var main = ps.main;
-            main.loop = true;
-            if (!ps.isPlaying) ps.Play();
+            _impactAura.transform.localScale = Vector3.one * scale;
+
+            // BPM duration 설정 (Conductor 없으면 기본 1.5s 유지)
+            var main = _impactAura.main;
+            main.loop = false;
+            if (_conductor != null)
+                main.duration = (float)(_conductor.SecPerBeat * 4);
+
+            if (!_impactActive)
+            {
+                _impactActive = true;
+                SubscribeBeat();
+                // 즉시 1회 재생 (다음 마디 경계까지 기다리지 않음)
+                _impactAura.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                _impactAura.Play();
+            }
+        }
+
+        private void OnBeat(int beat)
+        {
+            if (!_impactActive || _impactAura == null) return;
+            // 4박(마디) 경계마다 재트리거 → 비트바 메트로놈과 위상 동기화
+            if (beat % 4 == 0)
+            {
+                _impactAura.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                _impactAura.Play();
+            }
+        }
+
+        private void SubscribeBeat()
+        {
+            if (_conductor != null)
+                _conductor.OnBeat += OnBeat;
+        }
+
+        private void UnsubscribeBeat()
+        {
+            if (_conductor != null)
+                _conductor.OnBeat -= OnBeat;
         }
     }
 }
