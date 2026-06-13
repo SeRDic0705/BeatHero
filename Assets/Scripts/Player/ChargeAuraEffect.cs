@@ -4,52 +4,80 @@ using UnityEngine;
 namespace BeatHero.Player
 {
     [Serializable]
-    public struct AuraStageConfig
+    public struct AuraLayerConfig
     {
-        public Color  color;
-        public float  startSize;
-        public float  emissionRate;
+        public Color color;
+        public float startSize;
+        public float emissionRate;
     }
 
-    // 차지 단계별 후광 파티클 제어 — SetStage(0)=꺼짐, 1~4=단계별 강도
+    // 차지 단계별 3-레이어 후광 파티클 제어
+    // GatherParticles(1+) → AuraSparks(2+) → FlameAura(3+)
     public class ChargeAuraEffect : MonoBehaviour
     {
-        [SerializeField] private ParticleSystem _particles;
+        [Header("Particle Systems")]
+        [SerializeField] private ParticleSystem _gatherParticles;
+        [SerializeField] private ParticleSystem _auraSparks;
+        [SerializeField] private ParticleSystem _flameAura;
 
-        // 인스펙터에서 단계별 색상·크기·방출 속도를 조정한다 (index 0 = stage 1)
-        [SerializeField] private AuraStageConfig[] _stages = new AuraStageConfig[4]
+        // index 0 = stage 1
+        [Header("Gather (stage 1+)")]
+        [SerializeField] private AuraLayerConfig[] _gatherConfigs = new AuraLayerConfig[4]
         {
-            new() { color = new Color(1f, 0.9f, 0.3f, 0.6f), startSize = 0.4f, emissionRate = 15f },
-            new() { color = new Color(1f, 0.6f, 0.1f, 0.7f), startSize = 0.7f, emissionRate = 30f },
-            new() { color = new Color(1f, 0.3f, 0.0f, 0.8f), startSize = 1.0f, emissionRate = 50f },
-            new() { color = new Color(1f, 0.95f, 0.6f, 1.0f), startSize = 1.4f, emissionRate = 80f },
+            new() { color = new Color(1f, 1f,    0.7f, 0.70f), startSize = 0.06f, emissionRate = 10f },
+            new() { color = new Color(1f, 0.95f, 0.4f, 0.85f), startSize = 0.07f, emissionRate = 18f },
+            new() { color = new Color(1f, 0.90f, 0.2f, 1.00f), startSize = 0.09f, emissionRate = 28f },
+            new() { color = new Color(1f, 1f,    0.5f, 1.00f), startSize = 0.11f, emissionRate = 40f },
         };
 
-        private void Awake()
+        // index 0 = stage 2
+        [Header("Sparks (stage 2+)")]
+        [SerializeField] private AuraLayerConfig[] _sparkConfigs = new AuraLayerConfig[4]
         {
-            if (_particles == null) _particles = GetComponent<ParticleSystem>();
-        }
+            new() { color = new Color(1f, 0.85f, 0.10f, 0.70f), startSize = 0.08f, emissionRate = 20f },
+            new() { color = new Color(1f, 0.70f, 0.05f, 0.85f), startSize = 0.10f, emissionRate = 35f },
+            new() { color = new Color(1f, 0.50f, 0.00f, 1.00f), startSize = 0.13f, emissionRate = 55f },
+            new() { color = new Color(1f, 0.50f, 0.00f, 1.00f), startSize = 0.13f, emissionRate = 55f },
+        };
+
+        // index 0 = stage 3
+        [Header("Flame (stage 3+)")]
+        [SerializeField] private AuraLayerConfig[] _flameConfigs = new AuraLayerConfig[4]
+        {
+            new() { color = new Color(1f, 0.45f, 0.00f, 0.80f), startSize = 0.15f, emissionRate = 25f },
+            new() { color = new Color(1f, 0.20f, 0.00f, 1.00f), startSize = 0.20f, emissionRate = 50f },
+            new() { color = new Color(1f, 0.20f, 0.00f, 1.00f), startSize = 0.20f, emissionRate = 50f },
+            new() { color = new Color(1f, 0.20f, 0.00f, 1.00f), startSize = 0.20f, emissionRate = 50f },
+        };
 
         public void SetStage(int stage)
         {
-            if (stage <= 0)
+            ApplyLayer(_gatherParticles, stage >= 1, _gatherConfigs, stage - 1);
+            ApplyLayer(_auraSparks,      stage >= 2, _sparkConfigs,  stage - 2);
+            ApplyLayer(_flameAura,       stage >= 3, _flameConfigs,  stage - 3);
+        }
+
+        private static void ApplyLayer(ParticleSystem ps, bool active, AuraLayerConfig[] configs, int idx)
+        {
+            if (ps == null) return;
+
+            if (!active)
             {
-                _particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
                 return;
             }
 
-            int idx = Mathf.Clamp(stage - 1, 0, _stages.Length - 1);
-            var cfg = _stages[idx];
+            idx = Mathf.Clamp(idx, 0, configs.Length - 1);
+            var cfg = configs[idx];
 
-            var main = _particles.main;
+            var main     = ps.main;
             main.startColor = cfg.color;
-            main.startSize  = cfg.startSize;
+            main.startSize  = new ParticleSystem.MinMaxCurve(cfg.startSize);
 
-            var emission = _particles.emission;
+            var emission = ps.emission;
             emission.rateOverTime = cfg.emissionRate;
 
-            if (!_particles.isPlaying)
-                _particles.Play();
+            if (!ps.isPlaying) ps.Play();
         }
     }
 }
