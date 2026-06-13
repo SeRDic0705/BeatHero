@@ -228,7 +228,7 @@ namespace BeatHero.Combat
 
                 if (preAttackJudge)
                 {
-                    if (_attackKeyDown) { _attackHeld = true; _playerAnim?.SetCharging(true); }
+                    if (_attackKeyDown) { _attackHeld = true; _playerAnim?.SetChargeStage(1); }
                     else FireAttack();
                 }
 
@@ -253,6 +253,7 @@ namespace BeatHero.Combat
                     _player.SpendMana(1);
                     _chargeDamageMultiplier += CHARGE_MULT_PER_BEAT;
                     _chargeBeats++;
+                    _playerAnim?.SetChargeStage(Mathf.Min(_chargeBeats, 3) + 1);
                     _tapGraceEndTime = -1f;
                 }
 
@@ -420,7 +421,7 @@ namespace BeatHero.Combat
             if (_beatInputConsumed) return;
             _beatInputConsumed = true;
             _attackHeld = true;
-            _playerAnim?.SetCharging(true);
+            _playerAnim?.SetChargeStage(1);
         }
 
         private void OnAttackReleased()
@@ -483,7 +484,7 @@ namespace BeatHero.Combat
             _chargeDamageMultiplier = 1f;
             _lastAttackReleaseTime  = -1f;
             _tapGraceEndTime        = -1f;
-            _playerAnim?.SetCharging(false);
+            _playerAnim?.SetChargeStage(0);
         }
 
         private void OnConductorPaused()                     => _paused = true;
