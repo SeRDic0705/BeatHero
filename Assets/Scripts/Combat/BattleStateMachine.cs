@@ -52,6 +52,11 @@ namespace BeatHero.Combat
         private bool   _paused;
         private double _pauseDelta;
 
+        // 페이즈 전환 대기 — 다음 프레이즈 시작 시각에 맞춰 SwitchPhaseAt 호출
+        private bool      _pendingPhaseSwitch;
+        private AudioClip _pendingBgm;
+        private int       _pendingBpm;
+
         // 입력 윈도우
         private bool    _inputWindowOpen;
         private bool    _attackHeld;
@@ -112,6 +117,7 @@ namespace BeatHero.Combat
             _grid.Initialize(monster.gridType);
             _player.Initialize(_playerConfig.maxHp);
 
+            _pendingPhaseSwitch = false;
             _phase = monster.GetCurrentPhase(1f);
             _conductor.PrepareSong(_phase.bgm, _phase.bpm);
             // 콜 효과음 프리로드 — 미로드 시 첫 PlayScheduled에서 로딩 지연으로 첫 박이 밀린다.
@@ -152,8 +158,16 @@ namespace BeatHero.Combat
             TransitionToNextPattern();
             _phraseRunning = false;
 
+            // BGM/BPM 전환: 다음 프레이즈 시작 dsp와 정확히 맞춤 (mid-phrase 어긋남 방지)
+            double nextPhraseStart = responseDsp + phraseDurationSec;
+            if (_pendingPhaseSwitch)
+            {
+                _conductor.SwitchPhaseAt(nextPhraseStart, _pendingBgm, _pendingBpm);
+                _pendingPhaseSwitch = false;
+            }
+
             if (_state == State.CallPhase)
-                StartCoroutine(HandlePhrasePair(responseDsp + phraseDurationSec));
+                StartCoroutine(HandlePhrasePair(nextPhraseStart));
         }
 
         // ── CallPhase ──────────────────────────────────────────
@@ -366,6 +380,7 @@ namespace BeatHero.Combat
         {
             if (_state == State.BattleEnd) return;
             _state = State.BattleEnd;
+            _pendingPhaseSwitch = false;
             _conductor.Stop();
             // 전투 종료 — 유지되던 마지막 위험 그리드를 비운다(다음 층 미존재 시에도 잔상 방지).
             _grid.ClearShape();
@@ -389,7 +404,10 @@ namespace BeatHero.Combat
             var newPhase = boss.GetCurrentPhase(hpPct);
             if (newPhase == _phase) return;
             _phase = newPhase;
-            _conductor.SwitchPhaseAtNextMeasure(_phase.bgm, _phase.bpm);
+            // BGM 전환은 HandlePhrasePair에서 nextPhraseStart 시각에 맞춰 처리
+            _pendingPhaseSwitch = true;
+            _pendingBgm         = _phase.bgm;
+            _pendingBpm         = _phase.bpm;
         }
 
         // ── 입력 핸들러 ────────────────────────────────────────

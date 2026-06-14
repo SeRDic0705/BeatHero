@@ -123,38 +123,48 @@ namespace BeatHero.Core
             OnResumed?.Invoke(pausedDuration);
         }
 
-        // 보스 페이즈 전환: 다음 마디 경계(4박 배수)에서 BGM/BPM 교체
-        public void SwitchPhaseAtNextMeasure(AudioClip bgm, int bpm, int beatsPerMeasure = 4)
+        // 보스 페이즈 전환: 지정된 dspTime에 BGM/BPM 교체.
+        // 클럭 파라미터(BPM·dspSongStartTime)는 즉시 갱신 → 다음 프레이즈가 올바른 BPM으로 시작됨.
+        // 오디오 소스 교체만 ApplyPendingSwitch에서 비동기 처리.
+        public void SwitchPhaseAt(double dspTime, AudioClip bgm, int bpm)
         {
-            int currentBeat = (int)SongPositionInBeats;
-            int nextMeasureBeat = ((currentBeat / beatsPerMeasure) + 1) * beatsPerMeasure;
-            _switchDspTime = GetBeatDspTime(nextMeasureBeat);
+            _switchDspTime = dspTime;
             _nextBgm = bgm;
             _nextBpm = bpm;
             _switchPending = true;
 
-            _audioSource.SetScheduledEndTime(_switchDspTime);
+            _audioSource.SetScheduledEndTime(dspTime);
             var nextSource = gameObject.AddComponent<AudioSource>();
             nextSource.clip = bgm;
             nextSource.loop = true;
             nextSource.outputAudioMixerGroup = _bgmMixerGroup;
-            nextSource.PlayScheduled(_switchDspTime);
-            // 전환 완료 시 ApplyPendingSwitch에서 파라미터 교체
+            nextSource.PlayScheduled(dspTime);
+
+            // 클럭 파라미터 즉시 교체 — 프레임 순서 경쟁 없이 새 BPM으로 전환
+            _bpm             = bpm;
+            _secPerBeat      = 60.0 / bpm;
+            _dspSongStartTime = dspTime;
+            _firstBeatOffsetSec = 0;
+            _lastFiredBeat   = 0;
+
+            OnSongScheduled?.Invoke(dspTime, bpm);
+        }
+
+        // 구형 API — 다음 마디 경계 자동 계산. BattleStateMachine은 SwitchPhaseAt을 사용.
+        public void SwitchPhaseAtNextMeasure(AudioClip bgm, int bpm, int beatsPerMeasure = 4)
+        {
+            int currentBeat    = (int)SongPositionInBeats;
+            int nextMeasureBeat = ((currentBeat / beatsPerMeasure) + 1) * beatsPerMeasure;
+            SwitchPhaseAt(GetBeatDspTime(nextMeasureBeat), bgm, bpm);
         }
 
         public double GetBeatDspTime(int beatIndex)
             => _dspSongStartTime + _firstBeatOffsetSec + beatIndex * _secPerBeat;
 
+        // 클럭 파라미터는 SwitchPhaseAt에서 이미 갱신됨 — 여기서는 AudioSource 교체만 처리
         private void ApplyPendingSwitch()
         {
             _switchPending = false;
-            _bpm = _nextBpm;
-            _secPerBeat = 60.0 / _nextBpm;
-            _dspSongStartTime = _switchDspTime;
-            _firstBeatOffsetSec = 0;
-            _lastFiredBeat = 0;
-
-            // 기존 AudioSource 제거 후 새 소스를 주 소스로 교체
             var sources = GetComponents<AudioSource>();
             foreach (var src in sources)
                 if (src != _audioSource && src.clip == _nextBgm)
@@ -163,8 +173,6 @@ namespace BeatHero.Core
                     _audioSource = src;
                     break;
                 }
-
-            OnSongScheduled?.Invoke(_dspSongStartTime, _bpm);
         }
     }
 }
