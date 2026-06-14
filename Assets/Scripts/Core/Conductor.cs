@@ -184,15 +184,20 @@ namespace BeatHero.Core
 
         private System.Collections.IEnumerator FadeOutSource(AudioSource src, float duration)
         {
-            float startVolume = src != null ? src.volume : 1f;
+            if (src == null || duration <= 0f) yield break;
+            float startVolume = src.volume;
             float elapsed = 0f;
-            while (elapsed < duration && src != null)
+            while (elapsed < duration)
             {
                 elapsed += UnityEngine.Time.deltaTime;
-                src.volume = Mathf.Lerp(startVolume, 0f, elapsed / duration);
+                float t = Mathf.Clamp01(elapsed / duration);
+                // Equal-power fade: cos 곡선으로 청각적으로 균일한 페이드
+                try { src.volume = startVolume * Mathf.Cos(t * Mathf.PI * 0.5f); }
+                catch { yield break; } // AudioSource가 Destroy된 경우 조기 종료
                 yield return null;
             }
-            if (src != null) src.volume = 0f;
+            try { src.volume = 0f; }
+            catch { }
         }
 
         // 구형 API — 다음 마디 경계 자동 계산. BattleStateMachine은 SwitchPhaseAt을 사용.
