@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c29b80fe10bb514ba2511bf44e0e2db, type: 3}
+  m_Name: Feedback_002
+  m_EditorClassIdentifier: BeatHero::BeatHero.Data.CellEffectFeedback
+  activateSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
+  vfxFrames:
+  - {fileID: 2110664200, guid: 8c002085390cf294a98e6ca3a762dfcb, type: 3}
+  - {fileID: -2024063969, guid: 8c002085390cf294a98e6ca3a762dfcb, type: 3}
+  - {fileID: -424379062, guid: 8c002085390cf294a98e6ca3a762dfcb, type: 3}
+  - {fileID: -576124781, guid: 8c002085390cf294a98e6ca3a762dfcb, type: 3}
+  - {fileID: -1546938663, guid: 8c002085390cf294a98e6ca3a762dfcb, type: 3}
+  - {fileID: -1665546478, guid: 8c002085390cf294a98e6ca3a762dfcb, type: 3}
+  vfxFps: 24
