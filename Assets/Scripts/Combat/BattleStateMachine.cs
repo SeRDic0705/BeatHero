@@ -200,8 +200,10 @@ namespace BeatHero.Combat
         // ── ResponsePhase ──────────────────────────────────────
         private IEnumerator HandleResponsePhrase(double phraseStartDsp)
         {
+            // CallPhase 마지막 박자를 1박 동안 표시 후 제거 (즉시 ClearShape하면 마지막 장판이 1프레임만 보임)
+            yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= phraseStartDsp + _pauseDelta);
             _grid.SetResponsePhase(true);
-            _grid.ClearShape(); // CallPhase 마지막 빨간 장판 제거
+            _grid.ClearShape();
             double secPerUnit = _conductor.SecPerBeat / PatternPlayer.UNITS_PER_BEAT;
             int unitOffset = 0;
 
