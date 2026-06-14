@@ -11,6 +11,7 @@ namespace BeatHero.Player
         private static readonly int FinalAtkHash= Animator.StringToHash("finalAttack");
         private static readonly int HurtHash    = Animator.StringToHash("hurt");
         private static readonly int IsDeadHash  = Animator.StringToHash("isDead");
+        private static readonly int IdleHash    = Animator.StringToHash("Idle");
 
         [SerializeField] private Animator          _animator;
         [SerializeField] private ChargeAuraEffect  _chargeAura;
@@ -55,6 +56,8 @@ namespace BeatHero.Player
             _animator.ResetTrigger(AttackHash);
             _animator.ResetTrigger(FinalAtkHash);
             _chargeAura?.SetStage(0);
+            // Death 상태에서 Idle로 가는 트랜지션이 없으므로 강제 점프
+            _animator.Play(IdleHash, 0, 0f);
         }
     }
 }
