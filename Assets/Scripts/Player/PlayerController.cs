@@ -31,6 +31,9 @@ namespace BeatHero.Player
             _anim?.ResetState();
         }
 
+        // 암전 직후 등 비주얼만 즉시 초기화할 때 사용 (스탯 건드리지 않음)
+        public void ResetVisuals() => _anim?.ResetState();
+
         // 피해 적용 — 보호막 있으면 1회 흡수
         public void TakeDamage(int amount)
         {

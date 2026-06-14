@@ -217,6 +217,9 @@ namespace BeatHero.Core
             if (SceneLoader.Instance != null)
                 yield return SceneLoader.Instance.WipeOut(_exitDuration);
 
+            // 암전 직후 플레이어 비주얼 리셋 — death 애니메이션이 ResultUI 뒤에서 재생되지 않도록
+            UnityEngine.Object.FindAnyObjectByType<BeatHero.Player.PlayerController>()?.ResetVisuals();
+
             if (_resultScreen != null)
             {
                 bool chosen = false;
