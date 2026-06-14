@@ -24,6 +24,7 @@ namespace BeatHero.UI
         {
             public RectTransform rt;
             public double arrivalDsp;
+            public double lead;   // 스폰 시점의 lead 값 — BPM 변경 후에도 올바른 속도로 이동
             public float fromX;
             public float toX;
             public float y;
@@ -69,23 +70,24 @@ namespace BeatHero.UI
             _conductor.OnResumed       -= OnResumed;
         }
 
-        // StartFloor(또는 보스 페이즈 전환) 시 호출. dspSongStart = 첫 마커가 커서에 도달 = BGM 시작 시각.
+        // 층 시작 또는 보스 페이즈 전환 시 호출.
+        // 층 시작: 마커 전부 초기화 후 새 BPM으로 시작.
+        // 페이즈 전환: 비행 중인 마커는 자기 lead로 자연 소멸 — 갑작스러운 리셋 없음.
         private void OnSongScheduled(double dspSongStart, int bpm)
         {
-            ReturnAllMarkers();
-
-            // Start()에서 호출될 때 Canvas 레이아웃이 미확정일 수 있으므로 강제 업데이트
-            Canvas.ForceUpdateCanvases();
+            bool isSwitch = _isRunning;
+            if (!isSwitch)
+            {
+                ReturnAllMarkers();
+                Canvas.ForceUpdateCanvases();
+            }
 
             double secPerBeat = 60.0 / bpm;
             _interval = secPerBeat;
             _lead     = secPerBeat * LOOKAHEAD_BEATS;
 
-            // 첫 마커(beat0)는 dspSongStart에 커서 도달 → 그 1리드 전(=StartFloor 순간)에 스폰포인트 출발.
-            // 이후 Update의 스폰 루프가 departure(arrival-lead) 도달 시점마다 생성.
-            // 페이즈 전환처럼 now가 이미 진행된 경우엔 비행 중인 마커들이 한 프레임에 일괄 시드된다.
             _nextArrivalDsp = dspSongStart;
-            _paused = false;
+            _paused    = false;
             _isRunning = true;
         }
 
@@ -122,9 +124,10 @@ namespace BeatHero.UI
         }
 
         // 위치 갱신. 커서 도달(frac>=1) 시 true 반환.
+        // m.lead: 스폰 시점의 lead — BPM 전환 후에도 기존 마커가 올바른 속도로 이동
         private bool PositionMarker(Marker m, double now)
         {
-            float frac = (float)(1.0 - (m.arrivalDsp - now) / _lead);
+            float frac = (float)(1.0 - (m.arrivalDsp - now) / m.lead);
             if (frac >= 1f) return true;
             if (frac < 0f) frac = 0f;
             float x = m.fromX + (m.toX - m.fromX) * frac;
@@ -142,7 +145,7 @@ namespace BeatHero.UI
 
         private void SpawnMarker(double arrivalDsp, float fromX, float toX, float y, double now)
         {
-            var m = new Marker { rt = GetMarker(), arrivalDsp = arrivalDsp, fromX = fromX, toX = toX, y = y };
+            var m = new Marker { rt = GetMarker(), arrivalDsp = arrivalDsp, lead = _lead, fromX = fromX, toX = toX, y = y };
             // 이미 커서를 지난(또는 도달한) 마커라면 추가하지 않고 즉시 반환
             if (PositionMarker(m, now)) { ReturnMarker(m.rt); return; }
             _activeMarkers.Add(m);
