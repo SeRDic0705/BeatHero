@@ -28,6 +28,7 @@ namespace BeatHero.Player
             Hp        = maxHp;
             Mana      = 0;
             HasShield = false;
+            _anim?.ResetState();
         }
 
         // 피해 적용 — 보호막 있으면 1회 흡수

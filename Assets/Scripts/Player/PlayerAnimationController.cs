@@ -44,5 +44,17 @@ namespace BeatHero.Player
             _animator.ResetTrigger(FinalAtkHash);
             _animator.SetBool(IsDeadHash, true);
         }
+
+        // 재도전·초기화 시 모든 애니메이터 상태 리셋
+        public void ResetState()
+        {
+            _animator.SetBool(IsDeadHash, false);
+            _animator.SetBool(IsRunning, false);
+            _animator.SetBool(IsCharging, false);
+            _animator.ResetTrigger(HurtHash);
+            _animator.ResetTrigger(AttackHash);
+            _animator.ResetTrigger(FinalAtkHash);
+            _chargeAura?.SetStage(0);
+        }
     }
 }
