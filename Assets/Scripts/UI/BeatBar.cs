@@ -13,8 +13,10 @@ namespace BeatHero.UI
         [SerializeField] private RectTransform _markerPrefab;
         [SerializeField] private Color _markerColor        = Color.white;
         [SerializeField] private float _markerWidth        = 4f;
-        [SerializeField] private float _cursorPulseScale   = 1.4f;
+        [SerializeField] private float _cursorPulseScale    = 1.4f;
         [SerializeField] private float _cursorPulseDuration = 0.1f;
+        [SerializeField] private float _phasePulseScale     = 2.5f;
+        [SerializeField] private float _phasePulseDuration  = 0.3f;
 
         // 리드 = 1마디. 마커는 출발 후 LOOKAHEAD_BEATS박 뒤(=커서 도달) BGM 비트와 일치.
         private const int LOOKAHEAD_BEATS = 4;
@@ -31,6 +33,7 @@ namespace BeatHero.UI
         }
 
         private Conductor _conductor;
+        private BeatHero.Combat.BattleStateMachine _battle;
         private double _lead;          // 240/BPM (초)
         private double _interval;      // 60/BPM  (초, 1박)
         private double _nextArrivalDsp; // 다음 스폰할 마커가 커서에 도달하는 시각
@@ -38,6 +41,7 @@ namespace BeatHero.UI
         private bool   _paused;
         private Vector3 _cursorBaseScale;
         private float _cursorPulseTimer;
+        private float _activePulseScale;   // 현재 적용 중인 펄스 배율
 
         private readonly List<Marker> _activeMarkers = new();
         private readonly Queue<RectTransform> _pool = new();
@@ -46,9 +50,24 @@ namespace BeatHero.UI
         {
             if (_cursor != null)
                 _cursorBaseScale = _cursor.localScale;
+            _activePulseScale = _cursorPulseScale;
         }
 
-        private void OnDestroy() => UnsubscribeAll();
+        private void OnDestroy()
+        {
+            UnsubscribeAll();
+            if (_battle != null)
+                _battle.OnBossPhaseChanged -= OnBossPhaseChanged;
+        }
+
+        public void BindBattle(BeatHero.Combat.BattleStateMachine battle)
+        {
+            if (_battle != null)
+                _battle.OnBossPhaseChanged -= OnBossPhaseChanged;
+            _battle = battle;
+            if (_battle != null)
+                _battle.OnBossPhaseChanged += OnBossPhaseChanged;
+        }
 
         public void Bind(Conductor conductor)
         {
@@ -197,13 +216,21 @@ namespace BeatHero.UI
         {
             if (_cursor == null || _cursorPulseTimer <= 0f) return;
             _cursorPulseTimer -= Time.deltaTime;
-            float t = Mathf.Clamp01(_cursorPulseTimer / _cursorPulseDuration);
-            _cursor.localScale = _cursorBaseScale * Mathf.Lerp(1f, _cursorPulseScale, t);
+            float duration = _activePulseScale >= _phasePulseScale ? _phasePulseDuration : _cursorPulseDuration;
+            float t = Mathf.Clamp01(_cursorPulseTimer / duration);
+            _cursor.localScale = _cursorBaseScale * Mathf.Lerp(1f, _activePulseScale, t);
         }
 
         public void OnBeat(int beat)
         {
+            _activePulseScale = _cursorPulseScale;
             _cursorPulseTimer = _cursorPulseDuration;
+        }
+
+        private void OnBossPhaseChanged()
+        {
+            _activePulseScale = _phasePulseScale;
+            _cursorPulseTimer = _phasePulseDuration;
         }
 
         // 일시정지: 모션/스폰 정지. dspTime은 계속 흐르므로 Resume에서 그만큼 보정.

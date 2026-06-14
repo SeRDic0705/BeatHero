@@ -150,6 +150,51 @@ namespace BeatHero.Core
             OnSongScheduled?.Invoke(dspTime, bpm);
         }
 
+        // 전환 완충 마디용: 구 BGM 페이드아웃 + 신 BGM을 transitionBeats박 뒤(CallPhase 시작)에 예약.
+        // 클럭 파라미터는 dspTime(전환 마디 시작) 기준으로 즉시 교체 → BeatBar가 신 BPM을 바로 표시.
+        public void SwitchPhaseWithTransition(double dspTime, AudioClip bgm, int bpm, int transitionBeats = 4)
+        {
+            double newSecPerBeat = 60.0 / bpm;
+            double bgmStartDsp   = dspTime + transitionBeats * newSecPerBeat;
+
+            // 구 BGM: CallPhase 시작 직전 정지 + 전환 마디 전체에 걸쳐 페이드아웃
+            _audioSource.SetScheduledEndTime(bgmStartDsp);
+            StartCoroutine(FadeOutSource(_audioSource, (float)(bgmStartDsp - AudioSettings.dspTime)));
+
+            // 신 BGM: CallPhase 시작 시각에 예약
+            _switchDspTime = bgmStartDsp;
+            _nextBgm       = bgm;
+            _nextBpm       = bpm;
+            _switchPending = true;
+            var nextSource = gameObject.AddComponent<AudioSource>();
+            nextSource.clip = bgm;
+            nextSource.loop = true;
+            nextSource.outputAudioMixerGroup = _bgmMixerGroup;
+            nextSource.PlayScheduled(bgmStartDsp);
+
+            // 클럭 파라미터 즉시 교체 — 전환 마디부터 신 BPM 기준
+            _bpm                = bpm;
+            _secPerBeat         = newSecPerBeat;
+            _dspSongStartTime   = dspTime;
+            _firstBeatOffsetSec = 0;
+            _lastFiredBeat      = 0;
+
+            OnSongScheduled?.Invoke(dspTime, bpm);
+        }
+
+        private System.Collections.IEnumerator FadeOutSource(AudioSource src, float duration)
+        {
+            float startVolume = src != null ? src.volume : 1f;
+            float elapsed = 0f;
+            while (elapsed < duration && src != null)
+            {
+                elapsed += UnityEngine.Time.deltaTime;
+                src.volume = Mathf.Lerp(startVolume, 0f, elapsed / duration);
+                yield return null;
+            }
+            if (src != null) src.volume = 0f;
+        }
+
         // 구형 API — 다음 마디 경계 자동 계산. BattleStateMachine은 SwitchPhaseAt을 사용.
         public void SwitchPhaseAtNextMeasure(AudioClip bgm, int bpm, int beatsPerMeasure = 4)
         {

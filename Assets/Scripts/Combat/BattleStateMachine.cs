@@ -37,6 +37,7 @@ namespace BeatHero.Combat
         public event System.Action OnBeatUnitFired;
         public event System.Action OnEffectiveBeatFired; // ResponsePhase + gridEffectShape != null 인 비트만
         public event System.Action<CellEffectFeedback, Vector3> OnMonsterCellEffectFired;
+        public event System.Action OnBossPhaseChanged; // 전환 완충 마디 박자마다 발동
 
         public MonsterData CurrentMonster => _monster;
         private MonsterData     _monster;
@@ -45,7 +46,7 @@ namespace BeatHero.Combat
 
         private List<ActiveHazard> _hazards = new();
 
-        private enum State { Idle, CallPhase, ResponsePhase, BattleEnd }
+        private enum State { Idle, CallPhase, ResponsePhase, PhaseTransition, BattleEnd }
         private State _state = State.Idle;
         private bool  _phraseRunning;
 
@@ -158,16 +159,18 @@ namespace BeatHero.Combat
             TransitionToNextPattern();
             _phraseRunning = false;
 
-            // BGM/BPM 전환: 다음 프레이즈 시작 dsp와 정확히 맞춤 (mid-phrase 어긋남 방지)
             double nextPhraseStart = responseDsp + phraseDurationSec;
             if (_pendingPhaseSwitch)
             {
-                _conductor.SwitchPhaseAt(nextPhraseStart, _pendingBgm, _pendingBpm);
+                // 전환 완충 마디 삽입: 신 BPM으로 4박 연출 후 CallPhase + 신 BGM 동시 시작
+                _conductor.SwitchPhaseWithTransition(nextPhraseStart, _pendingBgm, _pendingBpm, BEATS_PER_PHASE);
                 _pendingPhaseSwitch = false;
+                StartCoroutine(TransitionMeasureRoutine(nextPhraseStart));
             }
-
-            if (_state == State.CallPhase)
+            else if (_state == State.CallPhase)
+            {
                 StartCoroutine(HandlePhrasePair(nextPhraseStart));
+            }
         }
 
         // ── CallPhase ──────────────────────────────────────────
@@ -376,6 +379,24 @@ namespace BeatHero.Combat
 
             SelectRandomPattern();
             _state = State.CallPhase;
+        }
+
+        // ── 전환 완충 마디 ────────────────────────────────────
+        // 신 BPM으로 BEATS_PER_PHASE박 동안 연출 발동 후 CallPhase 시작
+        private IEnumerator TransitionMeasureRoutine(double startDsp)
+        {
+            _state = State.PhaseTransition;
+            double secPerBeat = _conductor.SecPerBeat; // 이미 신 BPM
+            for (int i = 0; i < BEATS_PER_PHASE; i++)
+            {
+                double beatDsp = startDsp + i * secPerBeat;
+                yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= beatDsp + _pauseDelta);
+                OnBossPhaseChanged?.Invoke();
+                _grid.FlashTransition();
+            }
+            _state = State.CallPhase;
+            double callPhaseStart = startDsp + BEATS_PER_PHASE * secPerBeat;
+            StartCoroutine(HandlePhrasePair(callPhaseStart));
         }
 
         private void EndBattle(bool cleared)
