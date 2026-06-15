@@ -20,7 +20,10 @@ namespace BeatHero.Core
         // 마커 어프로치 리드타임 = 1마디(4박). secPerBeat*BEATS_PER_MEASURE = 240/BPM 초.
         private const int BEATS_PER_MEASURE = 4;
 
-        private AudioSource _audioSource;
+        // 핑퐁 AudioSource: 전환 시 AddComponent/Destroy 없이 레퍼런스 스왑만 수행
+        private AudioSource _activeSource;   // 현재 재생 중인 BGM
+        private AudioSource _standbySource;  // 다음 BGM 대기 (게임 시작 시 사전 할당)
+
         private double _floorStartDsp;
         private double _dspSongStartTime;
         private double _firstBeatOffsetSec;
@@ -33,7 +36,6 @@ namespace BeatHero.Core
         // 예약 중인 페이즈 전환 데이터
         private bool _switchPending;
         private double _switchDspTime;
-        private AudioClip _nextBgm;
         private int _nextBpm;
 
         private bool _isPaused;
@@ -41,10 +43,15 @@ namespace BeatHero.Core
 
         private void Awake()
         {
-            _audioSource = GetComponent<AudioSource>();
-            if (_audioSource == null)
-                _audioSource = gameObject.AddComponent<AudioSource>();
-            _audioSource.outputAudioMixerGroup = _bgmMixerGroup;
+            _activeSource = GetComponent<AudioSource>();
+            if (_activeSource == null)
+                _activeSource = gameObject.AddComponent<AudioSource>();
+            _activeSource.outputAudioMixerGroup = _bgmMixerGroup;
+
+            // 대기 소스 — 게임 시작 시 1회만 생성. 전환마다 AddComponent 없음.
+            _standbySource = gameObject.AddComponent<AudioSource>();
+            _standbySource.outputAudioMixerGroup = _bgmMixerGroup;
+            _standbySource.volume = 0f;
         }
 
         private void Update()
@@ -77,8 +84,17 @@ namespace BeatHero.Core
             _isPlaying = false;
             _isPaused = false;
 
-            _audioSource.clip = bgm;
-            _audioSource.loop = true;
+            _activeSource.clip   = bgm;
+            _activeSource.loop   = true;
+            _activeSource.volume = 1f;
+            _activeSource.pitch  = 1f;
+
+            // 대기 소스도 초기화 (이전 층 잔여 데이터 제거)
+            _standbySource.Stop();
+            _standbySource.clip   = null;
+            _standbySource.volume = 0f;
+            _standbySource.pitch  = 1f;
+
             if (bgm != null && bgm.loadState != AudioDataLoadState.Loaded)
                 bgm.LoadAudioData();
         }
@@ -90,14 +106,15 @@ namespace BeatHero.Core
             double leadSec = _secPerBeat * BEATS_PER_MEASURE; // 240/BPM
             _dspSongStartTime = _floorStartDsp + leadSec;
             _lastFiredBeat = -1;
-            _audioSource.PlayScheduled(_dspSongStartTime);
+            _activeSource.PlayScheduled(_dspSongStartTime);
             _isPlaying = true;
             OnSongScheduled?.Invoke(_dspSongStartTime, _bpm);
         }
 
         public void Stop()
         {
-            _audioSource.Stop();
+            _activeSource.Stop();
+            _standbySource.Stop();
             _isPlaying = false;
             _isPaused = false;
             _switchPending = false;
@@ -107,7 +124,7 @@ namespace BeatHero.Core
         {
             if (!_isPlaying || _isPaused) return;
             _pauseDspTime = AudioSettings.dspTime;
-            _audioSource.Pause();
+            _activeSource.Pause();
             _isPaused = true;
             OnPaused?.Invoke();
         }
@@ -116,36 +133,35 @@ namespace BeatHero.Core
         {
             if (!_isPlaying || !_isPaused) return;
             double pausedDuration = AudioSettings.dspTime - _pauseDspTime;
-            _floorStartDsp     += pausedDuration;
-            _dspSongStartTime  += pausedDuration;
-            _audioSource.UnPause();
+            _floorStartDsp    += pausedDuration;
+            _dspSongStartTime += pausedDuration;
+            _activeSource.UnPause();
             _isPaused = false;
             OnResumed?.Invoke(pausedDuration);
         }
 
         // 보스 페이즈 전환: 지정된 dspTime에 BGM/BPM 교체.
         // 클럭 파라미터(BPM·dspSongStartTime)는 즉시 갱신 → 다음 프레이즈가 올바른 BPM으로 시작됨.
-        // 오디오 소스 교체만 ApplyPendingSwitch에서 비동기 처리.
         public void SwitchPhaseAt(double dspTime, AudioClip bgm, int bpm)
         {
             _switchDspTime = dspTime;
-            _nextBgm = bgm;
-            _nextBpm = bpm;
+            _nextBpm       = bpm;
             _switchPending = true;
 
-            _audioSource.SetScheduledEndTime(dspTime);
-            var nextSource = gameObject.AddComponent<AudioSource>();
-            nextSource.clip = bgm;
-            nextSource.loop = true;
-            nextSource.outputAudioMixerGroup = _bgmMixerGroup;
-            nextSource.PlayScheduled(dspTime);
+            _activeSource.SetScheduledEndTime(dspTime);
+
+            _standbySource.clip   = bgm;
+            _standbySource.loop   = true;
+            _standbySource.volume = 1f;
+            _standbySource.pitch  = 1f;
+            _standbySource.PlayScheduled(dspTime);
 
             // 클럭 파라미터 즉시 교체 — 프레임 순서 경쟁 없이 새 BPM으로 전환
-            _bpm             = bpm;
-            _secPerBeat      = 60.0 / bpm;
-            _dspSongStartTime = dspTime;
+            _bpm                = bpm;
+            _secPerBeat         = 60.0 / bpm;
+            _dspSongStartTime   = dspTime;
             _firstBeatOffsetSec = 0;
-            _lastFiredBeat   = 0;
+            _lastFiredBeat      = 0;
 
             OnSongScheduled?.Invoke(dspTime, bpm);
         }
@@ -156,25 +172,25 @@ namespace BeatHero.Core
         {
             // pitch 즉시 점프: clock 업데이트 전에 oldBpm 캡처
             if (pitchSweep && _bpm > 0)
-                _audioSource.pitch = (float)bpm / _bpm;
+                _activeSource.pitch = (float)bpm / _bpm;
 
             double newSecPerBeat = 60.0 / bpm;
             double bgmStartDsp   = dspTime + transitionBeats * newSecPerBeat;
 
             // 구 BGM: CallPhase 시작 직전 정지 + 전환 마디 전체에 걸쳐 페이드아웃
-            _audioSource.SetScheduledEndTime(bgmStartDsp);
-            StartCoroutine(FadeOutSource(_audioSource, (float)(bgmStartDsp - AudioSettings.dspTime)));
+            _activeSource.SetScheduledEndTime(bgmStartDsp);
+            StartCoroutine(FadeOutSource(_activeSource, (float)(bgmStartDsp - AudioSettings.dspTime)));
 
-            // 신 BGM: CallPhase 시작 시각에 예약
+            // 신 BGM: CallPhase 시작 시각에 예약 (대기 소스 재사용 — AddComponent 없음)
             _switchDspTime = bgmStartDsp;
-            _nextBgm       = bgm;
             _nextBpm       = bpm;
             _switchPending = true;
-            var nextSource = gameObject.AddComponent<AudioSource>();
-            nextSource.clip = bgm;
-            nextSource.loop = true;
-            nextSource.outputAudioMixerGroup = _bgmMixerGroup;
-            nextSource.PlayScheduled(bgmStartDsp);
+
+            _standbySource.clip   = bgm;
+            _standbySource.loop   = true;
+            _standbySource.volume = 1f;
+            _standbySource.pitch  = 1f;
+            _standbySource.PlayScheduled(bgmStartDsp);
 
             // 클럭 파라미터 즉시 교체 — 전환 마디부터 신 BPM 기준
             _bpm                = bpm;
@@ -197,17 +213,17 @@ namespace BeatHero.Core
                 float t = Mathf.Clamp01(elapsed / duration);
                 // Equal-power fade: cos 곡선으로 청각적으로 균일한 페이드
                 try { src.volume = startVolume * Mathf.Cos(t * Mathf.PI * 0.5f); }
-                catch { yield break; } // AudioSource가 Destroy된 경우 조기 종료
+                catch { yield break; }
                 yield return null;
             }
             try { src.volume = 0f; }
             catch { }
         }
 
-        // 구형 API — 다음 마디 경계 자동 계산. BattleStateMachine은 SwitchPhaseAt을 사용.
+        // 구형 API — 다음 마디 경계 자동 계산.
         public void SwitchPhaseAtNextMeasure(AudioClip bgm, int bpm, int beatsPerMeasure = 4)
         {
-            int currentBeat    = (int)SongPositionInBeats;
+            int currentBeat     = (int)SongPositionInBeats;
             int nextMeasureBeat = ((currentBeat / beatsPerMeasure) + 1) * beatsPerMeasure;
             SwitchPhaseAt(GetBeatDspTime(nextMeasureBeat), bgm, bpm);
         }
@@ -215,18 +231,16 @@ namespace BeatHero.Core
         public double GetBeatDspTime(int beatIndex)
             => _dspSongStartTime + _firstBeatOffsetSec + beatIndex * _secPerBeat;
 
-        // 클럭 파라미터는 SwitchPhaseAt에서 이미 갱신됨 — 여기서는 AudioSource 교체만 처리
+        // 레퍼런스 스왑 — Destroy/AddComponent 없이 핑퐁 교체
         private void ApplyPendingSwitch()
         {
             _switchPending = false;
-            var sources = GetComponents<AudioSource>();
-            foreach (var src in sources)
-                if (src != _audioSource && src.clip == _nextBgm)
-                {
-                    Destroy(_audioSource);
-                    _audioSource = src;
-                    break;
-                }
+            _activeSource.Stop();
+            (_activeSource, _standbySource) = (_standbySource, _activeSource);
+            // 구 소스 초기화 → 다음 전환에 재사용
+            _standbySource.clip   = null;
+            _standbySource.volume = 0f;
+            _standbySource.pitch  = 1f;
         }
     }
 }
