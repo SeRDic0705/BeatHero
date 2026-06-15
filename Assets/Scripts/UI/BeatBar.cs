@@ -92,7 +92,7 @@ namespace BeatHero.UI
         // 층 시작 또는 보스 페이즈 전환 시 호출.
         // 층 시작: 마커 전부 초기화 후 새 BPM으로 시작.
         // 페이즈 전환: 비행 중인 마커는 자기 lead로 자연 소멸 — 갑작스러운 리셋 없음.
-        private void OnSongScheduled(double dspSongStart, int bpm)
+        private void OnSongScheduled(double dspSongStart, float bpm)
         {
             bool isSwitch = _isRunning;
             if (!isSwitch)

@@ -9,11 +9,11 @@ namespace BeatHero.Core
         [SerializeField] private AudioMixerGroup _bgmMixerGroup;
         public double SongPositionSec => _songPositionSec;
         public double SongPositionInBeats => _songPositionSec / _secPerBeat;
-        public int Bpm => _bpm;
+        public float Bpm => _bpm;
         public double SecPerBeat => _secPerBeat;
 
         public event Action<int> OnBeat;
-        public event Action<double, int> OnSongScheduled; // (dspSongStartTime, bpm)
+        public event Action<double, float> OnSongScheduled; // (dspSongStartTime, bpm)
         public event Action OnPaused;
         public event Action<double> OnResumed; // (pausedDurationSec)
 
@@ -28,7 +28,7 @@ namespace BeatHero.Core
         private double _dspSongStartTime;
         private double _firstBeatOffsetSec;
         private double _songPositionSec;
-        private int _bpm;
+        private float _bpm;
         private double _secPerBeat;
         private int _lastFiredBeat;
         private bool _isPlaying;
@@ -36,7 +36,7 @@ namespace BeatHero.Core
         // 예약 중인 페이즈 전환 데이터
         private bool _switchPending;
         private double _switchDspTime;
-        private int _nextBpm;
+        private float _nextBpm;
 
         private bool _isPaused;
         private double _pauseDspTime;
@@ -74,7 +74,7 @@ namespace BeatHero.Core
         }
 
         // 1단계: 층 데이터 세팅 — clip/bpm 준비 + 오디오 데이터 프리로드(예약 재생 레이턴시 제거). 클럭 미시작.
-        public void PrepareSong(AudioClip bgm, int bpm, double firstBeatOffsetSec = 0.0)
+        public void PrepareSong(AudioClip bgm, float bpm, double firstBeatOffsetSec = 0.0)
         {
             _bpm = bpm;
             _secPerBeat = 60.0 / bpm;
@@ -142,7 +142,7 @@ namespace BeatHero.Core
 
         // 보스 페이즈 전환: 지정된 dspTime에 BGM/BPM 교체.
         // 클럭 파라미터(BPM·dspSongStartTime)는 즉시 갱신 → 다음 프레이즈가 올바른 BPM으로 시작됨.
-        public void SwitchPhaseAt(double dspTime, AudioClip bgm, int bpm)
+        public void SwitchPhaseAt(double dspTime, AudioClip bgm, float bpm)
         {
             _switchDspTime = dspTime;
             _nextBpm       = bpm;
@@ -168,7 +168,7 @@ namespace BeatHero.Core
 
         // 전환 완충 마디용: 구 BGM 페이드아웃 + 신 BGM을 transitionBeats박 뒤(CallPhase 시작)에 예약.
         // 클럭 파라미터는 dspTime(전환 마디 시작) 기준으로 즉시 교체 → BeatBar가 신 BPM을 바로 표시.
-        public void SwitchPhaseWithTransition(double dspTime, AudioClip bgm, int bpm, int transitionBeats = 4, bool pitchSweep = false)
+        public void SwitchPhaseWithTransition(double dspTime, AudioClip bgm, float bpm, int transitionBeats = 4, bool pitchSweep = false)
         {
             // pitch 즉시 점프: clock 업데이트 전에 oldBpm 캡처
             if (pitchSweep && _bpm > 0)
@@ -221,7 +221,7 @@ namespace BeatHero.Core
         }
 
         // 구형 API — 다음 마디 경계 자동 계산.
-        public void SwitchPhaseAtNextMeasure(AudioClip bgm, int bpm, int beatsPerMeasure = 4)
+        public void SwitchPhaseAtNextMeasure(AudioClip bgm, float bpm, int beatsPerMeasure = 4)
         {
             int currentBeat     = (int)SongPositionInBeats;
             int nextMeasureBeat = ((currentBeat / beatsPerMeasure) + 1) * beatsPerMeasure;

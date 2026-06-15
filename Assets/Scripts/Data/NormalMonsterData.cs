@@ -8,7 +8,7 @@ namespace BeatHero.Data
     public class NormalMonsterData : MonsterData
     {
         [BoxGroup("Combat")]
-        public int bpm;
+        public float bpm;
         [BoxGroup("Combat")]
         public AudioClip bgm;
         [BoxGroup("Combat")]
