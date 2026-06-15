@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using BeatHero.Data;
 using UnityEngine;
@@ -32,6 +33,11 @@ namespace BeatHero.Combat
         private static readonly Color COLOR_SHIELD           = new Color(0.2f, 0.4f, 0.9f);
 
         private bool _isResponsePhase;
+        private bool _flashOverride;
+        private Color _flashOverrideColor;
+
+        [SerializeField] private Color _transitionFlashColor = Color.white;
+        [SerializeField] private float _transitionFlashDuration = 0.2f;
 
         public void Initialize(GridType gridType)
         {
@@ -108,6 +114,22 @@ namespace BeatHero.Combat
             _isResponsePhase = isResponse;
         }
 
+        // 전환 완충 마디 박자마다 호출 — 모든 타일을 잠시 플래시 색으로
+        public void FlashTransition()
+        {
+            StartCoroutine(FlashRoutine());
+        }
+
+        private IEnumerator FlashRoutine()
+        {
+            _flashOverride      = true;
+            _flashOverrideColor = _transitionFlashColor;
+            RefreshVisuals();
+            yield return new WaitForSeconds(_transitionFlashDuration);
+            _flashOverride = false;
+            RefreshVisuals();
+        }
+
         public Vector3 GetTileWorldPosition(Vector2Int gridPos)
         {
             float offset = (GridWidth - 1) * _cellSize * 0.5f;
@@ -164,6 +186,8 @@ namespace BeatHero.Combat
                 {
                     var sr = _tiles[x, y]?.GetComponent<SpriteRenderer>();
                     if (sr == null) continue;
+
+                    if (_flashOverride) { sr.color = _flashOverrideColor; continue; }
 
                     var pos = new Vector2Int(x, y);
                     if (IsHazardAt(pos))

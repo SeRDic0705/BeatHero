@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using BeatHero.Audio;
 using BeatHero.Data;
@@ -12,7 +13,9 @@ namespace BeatHero.Combat
     [RequireComponent(typeof(SpriteRenderer))]
     public class MonsterView : MonoBehaviour
     {
-        [SerializeField] private float _popUnits = 0.2f;
+        [SerializeField] private float _popUnits      = 0.2f;
+        [SerializeField] private float _shakeAmount   = 0.15f;
+        [SerializeField] private float _shakeDuration = 0.2f;
 
         private SpriteRenderer      _renderer;
         private Animator            _animator;
@@ -32,9 +35,10 @@ namespace BeatHero.Combat
             _battle = Object.FindAnyObjectByType<BattleStateMachine>();
             if (_battle != null)
             {
-                _battle.OnBattleStarted        += SetMonster;
-                _battle.OnBeatUnitFired        += AdvanceSprite;
+                _battle.OnBattleStarted          += SetMonster;
+                _battle.OnBeatUnitFired          += AdvanceSprite;
                 _battle.OnMonsterCellEffectFired += PlayCellEffectFeedback;
+                _battle.OnBossPhaseChanged       += OnBossPhaseChanged;
             }
         }
 
@@ -51,6 +55,7 @@ namespace BeatHero.Combat
                 _battle.OnBattleStarted          -= SetMonster;
                 _battle.OnBeatUnitFired          -= AdvanceSprite;
                 _battle.OnMonsterCellEffectFired -= PlayCellEffectFeedback;
+                _battle.OnBossPhaseChanged       -= OnBossPhaseChanged;
             }
         }
 
@@ -76,6 +81,26 @@ namespace BeatHero.Combat
             _yFlip = !_yFlip;
             transform.localPosition = _baseLocalPos + Vector3.up * (_yFlip ? _popUnits : -_popUnits);
             _sfxPlayedThisBeat.Clear();
+        }
+
+        private void OnBossPhaseChanged()
+        {
+            if (_animator != null)
+                _animator.SetTrigger("PhaseChange");
+            StartCoroutine(ShakeRoutine());
+        }
+
+        private IEnumerator ShakeRoutine()
+        {
+            float elapsed = 0f;
+            while (elapsed < _shakeDuration)
+            {
+                elapsed += Time.deltaTime;
+                Vector2 offset = Random.insideUnitCircle * _shakeAmount;
+                transform.localPosition = _baseLocalPos + new Vector3(offset.x, offset.y, 0f);
+                yield return null;
+            }
+            transform.localPosition = _baseLocalPos;
         }
 
         private void PlayCellEffectFeedback(CellEffectFeedback feedback, Vector3 worldPos)

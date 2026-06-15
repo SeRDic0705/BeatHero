@@ -22,6 +22,7 @@ namespace BeatHero.Combat
 
         [Header("Audio")]
         [SerializeField] private AudioClip _callBeatSfx;
+        [SerializeField] private bool _pitchSweepOnTransition = true;
 
         [Header("Dependencies")]
         [SerializeField] private Conductor                  _conductor;
@@ -37,6 +38,7 @@ namespace BeatHero.Combat
         public event System.Action OnBeatUnitFired;
         public event System.Action OnEffectiveBeatFired; // ResponsePhase + gridEffectShape != null 인 비트만
         public event System.Action<CellEffectFeedback, Vector3> OnMonsterCellEffectFired;
+        public event System.Action OnBossPhaseChanged; // 전환 완충 마디 박자마다 발동
 
         public MonsterData CurrentMonster => _monster;
         private MonsterData     _monster;
@@ -45,12 +47,17 @@ namespace BeatHero.Combat
 
         private List<ActiveHazard> _hazards = new();
 
-        private enum State { Idle, CallPhase, ResponsePhase, BattleEnd }
+        private enum State { Idle, CallPhase, ResponsePhase, PhaseTransition, BattleEnd }
         private State _state = State.Idle;
         private bool  _phraseRunning;
 
         private bool   _paused;
         private double _pauseDelta;
+
+        // 페이즈 전환 대기 — 다음 프레이즈 시작 시각에 맞춰 SwitchPhaseAt 호출
+        private bool      _pendingPhaseSwitch;
+        private AudioClip _pendingBgm;
+        private int       _pendingBpm;
 
         // 입력 윈도우
         private bool    _inputWindowOpen;
@@ -112,6 +119,7 @@ namespace BeatHero.Combat
             _grid.Initialize(monster.gridType);
             _player.Initialize(_playerConfig.maxHp);
 
+            _pendingPhaseSwitch = false;
             _phase = monster.GetCurrentPhase(1f);
             _conductor.PrepareSong(_phase.bgm, _phase.bpm);
             // 콜 효과음 프리로드 — 미로드 시 첫 PlayScheduled에서 로딩 지연으로 첫 박이 밀린다.
@@ -152,8 +160,18 @@ namespace BeatHero.Combat
             TransitionToNextPattern();
             _phraseRunning = false;
 
-            if (_state == State.CallPhase)
-                StartCoroutine(HandlePhrasePair(responseDsp + phraseDurationSec));
+            double nextPhraseStart = responseDsp + phraseDurationSec;
+            if (_pendingPhaseSwitch)
+            {
+                // 전환 완충 마디 삽입: 신 BPM으로 4박 연출 후 CallPhase + 신 BGM 동시 시작
+                _conductor.SwitchPhaseWithTransition(nextPhraseStart, _pendingBgm, _pendingBpm, BEATS_PER_PHASE, _pitchSweepOnTransition);
+                _pendingPhaseSwitch = false;
+                StartCoroutine(TransitionMeasureRoutine(nextPhraseStart));
+            }
+            else if (_state == State.CallPhase)
+            {
+                StartCoroutine(HandlePhrasePair(nextPhraseStart));
+            }
         }
 
         // ── CallPhase ──────────────────────────────────────────
@@ -186,8 +204,10 @@ namespace BeatHero.Combat
         // ── ResponsePhase ──────────────────────────────────────
         private IEnumerator HandleResponsePhrase(double phraseStartDsp)
         {
+            // CallPhase 마지막 박자를 1박 동안 표시 후 제거 (즉시 ClearShape하면 마지막 장판이 1프레임만 보임)
+            yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= phraseStartDsp + _pauseDelta);
             _grid.SetResponsePhase(true);
-            _grid.ClearShape(); // CallPhase 마지막 빨간 장판 제거
+            _grid.ClearShape();
             double secPerUnit = _conductor.SecPerBeat / PatternPlayer.UNITS_PER_BEAT;
             int unitOffset = 0;
 
@@ -362,10 +382,29 @@ namespace BeatHero.Combat
             _state = State.CallPhase;
         }
 
+        // ── 전환 완충 마디 ────────────────────────────────────
+        // 신 BPM으로 BEATS_PER_PHASE박 동안 연출 발동 후 CallPhase 시작
+        private IEnumerator TransitionMeasureRoutine(double startDsp)
+        {
+            _state = State.PhaseTransition;
+            double secPerBeat = _conductor.SecPerBeat; // 이미 신 BPM
+            for (int i = 0; i < BEATS_PER_PHASE; i++)
+            {
+                double beatDsp = startDsp + i * secPerBeat;
+                yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= beatDsp + _pauseDelta);
+                OnBossPhaseChanged?.Invoke();
+                _grid.FlashTransition();
+            }
+            _state = State.CallPhase;
+            double callPhaseStart = startDsp + BEATS_PER_PHASE * secPerBeat;
+            StartCoroutine(HandlePhrasePair(callPhaseStart));
+        }
+
         private void EndBattle(bool cleared)
         {
             if (_state == State.BattleEnd) return;
             _state = State.BattleEnd;
+            _pendingPhaseSwitch = false;
             _conductor.Stop();
             // 전투 종료 — 유지되던 마지막 위험 그리드를 비운다(다음 층 미존재 시에도 잔상 방지).
             _grid.ClearShape();
@@ -389,7 +428,10 @@ namespace BeatHero.Combat
             var newPhase = boss.GetCurrentPhase(hpPct);
             if (newPhase == _phase) return;
             _phase = newPhase;
-            _conductor.SwitchPhaseAtNextMeasure(_phase.bgm, _phase.bpm);
+            // BGM 전환은 HandlePhrasePair에서 nextPhraseStart 시각에 맞춰 처리
+            _pendingPhaseSwitch = true;
+            _pendingBgm         = _phase.bgm;
+            _pendingBpm         = _phase.bpm;
         }
 
         // ── 입력 핸들러 ────────────────────────────────────────

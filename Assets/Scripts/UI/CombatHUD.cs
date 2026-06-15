@@ -36,6 +36,8 @@ namespace BeatHero.UI
 
             var conductor = Object.FindAnyObjectByType<Conductor>();
             if (conductor != null) BindConductor(conductor);
+
+            if (battle != null) RebindBeatBarBattle(battle);
         }
 
         private void Start()
@@ -87,6 +89,12 @@ namespace BeatHero.UI
             _conductor = conductor;
             if (_beatBar != null)
                 _beatBar.Bind(conductor);
+        }
+
+        public void RebindBeatBarBattle(BattleStateMachine battle)
+        {
+            if (_beatBar != null)
+                _beatBar.BindBattle(battle);
         }
 
         private void UpdatePlayerHp(int current, int max)
