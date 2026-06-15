@@ -57,7 +57,7 @@ namespace BeatHero.Combat
         // 페이즈 전환 대기 — 다음 프레이즈 시작 시각에 맞춰 SwitchPhaseAt 호출
         private bool      _pendingPhaseSwitch;
         private AudioClip _pendingBgm;
-        private int       _pendingBpm;
+        private float     _pendingBpm;
 
         // 입력 윈도우
         private bool    _inputWindowOpen;
