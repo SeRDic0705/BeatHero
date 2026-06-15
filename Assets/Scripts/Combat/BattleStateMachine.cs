@@ -22,6 +22,7 @@ namespace BeatHero.Combat
 
         [Header("Audio")]
         [SerializeField] private AudioClip _callBeatSfx;
+        [SerializeField] private bool _pitchSweepOnTransition = true;
 
         [Header("Dependencies")]
         [SerializeField] private Conductor                  _conductor;
@@ -163,7 +164,7 @@ namespace BeatHero.Combat
             if (_pendingPhaseSwitch)
             {
                 // 전환 완충 마디 삽입: 신 BPM으로 4박 연출 후 CallPhase + 신 BGM 동시 시작
-                _conductor.SwitchPhaseWithTransition(nextPhraseStart, _pendingBgm, _pendingBpm, BEATS_PER_PHASE);
+                _conductor.SwitchPhaseWithTransition(nextPhraseStart, _pendingBgm, _pendingBpm, BEATS_PER_PHASE, _pitchSweepOnTransition);
                 _pendingPhaseSwitch = false;
                 StartCoroutine(TransitionMeasureRoutine(nextPhraseStart));
             }

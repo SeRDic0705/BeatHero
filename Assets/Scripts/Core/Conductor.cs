@@ -152,8 +152,12 @@ namespace BeatHero.Core
 
         // 전환 완충 마디용: 구 BGM 페이드아웃 + 신 BGM을 transitionBeats박 뒤(CallPhase 시작)에 예약.
         // 클럭 파라미터는 dspTime(전환 마디 시작) 기준으로 즉시 교체 → BeatBar가 신 BPM을 바로 표시.
-        public void SwitchPhaseWithTransition(double dspTime, AudioClip bgm, int bpm, int transitionBeats = 4)
+        public void SwitchPhaseWithTransition(double dspTime, AudioClip bgm, int bpm, int transitionBeats = 4, bool pitchSweep = false)
         {
+            // pitch 즉시 점프: clock 업데이트 전에 oldBpm 캡처
+            if (pitchSweep && _bpm > 0)
+                _audioSource.pitch = (float)bpm / _bpm;
+
             double newSecPerBeat = 60.0 / bpm;
             double bgmStartDsp   = dspTime + transitionBeats * newSecPerBeat;
 
