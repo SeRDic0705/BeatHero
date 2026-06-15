@@ -457,7 +457,9 @@ namespace BeatHero.Combat
 
         private void FireAttack()
         {
-            if (!_player.SpendMana(1)) return; // 마나 부족 시 공격 불가
+            // 차지 공격(multiplier > 1)은 유지 중 이미 마나를 지불했으므로 추가 비용 없음
+            // 탭 공격(multiplier = 1)은 기존대로 마나 1 소비
+            if (_chargeDamageMultiplier <= 1f && !_player.SpendMana(1)) return;
             _hasPendingMove = false; // 공격 발동 → 같은 비트 이동 무효
             _playerAnim?.TriggerAttack();
             int dmg = Mathf.RoundToInt(_playerConfig.attackPower * _chargeDamageMultiplier);
