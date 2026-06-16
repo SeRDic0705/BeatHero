@@ -13,8 +13,14 @@ namespace BeatHero.Data
         [BoxGroup("Stats")]
         public GridType gridType;
 
+        // 모든 몬스터는 MonsterBaseAnimator 상태머신을 공유하고 클립만 교체한다.
+        // MonsterView가 런타임에 AnimatorOverrideController를 생성해 적용한다.
         [BoxGroup("Animation")]
-        public RuntimeAnimatorController animator;
+        public AnimationClip idleClip;
+        [BoxGroup("Animation")]
+        public AnimationClip hurtClip;
+        [BoxGroup("Animation")]
+        public AnimationClip deathClip;
 
         [BoxGroup("Effects")]
         public Dictionary<CellEffect, CellEffectFeedback> effectFeedbacks = new();

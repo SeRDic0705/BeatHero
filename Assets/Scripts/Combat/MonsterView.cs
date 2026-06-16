@@ -6,7 +6,7 @@ using UnityEngine;
 namespace BeatHero.Combat
 {
     // 씬에 배치된 몬스터 GameObject의 비주얼 담당.
-    // OnBattleStarted         → 층 전환마다 Animator Controller 교체.
+    // OnBattleStarted         → 층 전환마다 MonsterData 클립으로 OverrideController 교체.
     // OnBeatUnitFired(sec)    → BeatUnit 재생 길이에 맞춰 Idle 속도 조정 + 재생.
     // OnMonsterHit            → Hurt 트리거.
     // OnMonsterCellEffectFired→ CellEffect 타입별 SFX + VFX 재생.
@@ -17,6 +17,8 @@ namespace BeatHero.Combat
         private static readonly int HurtHash  = Animator.StringToHash("hurt");
         private static readonly int DeathHash = Animator.StringToHash("death");
 
+        // 모든 몬스터가 공유하는 상태머신. Inspector에서 MonsterBaseAnimator 연결.
+        [SerializeField] private RuntimeAnimatorController _baseController;
         [SerializeField] private float _shakeAmount   = 0.15f;
         [SerializeField] private float _shakeDuration = 0.2f;
 
@@ -65,10 +67,16 @@ namespace BeatHero.Combat
         {
             _currentMonster = data;
             _baseLocalPos   = transform.localPosition;
-            if (_animator == null || data.animator == null) return;
+            if (_animator == null || _baseController == null) return;
 
-            _animator.runtimeAnimatorController = data.animator;
-            // Idle 상태의 클립 길이를 State 이름 기준으로 자동 추출
+            // MonsterBaseAnimator 상태머신을 공유하고 몬스터별 클립만 교체
+            var overrideCtrl = new AnimatorOverrideController(_baseController);
+            overrideCtrl["Idle"]  = data.idleClip;
+            overrideCtrl["Hurt"]  = data.hurtClip;
+            overrideCtrl["Death"] = data.deathClip;
+            _animator.runtimeAnimatorController = overrideCtrl;
+
+            // Idle State 클립 길이 자동 추출
             _animator.Play("Idle", 0, 0f);
             _animator.Update(0f);
             _idleClipLength = _animator.GetCurrentAnimatorStateInfo(0).length;

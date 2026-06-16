@@ -9,7 +9,7 @@
 ## 클래스 구조
 
 ### 1. MonsterData (base ScriptableObject)
-몬스터 공통 데이터 — 프레젠테이션 및 기본 스탯.
+몬스터 공통 데이터 — 애니메이션 클립, 이펙트, 기본 스탯.
 
 ```csharp
 public abstract class MonsterData : SerializedScriptableObject
@@ -19,11 +19,12 @@ public abstract class MonsterData : SerializedScriptableObject
     public int attackPower;    // 피해 공식: attackPower × PatternData.damageMultiplier
     public GridType gridType;  // Normal3x3 / Boss5x5
 
+    // 모든 몬스터는 MonsterBaseAnimator 상태머신을 공유하고 클립만 교체한다.
+    // MonsterView가 런타임에 AnimatorOverrideController를 생성해 각 클립을 덮어씌운다.
     [BoxGroup("Animation")]
-    public RuntimeAnimatorController animator;
-    public float idleClipLength = 1f; // Idle 클립 길이(초) — BPM 속도 계산용
-    // Animator 상태: Idle / Hurt(Trigger) / Death(Trigger)
-    // Idle → BPM 비례 speed 제어. Hurt → 피격 시 트리거. Death → 층 클리어 시네마틱.
+    public AnimationClip idleClip;   // BPM 비례 speed 제어
+    public AnimationClip hurtClip;   // 피격 시 hurt Trigger
+    public AnimationClip deathClip;  // 층 클리어 시네마틱 death Trigger
 
     [BoxGroup("Effects")]
     public Dictionary<CellEffect, CellEffectFeedback> effectFeedbacks = new();
@@ -35,6 +36,43 @@ public abstract class MonsterData : SerializedScriptableObject
     public abstract CombatPhaseData GetCurrentPhase(float hpPercent);
 }
 ```
+
+---
+
+## 애니메이션 아키텍처
+
+### MonsterBaseAnimator (공유 상태머신)
+`Assets/Animations/Monster/MonsterBaseAnimator.controller`
+
+| 상태 | 전환 조건 | 우선순위 |
+|---|---|---|
+| **Idle** (기본) | — | — |
+| **Hurt** | `hurt` Trigger (Any→Hurt) | 2 |
+| **Death** | `death` Trigger (Any→Death) | 1 |
+
+- Hurt → Idle : exitTime=1f (피격 모션 완료 후 자동 복귀)
+- Any → Death : canTransitionToSelf=false
+
+### AnimatorOverrideController (런타임)
+`MonsterView.SetMonster(MonsterData)` 호출 시 매번 생성:
+
+```
+new AnimatorOverrideController(_baseController)
+overrideCtrl["Idle"]  = data.idleClip;
+overrideCtrl["Hurt"]  = data.hurtClip;
+overrideCtrl["Death"] = data.deathClip;
+_animator.runtimeAnimatorController = overrideCtrl;
+```
+
+- `_baseController` : Inspector에서 MonsterBaseAnimator 연결 (MonsterView SerializeField)
+- Idle 클립 길이는 `animator.Play("Idle")+Update(0f)`로 자동 추출 → 런타임 계산에 사용
+
+### Idle BPM 동기화
+```
+animator.speed = idleClipLength / beatDurationSec
+```
+- `beatDurationSec` = BattleStateMachine의 `OnBeatUnitFired(double)` 인자
+- BeatUnit마다 Idle을 0f normalizedTime으로 재시작 → 매 비트마다 클립 처음부터 재생
 
 ---
 
@@ -128,9 +166,10 @@ CellEffect (abstract SO) 에 `CellEffectFeedback feedback` 필드를 참조로 �
 
 | 클래스 | 역할 |
 |---|---|
-| `MonsterData` | 공통 프레젠테이션/스탯 + `GetCurrentPhase()` 인터페이스 |
+| `MonsterData` | 공통 스탯 + Animation 클립 3종 + Effects + `GetCurrentPhase()` 인터페이스 |
 | `CombatPhaseData` | 페이즈 단위 전투 데이터 (bpm, bgm, patterns) |
 | `NormalMonsterData` | 단일 페이즈 몬스터, 직접 CombatPhaseData 보유 |
 | `BossPhase` | CombatPhaseData + HP 전환 임계값 |
 | `BossMonsterData` | 다중 BossPhase 리스트, HP 기준 페이즈 전환 |
 | `CellEffectFeedback` | VFX/SFX 연출 SO, CellEffect들이 공유해 재사용 |
+| `MonsterBaseAnimator` | 공유 Animator Controller (Idle/Hurt/Death 상태머신) |
