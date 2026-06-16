@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eafb6407f78f809479d56bab1d713889, type: 3}
-  m_Name: Slime
+  m_Name: Stage01_Slime
   m_EditorClassIdentifier: BeatHero::BeatHero.Data.NormalMonsterData
   serializationData:
     SerializedFormat: 2
@@ -59,13 +59,16 @@ MonoBehaviour:
   attackPower: 10
   gridType: 0
   sprites:
-  - {fileID: 21300000, guid: 1c856a67ba3477842ba5c768a51a1cb4, type: 3}
-  - {fileID: 21300000, guid: fb620fe0f9f46e54ab6a9717eff2c16a, type: 3}
+  - {fileID: 21300000, guid: b29ff03ba07dc694cb31247ebca1dfbc, type: 3}
+  - {fileID: 21300000, guid: 0cb4b2de106036649ac459242b6d39e0, type: 3}
   animator: {fileID: 0}
   hitSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
   deathSfx: {fileID: 0}
   deathVfxPrefab: {fileID: 0}
-  bpm: 155
-  bgm: {fileID: 8300000, guid: c9c0238a25b072b47a4d6d89876c3227, type: 3}
+  bpm: 100
+  bgm: {fileID: 8300000, guid: dfef0d7f5360a4f4bbf65397116d7ce1, type: 3}
   patterns:
   - {fileID: 11400000, guid: 538f31141fd331048a54941017aec844, type: 2}
+  - {fileID: 11400000, guid: e03e3d53e375df943b88a45c2ed718ab, type: 2}
+  - {fileID: 11400000, guid: 1dfdb530074dc9b43b64dff832905a0e, type: 2}
+  - {fileID: 11400000, guid: d122fcdbaaa27e7418a547261dc6e203, type: 2}
