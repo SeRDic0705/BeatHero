@@ -35,8 +35,9 @@ namespace BeatHero.Combat
 
         public event System.Action<MonsterData> OnBattleStarted;
         public event System.Action<int, int> OnMonsterHpChanged; // (current, max)
-        public event System.Action OnBeatUnitFired;
+        public event System.Action<double> OnBeatUnitFired; // beatDurationSec: 현재 BeatUnit의 재생 길이(초)
         public event System.Action OnEffectiveBeatFired; // ResponsePhase + gridEffectShape != null 인 비트만
+        public event System.Action OnMonsterHit;         // 플레이어 공격이 몬스터에 실제로 데미지를 입혔을 때
         public event System.Action<CellEffectFeedback, Vector3> OnMonsterCellEffectFired;
         public event System.Action OnBossPhaseChanged; // 전환 완충 마디 박자마다 발동
 
@@ -194,7 +195,7 @@ namespace BeatHero.Combat
                 // noteStartDsp + _pauseDelta = 프레이즈 경계 포함 모든 일시정지 반영한 목표 시각.
                 yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= noteStartDsp + _pauseDelta);
 
-                OnBeatUnitFired?.Invoke();
+                OnBeatUnitFired?.Invoke(secPerUnit * (int)bu.noteLength);
                 _grid.ShowShape(bu.gridEffectShape);
 
                 unitOffset += (int)bu.noteLength;
@@ -216,7 +217,7 @@ namespace BeatHero.Combat
                 double noteStartDsp = phraseStartDsp + secPerUnit * unitOffset;
                 yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= noteStartDsp + _pauseDelta);
 
-                OnBeatUnitFired?.Invoke();
+                OnBeatUnitFired?.Invoke(secPerUnit * (int)bu.noteLength);
                 if (bu.gridEffectShape != null) OnEffectiveBeatFired?.Invoke();
                 _grid.UpdateDangerMap(bu.gridEffectShape); // 타일 색상 변경 없이 판정맵만 갱신
                 PlayShapeFeedbacks(bu.gridEffectShape);
@@ -507,6 +508,7 @@ namespace BeatHero.Combat
             int dmg = Mathf.RoundToInt(_playerConfig.attackPower * _chargeDamageMultiplier);
             _monsterHp = Mathf.Max(0, _monsterHp - dmg);
             OnMonsterHpChanged?.Invoke(_monsterHp, _monster.maxHp);
+            OnMonsterHit?.Invoke();
             AudioManager.Instance?.PlaySFX(_monster.hitSfx);
             ResetCharge();
         }

@@ -13,17 +13,18 @@ namespace BeatHero.Data
         [BoxGroup("Stats")]
         public GridType gridType;
 
-        [BoxGroup("Presentation")]
-        public List<Sprite> sprites;
-        [BoxGroup("Presentation")]
-        public Dictionary<CellEffect, CellEffectFeedback> effectFeedbacks = new();
-        [BoxGroup("Presentation")]
+        [BoxGroup("Animation")]
         public RuntimeAnimatorController animator;
-        [BoxGroup("Presentation")]
+        [BoxGroup("Animation")]
+        public float idleClipLength = 1f;
+
+        [BoxGroup("Effects")]
+        public Dictionary<CellEffect, CellEffectFeedback> effectFeedbacks = new();
+        [BoxGroup("Effects")]
         public AudioClip hitSfx;
-        [BoxGroup("Presentation")]
+        [BoxGroup("Effects")]
         public AudioClip deathSfx;
-        [BoxGroup("Presentation")]
+        [BoxGroup("Effects")]
         public GameObject deathVfxPrefab;
 
         public abstract CombatPhaseData GetCurrentPhase(float hpPercent);

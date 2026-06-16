@@ -19,9 +19,14 @@ public abstract class MonsterData : SerializedScriptableObject
     public int attackPower;    // 피해 공식: attackPower × PatternData.damageMultiplier
     public GridType gridType;  // Normal3x3 / Boss5x5
 
-    [BoxGroup("Presentation")]
-    public Sprite sprite;
+    [BoxGroup("Animation")]
     public RuntimeAnimatorController animator;
+    public float idleClipLength = 1f; // Idle 클립 길이(초) — BPM 속도 계산용
+    // Animator 상태: Idle / Hurt(Trigger) / Death(Trigger)
+    // Idle → BPM 비례 speed 제어. Hurt → 피격 시 트리거. Death → 층 클리어 시네마틱.
+
+    [BoxGroup("Effects")]
+    public Dictionary<CellEffect, CellEffectFeedback> effectFeedbacks = new();
     public AudioClip hitSfx;
     public AudioClip deathSfx;
     public GameObject deathVfxPrefab;
