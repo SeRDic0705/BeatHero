@@ -28,8 +28,6 @@ namespace BeatHero.Data
         public AudioClip hitSfx;
         [BoxGroup("Effects")]
         public AudioClip deathSfx;
-        [BoxGroup("Effects")]
-        public GameObject deathVfxPrefab;
 
         public abstract CombatPhaseData GetCurrentPhase(float hpPercent);
     }

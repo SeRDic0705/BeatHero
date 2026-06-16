@@ -374,7 +374,6 @@ namespace BeatHero.Combat
 
             if (_monsterHp <= 0)
             {
-                AudioManager.Instance?.PlaySFX(_monster.deathSfx);
                 EndBattle(cleared: true);
                 return;
             }
