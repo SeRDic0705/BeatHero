@@ -3429,7 +3429,7 @@ MonoBehaviour:
   _floorData: {fileID: 11400000, guid: c3b09ba8ec163ec479e100ee696e0f56, type: 2}
   _battle: {fileID: 1667971345}
   _resultScreen: {fileID: 130623437}
-  _rushDuration: 1
+  _rushDuration: 0.5
   _exitDuration: 1
   _blackoutMinWait: 0.5
   _enterDuration: 1
