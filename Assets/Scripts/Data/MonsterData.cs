@@ -13,18 +13,21 @@ namespace BeatHero.Data
         [BoxGroup("Stats")]
         public GridType gridType;
 
-        [BoxGroup("Presentation")]
-        public List<Sprite> sprites;
-        [BoxGroup("Presentation")]
+        // 모든 몬스터는 MonsterBaseAnimator 상태머신을 공유하고 클립만 교체한다.
+        // MonsterView가 런타임에 AnimatorOverrideController를 생성해 적용한다.
+        [BoxGroup("Animation")]
+        public AnimationClip idleClip;
+        [BoxGroup("Animation")]
+        public AnimationClip hurtClip;
+        [BoxGroup("Animation")]
+        public AnimationClip deathClip;
+
+        [BoxGroup("Effects")]
         public Dictionary<CellEffect, CellEffectFeedback> effectFeedbacks = new();
-        [BoxGroup("Presentation")]
-        public RuntimeAnimatorController animator;
-        [BoxGroup("Presentation")]
+        [BoxGroup("Effects")]
         public AudioClip hitSfx;
-        [BoxGroup("Presentation")]
+        [BoxGroup("Effects")]
         public AudioClip deathSfx;
-        [BoxGroup("Presentation")]
-        public GameObject deathVfxPrefab;
 
         public abstract CombatPhaseData GetCurrentPhase(float hpPercent);
     }

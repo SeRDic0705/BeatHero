@@ -126,7 +126,8 @@ namespace BeatHero.Core
             if (player != null && monsterView != null)
                 yield return StartCoroutine(player.RushTo(monsterView.transform.position, _rushDuration));
 
-            // 사망 SFX
+            // 사망 애니메이션 + SFX
+            monsterView?.PlayDeath();
             AudioManager.Instance?.PlaySFX(_battle.CurrentMonster?.deathSfx);
 
             // 오른쪽 퇴장 + 아이리스 닫힘 동시

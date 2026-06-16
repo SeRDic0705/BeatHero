@@ -44,26 +44,18 @@ MonoBehaviour:
   maxHp: 50
   attackPower: 20
   gridType: 1
-  sprites:
-  - {fileID: 2827375698842611380, guid: 73135ad901d663b4c9e01bf376171996, type: 3}
-  - {fileID: -3539172616998215979, guid: 7149399755df9ee4b9b5318c72c8c589, type: 3}
-  - {fileID: -6638251792280921592, guid: 3e063bb08dd68ae49b5c09796d131cde, type: 3}
-  - {fileID: 4732276615181589207, guid: 5a6506cd1ae9c5946884922704b8b3f1, type: 3}
-  - {fileID: -7545658627555075865, guid: 143c98f25bcdabb4e95c4aec9a6b3145, type: 3}
-  - {fileID: 7121762235045009767, guid: 260a6bbf99ff48e4986c4743372498c3, type: 3}
-  - {fileID: 7787601957951568071, guid: 746fdfbde135b984aaf88d89cc69a114, type: 3}
-  - {fileID: 5843527684465519813, guid: 6b9a29a1bd5339d41bb4d767a9bc5ce7, type: 3}
-  animator: {fileID: 0}
+  idleClip: {fileID: 7400000, guid: 5118900a0fbea814ea3ffb8fada43696, type: 2}
+  hurtClip: {fileID: 7400000, guid: 8343e24825085354186de10f6f858f08, type: 2}
+  deathClip: {fileID: 7400000, guid: 28a7dd162c70bb044953a047ddabf012, type: 2}
   hitSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
   deathSfx: {fileID: 0}
-  deathVfxPrefab: {fileID: 0}
   phases:
   - bpm: 155
     bgm: {fileID: 8300000, guid: c9c0238a25b072b47a4d6d89876c3227, type: 3}
     patterns:
     - {fileID: 11400000, guid: a9a3c653df57fc04abeb49ec8b0e5e84, type: 2}
     hpThreshold: 1
-  - bpm: 180
+  - bpm: 98
     bgm: {fileID: 8300000, guid: 24d6ea13c9544404395b93d5d0fa3f86, type: 3}
     patterns:
     - {fileID: 11400000, guid: 698150182ea4c5447925541962642828, type: 2}

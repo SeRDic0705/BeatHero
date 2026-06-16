@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using BeatHero.Audio;
 using BeatHero.Data;
 using UnityEngine;
@@ -7,36 +6,43 @@ using UnityEngine;
 namespace BeatHero.Combat
 {
     // 씬에 배치된 몬스터 GameObject의 비주얼 담당.
-    // OnBattleStarted  → 층 전환마다 스프라이트/애니메이터 교체.
-    // OnBeatUnitFired  → BeatUnit 발화마다 스프라이트 순환 + 팝 이동.
-    // OnMonsterCellEffectFired → CellEffect 타입별 SFX + VFX 재생.
-    [RequireComponent(typeof(SpriteRenderer))]
+    // OnBattleStarted         → 층 전환마다 MonsterData 클립으로 OverrideController 교체.
+    // OnBeatUnitFired(sec)    → BeatUnit 재생 길이에 맞춰 Idle 속도 조정 + 재생.
+    // OnMonsterHit            → Hurt 트리거.
+    // OnMonsterCellEffectFired→ CellEffect 타입별 SFX + VFX 재생.
+    // PlayDeath()             → GameManager가 시네마틱 타이밍에 직접 호출.
+    [RequireComponent(typeof(SpriteRenderer), typeof(Animator))]
     public class MonsterView : MonoBehaviour
     {
-        [SerializeField] private float _popUnits      = 0.2f;
+        private static readonly int HurtHash  = Animator.StringToHash("hurt");
+        private static readonly int DeathHash = Animator.StringToHash("death");
+
+        // 모든 몬스터가 공유하는 상태머신. Inspector에서 MonsterBaseAnimator 연결.
+        [SerializeField] private RuntimeAnimatorController _baseController;
+        // MonsterBaseAnimator 각 State에 할당된 베이스 클립 — override 키로 사용.
+        [SerializeField] private AnimationClip _baseIdleClip;
+        [SerializeField] private AnimationClip _baseHurtClip;
+        [SerializeField] private AnimationClip _baseDeathClip;
         [SerializeField] private float _shakeAmount   = 0.15f;
         [SerializeField] private float _shakeDuration = 0.2f;
 
-        private SpriteRenderer      _renderer;
         private Animator            _animator;
         private BattleStateMachine  _battle;
 
         private MonsterData _currentMonster;
-        private int         _spriteIndex;
+        private float       _idleClipLength = 1f;
         private Vector3     _baseLocalPos;
-        private bool        _yFlip;
-        private readonly HashSet<CellEffectFeedback> _sfxPlayedThisBeat = new();
+        private readonly System.Collections.Generic.HashSet<CellEffectFeedback> _sfxPlayedThisBeat = new();
 
         private void Awake()
         {
-            _renderer = GetComponent<SpriteRenderer>();
             _animator = GetComponent<Animator>();
-
-            _battle = Object.FindAnyObjectByType<BattleStateMachine>();
+            _battle   = Object.FindAnyObjectByType<BattleStateMachine>();
             if (_battle != null)
             {
                 _battle.OnBattleStarted          += SetMonster;
-                _battle.OnBeatUnitFired          += AdvanceSprite;
+                _battle.OnBeatUnitFired          += OnBeatUnit;
+                _battle.OnMonsterHit             += OnHit;
                 _battle.OnMonsterCellEffectFired += PlayCellEffectFeedback;
                 _battle.OnBossPhaseChanged       += OnBossPhaseChanged;
             }
@@ -44,6 +50,7 @@ namespace BeatHero.Combat
 
         private void Start()
         {
+            _baseLocalPos = transform.localPosition;
             if (_battle != null && _battle.CurrentMonster != null)
                 SetMonster(_battle.CurrentMonster);
         }
@@ -53,7 +60,8 @@ namespace BeatHero.Combat
             if (_battle != null)
             {
                 _battle.OnBattleStarted          -= SetMonster;
-                _battle.OnBeatUnitFired          -= AdvanceSprite;
+                _battle.OnBeatUnitFired          -= OnBeatUnit;
+                _battle.OnMonsterHit             -= OnHit;
                 _battle.OnMonsterCellEffectFired -= PlayCellEffectFeedback;
                 _battle.OnBossPhaseChanged       -= OnBossPhaseChanged;
             }
@@ -61,26 +69,55 @@ namespace BeatHero.Combat
 
         private void SetMonster(MonsterData data)
         {
-            _currentMonster  = data;
-            _spriteIndex     = 0;
-            _baseLocalPos    = transform.localPosition;
-            _yFlip           = false;
-            _renderer.sprite = data.sprites.Count > 0 ? data.sprites[0] : null;
+            _currentMonster = data;
+            _baseLocalPos   = transform.localPosition;
+            if (_animator == null || _baseController == null) return;
 
-            if (_animator != null)
-                _animator.runtimeAnimatorController = data.animator;
+            // MonsterBaseAnimator 상태머신을 공유하고 몬스터별 클립만 교체.
+            // 클립 이름이 아닌 오브젝트 참조를 키로 사용해 이름 의존성 제거.
+            var overrideCtrl = new AnimatorOverrideController(_baseController);
+            if (data.idleClip  != null && _baseIdleClip  != null) overrideCtrl[_baseIdleClip]  = data.idleClip;
+            if (data.hurtClip  != null && _baseHurtClip  != null) overrideCtrl[_baseHurtClip]  = data.hurtClip;
+            if (data.deathClip != null && _baseDeathClip != null) overrideCtrl[_baseDeathClip] = data.deathClip;
+            _animator.runtimeAnimatorController = overrideCtrl;
+
+            // Play(0f) + Update(0f): Idle 첫 프레임을 SpriteRenderer에 즉시 반영 + 클립 길이 추출
+            if (data.idleClip != null)
+            {
+                _animator.Play("Idle", 0, 0f);
+                _animator.Update(0f);
+                _idleClipLength = _animator.GetCurrentAnimatorStateInfo(0).length;
+            }
         }
 
-        private void AdvanceSprite()
+        // BeatUnit 발화마다 Idle 재생. gridEffect 없는 None 비트는 첫 프레임에 정지.
+        private void OnBeatUnit(double beatDurationSec, bool hasGridEffect)
         {
-            if (_currentMonster == null || _currentMonster.sprites.Count == 0) return;
+            if (_currentMonster == null || _animator == null || beatDurationSec <= 0) return;
 
-            _renderer.sprite = _currentMonster.sprites[_spriteIndex];
-            _spriteIndex = (_spriteIndex + 1) % _currentMonster.sprites.Count;
+            if (!hasGridEffect)
+            {
+                _animator.speed = 0f;
+                _animator.Play(Animator.StringToHash("Idle"), 0, 0f);
+                _animator.Update(0f);
+                return;
+            }
 
-            _yFlip = !_yFlip;
-            transform.localPosition = _baseLocalPos + Vector3.up * (_yFlip ? _popUnits : -_popUnits);
+            _animator.speed = _idleClipLength / (float)beatDurationSec;
+            _animator.Play(Animator.StringToHash("Idle"), 0, 0f);
             _sfxPlayedThisBeat.Clear();
+        }
+
+        private void OnHit()
+        {
+            if (_animator == null) return;
+            _animator.SetTrigger(HurtHash);
+        }
+
+        public void PlayDeath()
+        {
+            if (_animator == null) return;
+            _animator.SetTrigger(DeathHash);
         }
 
         private void OnBossPhaseChanged()
