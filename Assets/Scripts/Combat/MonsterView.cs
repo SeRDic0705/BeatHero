@@ -24,6 +24,7 @@ namespace BeatHero.Combat
         private BattleStateMachine  _battle;
 
         private MonsterData _currentMonster;
+        private float       _idleClipLength = 1f;
         private Vector3     _baseLocalPos;
         private readonly System.Collections.Generic.HashSet<CellEffectFeedback> _sfxPlayedThisBeat = new();
 
@@ -64,8 +65,13 @@ namespace BeatHero.Combat
         {
             _currentMonster = data;
             _baseLocalPos   = transform.localPosition;
-            if (_animator != null)
-                _animator.runtimeAnimatorController = data.animator;
+            if (_animator == null || data.animator == null) return;
+
+            _animator.runtimeAnimatorController = data.animator;
+            // Idle 상태의 클립 길이를 State 이름 기준으로 자동 추출
+            _animator.Play("Idle", 0, 0f);
+            _animator.Update(0f);
+            _idleClipLength = _animator.GetCurrentAnimatorStateInfo(0).length;
         }
 
         // BeatUnit 발화마다 Idle을 해당 BeatUnit 길이에 정확히 맞춰 재생.
@@ -73,7 +79,7 @@ namespace BeatHero.Combat
         {
             if (_currentMonster == null || _animator == null || beatDurationSec <= 0) return;
 
-            _animator.speed = (float)(_currentMonster.idleClipLength / beatDurationSec);
+            _animator.speed = _idleClipLength / (float)beatDurationSec;
             _animator.Play(Animator.StringToHash("Idle"), 0, 0f);
             _sfxPlayedThisBeat.Clear();
         }

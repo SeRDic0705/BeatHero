@@ -15,8 +15,6 @@ namespace BeatHero.Data
 
         [BoxGroup("Animation")]
         public RuntimeAnimatorController animator;
-        [BoxGroup("Animation")]
-        public float idleClipLength = 1f;
 
         [BoxGroup("Effects")]
         public Dictionary<CellEffect, CellEffectFeedback> effectFeedbacks = new();
