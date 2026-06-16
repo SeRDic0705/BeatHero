@@ -19,6 +19,10 @@ namespace BeatHero.Combat
 
         // 모든 몬스터가 공유하는 상태머신. Inspector에서 MonsterBaseAnimator 연결.
         [SerializeField] private RuntimeAnimatorController _baseController;
+        // MonsterBaseAnimator 각 State에 할당된 베이스 클립 — override 키로 사용.
+        [SerializeField] private AnimationClip _baseIdleClip;
+        [SerializeField] private AnimationClip _baseHurtClip;
+        [SerializeField] private AnimationClip _baseDeathClip;
         [SerializeField] private float _shakeAmount   = 0.15f;
         [SerializeField] private float _shakeDuration = 0.2f;
 
@@ -69,11 +73,12 @@ namespace BeatHero.Combat
             _baseLocalPos   = transform.localPosition;
             if (_animator == null || _baseController == null) return;
 
-            // MonsterBaseAnimator 상태머신을 공유하고 몬스터별 클립만 교체
+            // MonsterBaseAnimator 상태머신을 공유하고 몬스터별 클립만 교체.
+            // 클립 이름이 아닌 오브젝트 참조를 키로 사용해 이름 의존성 제거.
             var overrideCtrl = new AnimatorOverrideController(_baseController);
-            if (data.idleClip  != null) overrideCtrl["Idle"]  = data.idleClip;
-            if (data.hurtClip  != null) overrideCtrl["Hurt"]  = data.hurtClip;
-            if (data.deathClip != null) overrideCtrl["Death"] = data.deathClip;
+            if (data.idleClip  != null && _baseIdleClip  != null) overrideCtrl[_baseIdleClip]  = data.idleClip;
+            if (data.hurtClip  != null && _baseHurtClip  != null) overrideCtrl[_baseHurtClip]  = data.hurtClip;
+            if (data.deathClip != null && _baseDeathClip != null) overrideCtrl[_baseDeathClip] = data.deathClip;
             _animator.runtimeAnimatorController = overrideCtrl;
 
             // Play(0f) + Update(0f): Idle 첫 프레임을 SpriteRenderer에 즉시 반영 + 클립 길이 추출
