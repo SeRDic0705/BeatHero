@@ -67,12 +67,6 @@ namespace BeatHero.Combat
         {
             _currentMonster = data;
             _baseLocalPos   = transform.localPosition;
-
-            // 클립이 없어도 기본 스프라이트는 즉시 표시
-            var sr = GetComponent<SpriteRenderer>();
-            if (sr != null && data.defaultSprite != null)
-                sr.sprite = data.defaultSprite;
-
             if (_animator == null || _baseController == null) return;
 
             // MonsterBaseAnimator 상태머신을 공유하고 몬스터별 클립만 교체
@@ -82,7 +76,7 @@ namespace BeatHero.Combat
             if (data.deathClip != null) overrideCtrl["Death"] = data.deathClip;
             _animator.runtimeAnimatorController = overrideCtrl;
 
-            // Idle State 클립 길이 자동 추출 (클립 없으면 기본값 유지)
+            // Play(0f) + Update(0f): Idle 첫 프레임을 SpriteRenderer에 즉시 반영 + 클립 길이 추출
             if (data.idleClip != null)
             {
                 _animator.Play("Idle", 0, 0f);
