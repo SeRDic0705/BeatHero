@@ -931,6 +931,8 @@ MonoBehaviour:
   _markerWidth: 4
   _cursorPulseScale: 1.4
   _cursorPulseDuration: 0.1
+  _phasePulseScale: 2.5
+  _phasePulseDuration: 0.3
 --- !u!224 &221730386
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4150,6 +4152,7 @@ GameObject:
   - component: {fileID: 900000002}
   - component: {fileID: 900000003}
   - component: {fileID: 900000004}
+  - component: {fileID: 900000005}
   m_Layer: 0
   m_Name: Monster
   m_TagString: Untagged
@@ -4243,7 +4246,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db4a9dc4cee81454b995ba671e87aa7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: BeatHero::BeatHero.Combat.MonsterView
-  _popUnits: 0.1
+  _baseController: {fileID: 9100000, guid: 9530e8c9dbf8efa438a4a678a8bc86ba, type: 2}
+  _shakeAmount: 0.15
+  _shakeDuration: 0.2
+--- !u!95 &900000005
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 900000001}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &908967021
 GameObject:
   m_ObjectHideFlags: 0
@@ -12087,6 +12114,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: BeatHero::BeatHero.Combat.GridManager
   _tilePrefab: {fileID: 0}
   _cellSize: 1
+  _transitionFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  _transitionFlashDuration: 0.2
 --- !u!114 &1667971345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12103,6 +12132,7 @@ MonoBehaviour:
   _failZoneSec: 0.021
   _tapGraceSec: 0.15
   _callBeatSfx: {fileID: 8300000, guid: 44376458ef543b94e97e7090ae81c23c, type: 3}
+  _pitchSweepOnTransition: 1
   _conductor: {fileID: 2136934201}
   _grid: {fileID: 1667971344}
   _patternPlayer: {fileID: 1667971343}
