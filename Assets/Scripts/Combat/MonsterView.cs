@@ -85,10 +85,18 @@ namespace BeatHero.Combat
             }
         }
 
-        // BeatUnit 발화마다 Idle을 해당 BeatUnit 길이에 정확히 맞춰 재생.
-        private void OnBeatUnit(double beatDurationSec)
+        // BeatUnit 발화마다 Idle 재생. gridEffect 없는 None 비트는 첫 프레임에 정지.
+        private void OnBeatUnit(double beatDurationSec, bool hasGridEffect)
         {
             if (_currentMonster == null || _animator == null || beatDurationSec <= 0) return;
+
+            if (!hasGridEffect)
+            {
+                _animator.speed = 0f;
+                _animator.Play(Animator.StringToHash("Idle"), 0, 0f);
+                _animator.Update(0f);
+                return;
+            }
 
             _animator.speed = _idleClipLength / (float)beatDurationSec;
             _animator.Play(Animator.StringToHash("Idle"), 0, 0f);
