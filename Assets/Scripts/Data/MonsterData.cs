@@ -16,6 +16,8 @@ namespace BeatHero.Data
         // 모든 몬스터는 MonsterBaseAnimator 상태머신을 공유하고 클립만 교체한다.
         // MonsterView가 런타임에 AnimatorOverrideController를 생성해 적용한다.
         [BoxGroup("Animation")]
+        public Sprite defaultSprite;  // Animator 클립 없을 때 SpriteRenderer 초기값
+        [BoxGroup("Animation")]
         public AnimationClip idleClip;
         [BoxGroup("Animation")]
         public AnimationClip hurtClip;

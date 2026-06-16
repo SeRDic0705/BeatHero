@@ -67,19 +67,28 @@ namespace BeatHero.Combat
         {
             _currentMonster = data;
             _baseLocalPos   = transform.localPosition;
+
+            // 클립이 없어도 기본 스프라이트는 즉시 표시
+            var sr = GetComponent<SpriteRenderer>();
+            if (sr != null && data.defaultSprite != null)
+                sr.sprite = data.defaultSprite;
+
             if (_animator == null || _baseController == null) return;
 
             // MonsterBaseAnimator 상태머신을 공유하고 몬스터별 클립만 교체
             var overrideCtrl = new AnimatorOverrideController(_baseController);
-            overrideCtrl["Idle"]  = data.idleClip;
-            overrideCtrl["Hurt"]  = data.hurtClip;
-            overrideCtrl["Death"] = data.deathClip;
+            if (data.idleClip  != null) overrideCtrl["Idle"]  = data.idleClip;
+            if (data.hurtClip  != null) overrideCtrl["Hurt"]  = data.hurtClip;
+            if (data.deathClip != null) overrideCtrl["Death"] = data.deathClip;
             _animator.runtimeAnimatorController = overrideCtrl;
 
-            // Idle State 클립 길이 자동 추출
-            _animator.Play("Idle", 0, 0f);
-            _animator.Update(0f);
-            _idleClipLength = _animator.GetCurrentAnimatorStateInfo(0).length;
+            // Idle State 클립 길이 자동 추출 (클립 없으면 기본값 유지)
+            if (data.idleClip != null)
+            {
+                _animator.Play("Idle", 0, 0f);
+                _animator.Update(0f);
+                _idleClipLength = _animator.GetCurrentAnimatorStateInfo(0).length;
+            }
         }
 
         // BeatUnit 발화마다 Idle을 해당 BeatUnit 길이에 정확히 맞춰 재생.
