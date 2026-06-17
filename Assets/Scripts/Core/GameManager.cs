@@ -33,6 +33,9 @@ namespace BeatHero.Core
         [SerializeField] private float _blackoutMinWait    = 0.5f;
         [SerializeField] private float _enterDuration      = 1f;
 
+        // 몬스터 처치 시 BGM 페이드아웃 길이 = 돌진 + 퇴장(아이리스 닫힘 완료 시점).
+        public float ClearFadeDuration => _rushDuration + _exitDuration;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)

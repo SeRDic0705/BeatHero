@@ -16,8 +16,9 @@ namespace BeatHero.Combat
     [RequireComponent(typeof(SpriteRenderer), typeof(Animator))]
     public class MonsterView : MonoBehaviour
     {
-        private static readonly int HurtHash  = Animator.StringToHash("hurt");
-        private static readonly int DeathHash = Animator.StringToHash("death");
+        private static readonly int HurtHash      = Animator.StringToHash("hurt");
+        private static readonly int DeathHash     = Animator.StringToHash("death");
+        private static readonly int HurtStateHash = Animator.StringToHash("Hurt");
         private static readonly int FlashAmountId = Shader.PropertyToID("_FlashAmount");
         private static readonly int FlashColorId  = Shader.PropertyToID("_FlashColor");
 
@@ -79,6 +80,7 @@ namespace BeatHero.Combat
                 _battle.OnBattleStarted          += SetMonster;
                 _battle.OnBeatUnitFired          += OnBeatUnit;
                 _battle.OnMonsterHit             += OnHit;
+                _battle.OnMonsterDefeated        += FreezeOnHurt;
                 _battle.OnMonsterCellEffectFired += PlayCellEffectFeedback;
                 _battle.OnBossPhaseChanged       += OnBossPhaseChanged;
             }
@@ -100,6 +102,7 @@ namespace BeatHero.Combat
                 _battle.OnBattleStarted          -= SetMonster;
                 _battle.OnBeatUnitFired          -= OnBeatUnit;
                 _battle.OnMonsterHit             -= OnHit;
+                _battle.OnMonsterDefeated        -= FreezeOnHurt;
                 _battle.OnMonsterCellEffectFired -= PlayCellEffectFeedback;
                 _battle.OnBossPhaseChanged       -= OnBossPhaseChanged;
             }
@@ -111,6 +114,9 @@ namespace BeatHero.Combat
             _currentMonster = data;
             _baseLocalPos   = transform.localPosition;
             if (_animator == null || _baseController == null) return;
+
+            // 이전 층에서 FreezeOnHurt로 speed=0 고정됐을 수 있으므로 복원.
+            _animator.speed = 1f;
 
             // MonsterBaseAnimator 상태머신을 공유하고 몬스터별 클립만 교체.
             // 클립 이름이 아닌 오브젝트 참조를 키로 사용해 이름 의존성 제거.
@@ -266,9 +272,20 @@ namespace BeatHero.Combat
             _hitVfxStopRoutine = null;
         }
 
+        // HP가 0이 된 순간 호출 — Hurt 클립 마지막 프레임에서 정지(피격 포즈 유지).
+        // 넉백·스쿼시 등 transform 기반 FX는 그 위에서 계속 재생된다.
+        private void FreezeOnHurt()
+        {
+            if (_animator == null) return;
+            _animator.Play(HurtStateHash, 0, 1f); // Hurt 상태 마지막 프레임으로 점프
+            _animator.Update(0f);                 // SpriteRenderer에 즉시 반영
+            _animator.speed = 0f;                 // 정지
+        }
+
         public void PlayDeath()
         {
             if (_animator == null) return;
+            _animator.speed = 1f; // FreezeOnHurt로 멈춰 있던 상태 해제
             _animator.SetTrigger(DeathHash);
         }
 
