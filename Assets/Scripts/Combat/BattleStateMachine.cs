@@ -183,9 +183,9 @@ namespace BeatHero.Combat
         private IEnumerator HandleCallPhrase(double phraseStartDsp)
         {
             _grid.SetResponsePhase(false);
-            OnCallPhaseStarted?.Invoke();
             double secPerUnit = _conductor.SecPerBeat / PatternPlayer.UNITS_PER_BEAT;
             int unitOffset = 0;
+            bool firstNote = true;
 
             foreach (var bu in _patternPlayer.CurrentPattern.beatUnits)
             {
@@ -200,6 +200,9 @@ namespace BeatHero.Combat
                 // noteStartDsp + _pauseDelta = 프레이즈 경계 포함 모든 일시정지 반영한 목표 시각.
                 yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= noteStartDsp + _pauseDelta);
 
+                // CallPhase 시작 알림은 첫 비트가 "실제로" 발화되는 이 시점에. 코루틴 시작 시점에 울리면
+                // 다음 프레이즈는 ResponsePhase 종료 직후(=다음 CallPhase 약 1박 전) 시작되므로 한 박 빨리 울린다.
+                if (firstNote) { OnCallPhaseStarted?.Invoke(); firstNote = false; }
                 OnBeatUnitFired?.Invoke(secPerUnit * (int)bu.noteLength, bu.gridEffectShape != null);
                 _grid.ShowShape(bu.gridEffectShape);
 
