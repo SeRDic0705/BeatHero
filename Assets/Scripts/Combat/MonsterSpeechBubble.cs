@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using BeatHero.Data;
 using TMPro;
@@ -12,9 +13,11 @@ namespace BeatHero.Combat
     {
         [SerializeField] private GameObject _root; // 말풍선 비주얼 루트(SetActive 토글)
         [SerializeField] private TMP_Text   _text;
+        [SerializeField] private float      _charsPerSecond = 30f; // 타이핑 속도(0 이하면 즉시 전체 표시)
 
         private BattleStateMachine _battle;
         private MonsterData        _monster;
+        private Coroutine          _typingRoutine;
 
         private readonly List<MonsterDialogueLine> _sequential = new();
         private readonly List<MonsterDialogueLine> _randomPool = new();
@@ -111,12 +114,37 @@ namespace BeatHero.Combat
 
         private void Show(string content)
         {
-            if (_text != null) _text.text = content;
             if (_root != null) _root.SetActive(true);
+            if (_text == null) return;
+            _text.text = content;
+
+            if (_typingRoutine != null) { StopCoroutine(_typingRoutine); _typingRoutine = null; }
+
+            // 타이핑 연출 — maxVisibleCharacters를 0→전체로 늘려 한 글자씩 노출.
+            if (isActiveAndEnabled && _charsPerSecond > 0f && !string.IsNullOrEmpty(content))
+                _typingRoutine = StartCoroutine(TypeRoutine());
+            else
+                _text.maxVisibleCharacters = int.MaxValue; // 즉시 전체 표시
+        }
+
+        private IEnumerator TypeRoutine()
+        {
+            _text.maxVisibleCharacters = 0;
+            _text.ForceMeshUpdate();
+            int total = _text.textInfo.characterCount;
+            var wait = new WaitForSeconds(1f / _charsPerSecond);
+            for (int shown = 1; shown <= total; shown++)
+            {
+                _text.maxVisibleCharacters = shown;
+                yield return wait;
+            }
+            _text.maxVisibleCharacters = int.MaxValue;
+            _typingRoutine = null;
         }
 
         public void Hide()
         {
+            if (_typingRoutine != null) { StopCoroutine(_typingRoutine); _typingRoutine = null; }
             if (_root != null) _root.SetActive(false);
         }
     }

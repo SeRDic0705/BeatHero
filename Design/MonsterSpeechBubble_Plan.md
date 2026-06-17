@@ -54,9 +54,10 @@ public event System.Action OnResponsePhaseStarted; // HandleResponsePhrase에서
 ```
 
 ## 6. UI 컴포넌트 — MonsterSpeechBubble (신규, Combat, 월드공간)
-- 몬스터 자식 오브젝트. 직렬화: `_root`(말풍선 비주얼 루트, SetActive 토글), `_text`(월드공간 TMP).
+- 몬스터 자식 오브젝트. 직렬화: `_root`(말풍선 비주얼 루트, SetActive 토글), `_text`(월드공간 TMP), `_charsPerSecond`(타이핑 속도, 기본 30, 인스펙터 조정).
 - 구독: `OnBattleStarted`(대사 파생+카운터 리셋+숨김), `OnCallPhaseStarted`(선택+표시), `OnResponsePhaseStarted`(숨김).
 - `ShowDeath()` 공개 메서드: 사망 대사 있으면 표시(true)/없으면 미표시(false).
+- **타이핑 연출**: 표시 시 `maxVisibleCharacters`를 0→전체로 늘려 한 글자씩 노출(고정 cps). 새 대사/숨김 시 진행 코루틴 중단. `_charsPerSecond<=0`이면 즉시 전체 표시. 전투·사망 말풍선 공통.
 
 ## 7. 사망 흐름 연동 — GameManager.CompleteFloorRoutine
 - `PlayDeath()` + deathSfx 직후 `MonsterSpeechBubble.ShowDeath()` 호출.
