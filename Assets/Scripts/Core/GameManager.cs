@@ -33,6 +33,9 @@ namespace BeatHero.Core
         [SerializeField] private float _blackoutMinWait    = 0.5f;
         [SerializeField] private float _enterDuration      = 1f;
 
+        // 최후의 일격 돌진 목표 = 몬스터 위치 + 오프셋(화면상 몬스터 우측, 살짝 뒤).
+        [SerializeField] private Vector3 _rushTargetOffset = new(0.7f, 0f, 0f);
+
         // 몬스터 처치 시 BGM 페이드아웃 길이 = 돌진 + 퇴장(아이리스 닫힘 완료 시점).
         public float ClearFadeDuration => _rushDuration + _exitDuration;
 
@@ -125,9 +128,9 @@ namespace BeatHero.Core
 
             InputReader.Instance?.SwitchToUIMap();
 
-            // 최후의 일격 전진
+            // 최후의 일격 전진 — 몬스터 살짝 뒤(화면상 우측)로 돌진
             if (player != null && monsterView != null)
-                yield return StartCoroutine(player.RushTo(monsterView.transform.position, _rushDuration));
+                yield return StartCoroutine(player.RushTo(monsterView.transform.position + _rushTargetOffset, _rushDuration));
 
             // 사망 애니메이션 + SFX
             monsterView?.PlayDeath();
