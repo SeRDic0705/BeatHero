@@ -101,6 +101,21 @@ namespace BeatHero.Player
             _anim?.SetRunning(false);
         }
 
+        // 최후의 일격 돌진 — finalAttack 애니메이션 + ease 곡선(기본 ease-out: 초반 빠르고 후반 느림).
+        public IEnumerator FinalAttackDash(Vector3 target, float duration, AnimationCurve ease)
+        {
+            _anim?.TriggerFinalAttack();
+            Vector3 start = transform.position;
+            for (float t = 0f; t < duration; t += Time.deltaTime)
+            {
+                float n = duration > 0f ? t / duration : 1f;
+                float u = ease != null ? ease.Evaluate(n) : n;
+                transform.position = Vector3.Lerp(start, target, u);
+                yield return null;
+            }
+            transform.position = target;
+        }
+
         public IEnumerator ExitRight(float duration)
         {
             Vector3 start = transform.position;

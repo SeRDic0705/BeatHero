@@ -35,6 +35,9 @@ namespace BeatHero.Core
 
         // 최후의 일격 돌진 목표 = 몬스터 위치 + 오프셋(화면상 몬스터 우측, 살짝 뒤).
         [SerializeField] private Vector3 _rushTargetOffset = new(0.7f, 0f, 0f);
+        // 돌진 속도 곡선 — 기본 ease-out(초반 빠르고 후반 느림). 인스펙터에서 곡선 조정 가능.
+        [SerializeField] private AnimationCurve _rushEase =
+            new(new Keyframe(0f, 0f, 0f, 2f), new Keyframe(1f, 1f, 0f, 0f));
 
         // 몬스터 처치 시 BGM 페이드아웃 길이 = 돌진 + 퇴장(아이리스 닫힘 완료 시점).
         public float ClearFadeDuration => _rushDuration + _exitDuration;
@@ -128,9 +131,9 @@ namespace BeatHero.Core
 
             InputReader.Instance?.SwitchToUIMap();
 
-            // 최후의 일격 전진 — 몬스터 살짝 뒤(화면상 우측)로 돌진
+            // 최후의 일격 전진 — 몬스터 살짝 뒤(화면상 우측)로 finalAttack + ease-out 돌진
             if (player != null && monsterView != null)
-                yield return StartCoroutine(player.RushTo(monsterView.transform.position + _rushTargetOffset, _rushDuration));
+                yield return StartCoroutine(player.FinalAttackDash(monsterView.transform.position + _rushTargetOffset, _rushDuration, _rushEase));
 
             // 사망 애니메이션 + SFX
             monsterView?.PlayDeath();
