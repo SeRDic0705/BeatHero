@@ -45,6 +45,7 @@ namespace BeatHero.Combat
         private MonsterData     _monster;
         private CombatPhaseData _phase;
         private int             _monsterHp;
+        private int             _patternIndex; // 순차 출력(isRandom=false)용 런타임 인덱스
 
         private List<ActiveHazard> _hazards = new();
 
@@ -126,7 +127,8 @@ namespace BeatHero.Combat
             // 콜 효과음 프리로드 — 미로드 시 첫 PlayScheduled에서 로딩 지연으로 첫 박이 밀린다.
             if (_callBeatSfx != null && _callBeatSfx.loadState != AudioDataLoadState.Loaded)
                 _callBeatSfx.LoadAudioData();
-            SelectRandomPattern();
+            _patternIndex = 0;
+            SelectNextPattern();
             _player.transform.position = _grid.GetTileWorldPosition(_grid.PlayerPosition);
             _state = State.Idle;
         }
@@ -378,7 +380,7 @@ namespace BeatHero.Combat
                 return;
             }
 
-            SelectRandomPattern();
+            SelectNextPattern();
             _state = State.CallPhase;
         }
 
@@ -415,10 +417,23 @@ namespace BeatHero.Combat
             }
         }
 
-        private void SelectRandomPattern()
+        // isRandom=true면 균등 랜덤, false면 0번부터 순서대로 순환 선택(튜토리얼용 고정 순서).
+        private void SelectNextPattern()
         {
-            if (_phase.patterns == null || _phase.patterns.Count == 0) return;
-            _patternPlayer.SetPattern(_phase.patterns[Random.Range(0, _phase.patterns.Count)]);
+            var patterns = _phase.patterns;
+            if (patterns == null || patterns.Count == 0) return;
+
+            int index;
+            if (_monster.isRandom)
+            {
+                index = Random.Range(0, patterns.Count);
+            }
+            else
+            {
+                index = _patternIndex % patterns.Count;
+                _patternIndex = (_patternIndex + 1) % patterns.Count;
+            }
+            _patternPlayer.SetPattern(patterns[index]);
         }
 
         private void CheckBossPhaseTransition()
@@ -428,6 +443,7 @@ namespace BeatHero.Combat
             var newPhase = boss.GetCurrentPhase(hpPct);
             if (newPhase == _phase) return;
             _phase = newPhase;
+            _patternIndex = 0; // 새 페이즈는 패턴 리스트가 바뀌므로 순차 인덱스 리셋
             // BGM 전환은 HandlePhrasePair에서 nextPhraseStart 시각에 맞춰 처리
             _pendingPhaseSwitch = true;
             _pendingBgm         = _phase.bgm;
