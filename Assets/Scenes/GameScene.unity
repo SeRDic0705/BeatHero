@@ -4323,6 +4323,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: BeatHero::BeatHero.Combat.MonsterSpeechBubble
   _root: {fileID: 414539878}
   _text: {fileID: 1119461702}
+  _charsPerSecond: 10
 --- !u!1 &908967021
 GameObject:
   m_ObjectHideFlags: 0
