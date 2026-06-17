@@ -32,6 +32,11 @@ public abstract class MonsterData : SerializedScriptableObject
     public AudioClip deathSfx;
     public GameObject deathVfxPrefab;
 
+    // 패턴 출력 순서. true=매 프레이즈 균등 랜덤, false=0번부터 인덱스 순환(튜토리얼용 고정 순서).
+    // 순차 인덱스 자체는 런타임 가변이므로 BattleStateMachine이 보유(SO 수정 금지).
+    [BoxGroup("Pattern")]
+    public bool isRandom = true;
+
     // 전투 시스템이 타입 구분 없이 현재 페이즈 데이터를 요청하는 인터페이스
     public abstract CombatPhaseData GetCurrentPhase(float hpPercent);
 }
@@ -166,7 +171,7 @@ CellEffect (abstract SO) 에 `CellEffectFeedback feedback` 필드를 참조로 �
 
 | 클래스 | 역할 |
 |---|---|
-| `MonsterData` | 공통 스탯 + Animation 클립 3종 + Effects + `GetCurrentPhase()` 인터페이스 |
+| `MonsterData` | 공통 스탯 + Animation 클립 3종 + Effects + 패턴 순서 `isRandom` + `GetCurrentPhase()` 인터페이스 |
 | `CombatPhaseData` | 페이즈 단위 전투 데이터 (bpm, bgm, patterns) |
 | `NormalMonsterData` | 단일 페이즈 몬스터, 직접 CombatPhaseData 보유 |
 | `BossPhase` | CombatPhaseData + HP 전환 임계값 |
