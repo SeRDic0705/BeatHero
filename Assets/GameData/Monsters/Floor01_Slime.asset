@@ -58,9 +58,9 @@ MonoBehaviour:
   maxHp: 10
   attackPower: 10
   gridType: 0
-  idleClip: {fileID: 0}
-  hurtClip: {fileID: 0}
-  deathClip: {fileID: 0}
+  idleClip: {fileID: 7400000, guid: 5eb7ff66f12d3e740b1286af8f3e8600, type: 2}
+  hurtClip: {fileID: 7400000, guid: 421808427cac4ee4a954258a9e4b48fc, type: 2}
+  deathClip: {fileID: 7400000, guid: 421808427cac4ee4a954258a9e4b48fc, type: 2}
   hitSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
   deathSfx: {fileID: 0}
   isRandom: 1
