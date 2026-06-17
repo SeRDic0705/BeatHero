@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eafb6407f78f809479d56bab1d713889, type: 3}
-  m_Name: Floor05_Slime 4
+  m_Name: Floor03_Slime
   m_EditorClassIdentifier: BeatHero::BeatHero.Data.NormalMonsterData
   serializationData:
     SerializedFormat: 2
@@ -68,9 +68,5 @@ MonoBehaviour:
   bpm: 100
   bgm: {fileID: 8300000, guid: dfef0d7f5360a4f4bbf65397116d7ce1, type: 3}
   patterns:
-  - {fileID: 11400000, guid: a778df39972ff474fbdba75076406de9, type: 2}
-  - {fileID: 11400000, guid: 3385c4cc96f5c634c92848c46e512c0f, type: 2}
-  - {fileID: 11400000, guid: e536ded63d7ea5646ae5565c5841d373, type: 2}
-  - {fileID: 11400000, guid: b3a9ae81c0eef8b479a13c73698d1016, type: 2}
-  - {fileID: 11400000, guid: b8703b8bcea427243a0ac2eaaa8e64ad, type: 2}
-  - {fileID: 11400000, guid: 136578af829518249909b09ebc5b8043, type: 2}
+  - {fileID: 11400000, guid: cf138f248bde45b418c6e030d1e9510f, type: 2}
+  - {fileID: 11400000, guid: 1eb113208e43eb94685fb2f9c984e113, type: 2}

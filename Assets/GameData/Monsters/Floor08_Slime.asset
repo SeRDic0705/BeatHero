@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eafb6407f78f809479d56bab1d713889, type: 3}
-  m_Name: Floor01_Slime
+  m_Name: Floor08_Slime
   m_EditorClassIdentifier: BeatHero::BeatHero.Data.NormalMonsterData
   serializationData:
     SerializedFormat: 2
@@ -58,20 +58,19 @@ MonoBehaviour:
   maxHp: 10
   attackPower: 10
   gridType: 0
-  idleClip: {fileID: 7400000, guid: 38c6bb5e9bd8dad4185a3485e9e3d58c, type: 2}
-  hurtClip: {fileID: 7400000, guid: 38c6bb5e9bd8dad4185a3485e9e3d58c, type: 2}
-  deathClip: {fileID: 7400000, guid: 421808427cac4ee4a954258a9e4b48fc, type: 2}
+  sprites:
+  - {fileID: 21300000, guid: b29ff03ba07dc694cb31247ebca1dfbc, type: 3}
+  - {fileID: 21300000, guid: 0cb4b2de106036649ac459242b6d39e0, type: 3}
+  animator: {fileID: 0}
   hitSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
   deathSfx: {fileID: 0}
-  isRandom: 1
+  deathVfxPrefab: {fileID: 0}
   bpm: 100
   bgm: {fileID: 8300000, guid: dfef0d7f5360a4f4bbf65397116d7ce1, type: 3}
   patterns:
-  - {fileID: 11400000, guid: 538f31141fd331048a54941017aec844, type: 2}
-  - {fileID: 11400000, guid: e03e3d53e375df943b88a45c2ed718ab, type: 2}
-  - {fileID: 11400000, guid: 1dfdb530074dc9b43b64dff832905a0e, type: 2}
-  - {fileID: 11400000, guid: d122fcdbaaa27e7418a547261dc6e203, type: 2}
-  - {fileID: 11400000, guid: 73b095380edb33445af717e4834b031d, type: 2}
-  - {fileID: 11400000, guid: 09a746711bf2edc4ebfa2a9126668eaa, type: 2}
-  - {fileID: 11400000, guid: 043ec2c4b47ff4a43ba81d10517aa5e9, type: 2}
-  - {fileID: 11400000, guid: 94368168f8dfcd34ca79400ef2b0e14a, type: 2}
+  - {fileID: 11400000, guid: a778df39972ff474fbdba75076406de9, type: 2}
+  - {fileID: 11400000, guid: 3385c4cc96f5c634c92848c46e512c0f, type: 2}
+  - {fileID: 11400000, guid: e536ded63d7ea5646ae5565c5841d373, type: 2}
+  - {fileID: 11400000, guid: b3a9ae81c0eef8b479a13c73698d1016, type: 2}
+  - {fileID: 11400000, guid: b8703b8bcea427243a0ac2eaaa8e64ad, type: 2}
+  - {fileID: 11400000, guid: 136578af829518249909b09ebc5b8043, type: 2}
