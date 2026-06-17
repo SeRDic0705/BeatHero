@@ -130,6 +130,9 @@ namespace BeatHero.Core
             monsterView?.PlayDeath();
             AudioManager.Instance?.PlaySFX(_battle.CurrentMonster?.deathSfx);
 
+            // 사망 말풍선 — 전투 말풍선 제거 후 사망 대사 표시. 다음 층 SetFloorData(OnBattleStarted)에서 숨김.
+            UnityEngine.Object.FindAnyObjectByType<MonsterSpeechBubble>()?.ShowDeath();
+
             // 오른쪽 퇴장 + 아이리스 닫힘 동시
             if (SceneLoader.Instance != null && player != null)
             {
@@ -213,6 +216,8 @@ namespace BeatHero.Core
         {
             OnGameOver?.Invoke();
             InputReader.Instance?.SwitchToUIMap();
+            // 플레이어 사망 시 전투 말풍선 잔상 제거(CallPhase 중 사망 대비)
+            UnityEngine.Object.FindAnyObjectByType<MonsterSpeechBubble>()?.Hide();
 
             // 아이리스 닫힘 — 클리어 흐름과 동일하게 암전 후 결과창 표시
             if (SceneLoader.Instance != null)
