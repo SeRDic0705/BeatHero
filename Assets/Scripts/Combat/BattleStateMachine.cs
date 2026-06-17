@@ -332,6 +332,7 @@ namespace BeatHero.Combat
                 if (h.Position == _grid.PlayerPosition)
                 {
                     _player.TakeDamage(CalcMonsterDamage());
+                    if (_attackHeld) CancelCharge(); // 피격 시 차지 취소
                     return;
                 }
 
@@ -341,6 +342,7 @@ namespace BeatHero.Combat
             if (effect is DamageEffect)
             {
                 _player.TakeDamage(CalcMonsterDamage());
+                if (_attackHeld) CancelCharge(); // 피격 시 차지 취소
             }
             else if (effect is PersistentHazardEffect hazardEffect)
             {
