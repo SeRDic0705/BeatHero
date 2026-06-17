@@ -11,7 +11,7 @@ namespace BeatHero.Data
         public float bpm;
         [BoxGroup("Combat")]
         public AudioClip bgm;
-        [BoxGroup("Combat")]
+        [BoxGroup("Combat"), PropertyOrder(2)] // isRandom(PropertyOrder 1) 바로 아래
         public List<PatternData> patterns;
 
         public override CombatPhaseData GetCurrentPhase(float hpPercent)
