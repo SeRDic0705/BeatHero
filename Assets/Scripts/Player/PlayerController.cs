@@ -7,11 +7,12 @@ namespace BeatHero.Player
     // 플레이어 런타임 스탯 — HP·마나·보호막 보유 및 이벤트 발생
     public class PlayerController : MonoBehaviour
     {
-        private const int MAX_MANA = 5;
+        private const int MAX_MANA = 10;
 
         public int Hp      { get; private set; }
         public int MaxHp   { get; private set; }
         public int Mana    { get; private set; }
+        public int MaxMana => MAX_MANA;
         public bool HasShield { get; private set; }
 
         [SerializeField] private PlayerAnimationController _anim;

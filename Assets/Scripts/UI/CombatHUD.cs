@@ -10,9 +10,10 @@ namespace BeatHero.UI
     public class CombatHUD : MonoBehaviour
     {
         [Header("Player")]
-        [SerializeField] private Image    _playerHpFill; // type=Filled(Horizontal)
-        [SerializeField] private TMP_Text _playerHpText; // "현재/최대"
-        [SerializeField] private Image[]  _manaDots;      // 5
+        [SerializeField] private Image    _playerHpFill;     // type=Filled(Horizontal)
+        [SerializeField] private TMP_Text _playerHpText;     // "현재/최대"
+        [SerializeField] private TMP_Text _manaCurrentText;  // 현재 마나
+        [SerializeField] private TMP_Text _manaMaxText;      // "/최대마나"
 
         [Header("Monster")]
         [SerializeField] private Image    _monsterHpFill;
@@ -117,9 +118,8 @@ namespace BeatHero.UI
 
         private void UpdateMana(int mana)
         {
-            if (_manaDots == null) return;
-            for (int i = 0; i < _manaDots.Length; i++)
-                _manaDots[i].color = i < mana ? Color.yellow : new Color(1f, 1f, 1f, 0.2f);
+            if (_manaCurrentText != null) _manaCurrentText.text = mana.ToString();
+            if (_manaMaxText != null && _player != null) _manaMaxText.text = "/" + _player.MaxMana;
         }
 
         private void UpdateFloor(int floor)
