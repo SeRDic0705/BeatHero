@@ -55,12 +55,12 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  maxHp: 10
+  maxHp: 30
   attackPower: 10
   gridType: 0
-  idleClip: {fileID: 7400000, guid: 5eb7ff66f12d3e740b1286af8f3e8600, type: 2}
-  hurtClip: {fileID: 7400000, guid: 421808427cac4ee4a954258a9e4b48fc, type: 2}
-  deathClip: {fileID: 7400000, guid: 421808427cac4ee4a954258a9e4b48fc, type: 2}
+  idleClip: {fileID: 7400000, guid: 8ee324c3841275f4e9353ea8c00f6268, type: 2}
+  hurtClip: {fileID: 7400000, guid: 561d8e00fecc62547a6810f81e326ea8, type: 2}
+  deathClip: {fileID: 7400000, guid: 0b9702d65b317d440b1d0b27924b82ba, type: 2}
   hitSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
   deathSfx: {fileID: 0}
   isRandom: 1
