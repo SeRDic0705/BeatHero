@@ -22,5 +22,5 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   floors:
-  - {fileID: 11400000, guid: 32ad7af68f6356f418e315b9eb4475e7, type: 2}
+  - {fileID: 11400000, guid: e7e7a59c4d2a4444dbed536ba4adced1, type: 2}
   - {fileID: 11400000, guid: 36016fc5da536b542b81d561df3ddab7, type: 2}
