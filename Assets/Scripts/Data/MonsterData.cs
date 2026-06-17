@@ -35,6 +35,13 @@ namespace BeatHero.Data
         [BoxGroup("Combat"), PropertyOrder(1)]
         public bool isRandom = true;
 
+        // 전투 중 말풍선 대사. CallPhase 순번 기준 순차 출력 → 소진 후 랜덤 출력.
+        [BoxGroup("Dialogue"), TableList]
+        public List<MonsterDialogueLine> combatDialogues = new();
+        // 사망 말풍선 대사(몬스터당 1개). 비어 있으면 사망 말풍선 미표시.
+        [BoxGroup("Dialogue"), TextArea]
+        public string deathDialogue;
+
         public abstract CombatPhaseData GetCurrentPhase(float hpPercent);
     }
 }
