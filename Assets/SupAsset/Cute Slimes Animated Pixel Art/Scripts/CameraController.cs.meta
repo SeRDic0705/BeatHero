@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 9f832550ce4100b4188dbfe358a38bee
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 241052
+  packageName: Cute Slimes Animated Pixel Art
+  packageVersion: 1.1
+  assetPath: Assets/Tchongas/Cute Slimes Animated Pixel Art/Scripts/CameraController.cs
+  uploadId: 556271
