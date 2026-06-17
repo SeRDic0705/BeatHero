@@ -49,8 +49,9 @@ Shader "BeatHero/SpriteFlash"
             TEXTURE2D(_MainTex);
             SAMPLER(sampler_MainTex);
 
+            // 2D SRP Batcher는 머티리얼 CBUFFER 내 _MainTex_ST/_TexelSize를 지원하지 않는다.
+            // 스프라이트는 아틀라스 UV를 그대로 쓰므로 _ST(타일링/오프셋) 불필요 → 제외.
             CBUFFER_START(UnityPerMaterial)
-                float4 _MainTex_ST;
                 float4 _Color;
                 float4 _FlashColor;
                 float  _FlashAmount;
@@ -60,7 +61,7 @@ Shader "BeatHero/SpriteFlash"
             {
                 Varyings OUT;
                 OUT.positionHCS = TransformObjectToHClip(IN.positionOS);
-                OUT.uv          = TRANSFORM_TEX(IN.uv, _MainTex);
+                OUT.uv          = IN.uv; // 스프라이트 아틀라스 UV 그대로 사용
                 OUT.color       = IN.color * _Color;
                 return OUT;
             }
