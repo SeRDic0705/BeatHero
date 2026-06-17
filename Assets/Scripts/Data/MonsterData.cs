@@ -31,7 +31,8 @@ namespace BeatHero.Data
 
         // 패턴 출력 순서. true면 매 프레이즈 패턴 리스트에서 균등 랜덤 선택,
         // false면 0번부터 인덱스 순서대로 순환(튜토리얼용 고정 순서).
-        [BoxGroup("Pattern")]
+        // Combat 그룹의 patterns 바로 위에 표시 (NormalMonsterData.patterns = PropertyOrder 2).
+        [BoxGroup("Combat"), PropertyOrder(1)]
         public bool isRandom = true;
 
         public abstract CombatPhaseData GetCurrentPhase(float hpPercent);

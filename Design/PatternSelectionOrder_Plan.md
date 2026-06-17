@@ -12,7 +12,7 @@
 - bool 채택 (튜토리얼 용도엔 충분; 셔플·가중치 모드가 추후 필요하면 enum으로 승격).
 
 ## 변경 사항
-1. **`MonsterData`(base SO)**: `[BoxGroup("Pattern")] public bool isRandom = true;` 추가. `NormalMonsterData`·`BossMonsterData` 자동 상속.
+1. **`MonsterData`(base SO)**: `[BoxGroup("Combat"), PropertyOrder(1)] public bool isRandom = true;` 추가. `NormalMonsterData`·`BossMonsterData` 자동 상속. `NormalMonsterData.patterns`에 `PropertyOrder(2)`를 줘 isRandom이 Combat 그룹의 patterns 바로 위에 표시되게 한다(보스는 Combat 그룹이 없어 단독 박스로 표시).
 2. **`BattleStateMachine`**:
    - `private int _patternIndex;` 추가.
    - `SelectRandomPattern()` → `SelectNextPattern()`으로 일반화.

@@ -34,7 +34,8 @@ public abstract class MonsterData : SerializedScriptableObject
 
     // 패턴 출력 순서. true=매 프레이즈 균등 랜덤, false=0번부터 인덱스 순환(튜토리얼용 고정 순서).
     // 순차 인덱스 자체는 런타임 가변이므로 BattleStateMachine이 보유(SO 수정 금지).
-    [BoxGroup("Pattern")]
+    // Combat 그룹의 patterns 바로 위에 표시 (patterns = PropertyOrder 2).
+    [BoxGroup("Combat"), PropertyOrder(1)]
     public bool isRandom = true;
 
     // 전투 시스템이 타입 구분 없이 현재 페이즈 데이터를 요청하는 인터페이스
