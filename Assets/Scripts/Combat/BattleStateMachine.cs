@@ -14,6 +14,8 @@ namespace BeatHero.Combat
     {
         private const int   BEATS_PER_PHASE      = 4;
         private const float CHARGE_MULT_PER_BEAT = 0.5f;
+        private const int   MANA_GAIN_MOVE       = 2; // 일반 이동 시 획득
+        private const int   MANA_GAIN_DODGE      = 3; // 회피(위험 타일에서 이동) 시 획득
 
         [Header("Input Timing")]
         [SerializeField] private float _judgmentWindowSec = 0.021f; // 판정구간 반폭 (비트 전후 각각)
@@ -315,7 +317,7 @@ namespace BeatHero.Combat
             if (moved)
             {
                 _player.transform.position = _grid.GetTileWorldPosition(_grid.PlayerPosition);
-                _player.AddMana(_tileWasDangerAtWindowOpen ? 2 : 1);
+                _player.AddMana(_tileWasDangerAtWindowOpen ? MANA_GAIN_DODGE : MANA_GAIN_MOVE);
             }
 
             // 이동 시 차지 취소 (이동과 공격 배타적)
