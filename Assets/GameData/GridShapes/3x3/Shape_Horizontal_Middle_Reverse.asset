@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4f3bd5d3ed48c624f88bc33cc46142e9, type: 3}
-  m_Name: Shape_(2,1)
+  m_Name: Shape_Horizontal_Middle_Reverse
   m_EditorClassIdentifier: BeatHero::BeatHero.Data.GridEffectShape3x3
   serializationData:
     SerializedFormat: 2
@@ -32,23 +32,8 @@ MonoBehaviour:
       Entry: 1
       Data: 3|3
     - Name: 
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 6
-      Data: 
+      Entry: 10
+      Data: 0
     - Name: 
       Entry: 6
       Data: 
@@ -56,8 +41,23 @@ MonoBehaviour:
       Entry: 10
       Data: 0
     - Name: 
+      Entry: 10
+      Data: 0
+    - Name: 
       Entry: 6
       Data: 
+    - Name: 
+      Entry: 10
+      Data: 0
+    - Name: 
+      Entry: 10
+      Data: 0
+    - Name: 
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 10
+      Data: 0
     - Name: 
       Entry: 13
       Data: 
