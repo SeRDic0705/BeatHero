@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a57f89c132e16e345996b36fce13ccde, type: 3}
-  m_Name: Pattern_S1_P1_BasicAvoid
+  m_Name: Pattern_F1_P4
   m_EditorClassIdentifier: BeatHero::BeatHero.Data.PatternData
   serializationData:
     SerializedFormat: 2
@@ -23,13 +23,11 @@ MonoBehaviour:
     SerializationNodes: []
   beatUnits:
   - noteLength: 12
-    gridEffectShape: {fileID: 11400000, guid: a4c0f2f5d4de20f4da52caae5122e6c1, type: 2}
-  - noteLength: 6
-    gridEffectShape: {fileID: 0}
-  - noteLength: 6
-    gridEffectShape: {fileID: 11400000, guid: 5ef8cd0f277e32d42a07f7bdce2ab04a, type: 2}
+    gridEffectShape: {fileID: 11400000, guid: fe9cf6f258277804aac058159f306dda, type: 2}
   - noteLength: 12
-    gridEffectShape: {fileID: 11400000, guid: a4c0f2f5d4de20f4da52caae5122e6c1, type: 2}
+    gridEffectShape: {fileID: 11400000, guid: 6b24161b4af87e24ca5e0373e8b01745, type: 2}
   - noteLength: 12
-    gridEffectShape: {fileID: 11400000, guid: 5ef8cd0f277e32d42a07f7bdce2ab04a, type: 2}
+    gridEffectShape: {fileID: 11400000, guid: dec51caf2ced15049878e891d03e7350, type: 2}
+  - noteLength: 12
+    gridEffectShape: {fileID: 11400000, guid: 6b24161b4af87e24ca5e0373e8b01745, type: 2}
   damageMultiplier: 1
