@@ -29,6 +29,9 @@ namespace BeatHero.Player
             Mana      = 0;
             HasShield = false;
             _anim?.ResetState();
+            // 초기 HP/마나를 HUD에 알림 — 미발화 시 첫 피격 전까지 체력바가 0/0으로 표시됨
+            OnHpChanged?.Invoke(Hp, MaxHp);
+            OnManaChanged?.Invoke(Mana);
         }
 
         // 암전 직후 등 비주얼만 즉시 초기화할 때 사용 (스탯 건드리지 않음)
