@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eafb6407f78f809479d56bab1d713889, type: 3}
-  m_Name: Floor02_Slime
+  m_Name: Floor09_Slime
   m_EditorClassIdentifier: BeatHero::BeatHero.Data.NormalMonsterData
   serializationData:
     SerializedFormat: 2
@@ -58,18 +58,20 @@ MonoBehaviour:
   maxHp: 10
   attackPower: 10
   gridType: 0
-  idleClip: {fileID: 7400000, guid: ab4d6ce13f7d3d9418419cab9f2775a1, type: 2}
-  hurtClip: {fileID: 7400000, guid: 7a3803ccfd09f664c8a298cba1fff613, type: 2}
-  deathClip: {fileID: 7400000, guid: 95567c20943b3a3418b53d9622f8d709, type: 2}
+  idleClip: {fileID: 7400000, guid: 86b9b202797fd6848a03a03ce660c2cf, type: 2}
+  hurtClip: {fileID: 7400000, guid: 35dad1cb9e6a93c4cb5f060295c21c99, type: 2}
+  deathClip: {fileID: 7400000, guid: 8b5dbf0c5ae0b2b45980d0b1af4a5459, type: 2}
   hitSfx: {fileID: 8300000, guid: 5ea4ec9291c9c0a4a80161e8557d8729, type: 3}
   deathSfx: {fileID: 8300000, guid: 8671b0c3114bde44590047299c823672, type: 3}
   isRandom: 0
   combatDialogues: []
   deathDialogue: 
-  bpm: 70
-  bgm: {fileID: 8300000, guid: 2f6d91282d247a741b28b3d1e7cae124, type: 3}
+  bpm: 95
+  bgm: {fileID: 8300000, guid: 284a20a266a82094991030dfee0e8247, type: 3}
   patterns:
-  - {fileID: 11400000, guid: 63cf1bdb64336674da1cd1c5da3acc2e, type: 2}
-  - {fileID: 11400000, guid: 247f76ab983c741499365d2658ac7c3f, type: 2}
-  - {fileID: 11400000, guid: 71b0cd44c9d47524faedd43aa783f709, type: 2}
-  - {fileID: 11400000, guid: d8d4c8a712c07f9439d68e2f622253da, type: 2}
+  - {fileID: 11400000, guid: a778df39972ff474fbdba75076406de9, type: 2}
+  - {fileID: 11400000, guid: 3385c4cc96f5c634c92848c46e512c0f, type: 2}
+  - {fileID: 11400000, guid: e536ded63d7ea5646ae5565c5841d373, type: 2}
+  - {fileID: 11400000, guid: b3a9ae81c0eef8b479a13c73698d1016, type: 2}
+  - {fileID: 11400000, guid: b8703b8bcea427243a0ac2eaaa8e64ad, type: 2}
+  - {fileID: 11400000, guid: 136578af829518249909b09ebc5b8043, type: 2}
