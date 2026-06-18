@@ -39,7 +39,8 @@ namespace BeatHero.Combat
         public event System.Action<int, int> OnMonsterHpChanged; // (current, max)
         public event System.Action<double, bool> OnBeatUnitFired; // beatDurationSec, hasGridEffect
         public event System.Action OnEffectiveBeatFired; // ResponsePhase + gridEffectShape != null 인 비트만
-        public event System.Action OnMonsterHit;         // 플레이어 공격이 몬스터에 실제로 데미지를 입혔을 때
+        public event System.Action<bool> OnMonsterHit;   // 플레이어 공격이 몬스터에 데미지를 입혔을 때 (isLethal = 이 타격으로 HP가 0이 됨)
+        public event System.Action OnMonsterDefeated;     // 데미지로 몬스터 HP가 0이 된 순간(프레이즈 즉시 종료 직전)
         public event System.Action<CellEffectFeedback, Vector3> OnMonsterCellEffectFired;
         public event System.Action OnBossPhaseChanged; // 전환 완충 마디 박자마다 발동
         public event System.Action OnCallPhaseStarted;     // CallPhase(공격 예고) 시작
@@ -416,15 +417,23 @@ namespace BeatHero.Combat
         private void EndBattle(bool cleared)
         {
             if (_state == State.BattleEnd) return;
+            // 진행 중이던 프레이즈 코루틴 즉시 중단(OnPlayerDeath와 동일 패턴).
+            StopAllCoroutines();
+            _phraseRunning = false;
             _state = State.BattleEnd;
             _pendingPhaseSwitch = false;
-            _conductor.Stop();
             // 전투 종료 — 유지되던 마지막 위험 그리드를 비운다(다음 층 미존재 시에도 잔상 방지).
             _grid.ClearShape();
             if (cleared)
             {
+                // BGM은 즉시 끊지 않고 아이리스가 닫히는 시점(돌진+퇴장)까지 페이드아웃.
+                _conductor.FadeOutAndStop(GameManager.Instance.ClearFadeDuration);
                 _player.ResetMana();
                 GameManager.Instance.CompleteFloor();
+            }
+            else
+            {
+                _conductor.Stop();
             }
         }
 
@@ -534,9 +543,16 @@ namespace BeatHero.Combat
             int dmg = Mathf.RoundToInt(_playerConfig.attackPower * _chargeDamageMultiplier);
             _monsterHp = Mathf.Max(0, _monsterHp - dmg);
             OnMonsterHpChanged?.Invoke(_monsterHp, _monster.maxHp);
-            OnMonsterHit?.Invoke();
+            OnMonsterHit?.Invoke(_monsterHp <= 0);
             AudioManager.Instance?.PlaySFX(_monster.hitSfx);
             ResetCharge();
+
+            // HP가 0이 되면 프레이즈를 끝까지 기다리지 않고 즉시 종료.
+            if (_monsterHp <= 0)
+            {
+                OnMonsterDefeated?.Invoke(); // 몬스터 Hurt 마지막 프레임 정지
+                EndBattle(cleared: true);
+            }
         }
 
         private void CancelCharge() => ResetCharge();

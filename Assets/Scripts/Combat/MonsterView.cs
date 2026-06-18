@@ -2,8 +2,6 @@ using System.Collections;
 using BeatHero.Audio;
 using BeatHero.Data;
 using UnityEngine;
-using UnityEngine.Animations;
-using UnityEngine.Playables;
 
 namespace BeatHero.Combat
 {
@@ -16,8 +14,9 @@ namespace BeatHero.Combat
     [RequireComponent(typeof(SpriteRenderer), typeof(Animator))]
     public class MonsterView : MonoBehaviour
     {
-        private static readonly int HurtHash  = Animator.StringToHash("hurt");
-        private static readonly int DeathHash = Animator.StringToHash("death");
+        private static readonly int HurtHash       = Animator.StringToHash("hurt");
+        private static readonly int HurtStateHash  = Animator.StringToHash("Hurt");
+        private static readonly int DeathStateHash = Animator.StringToHash("Death");
         private static readonly int FlashAmountId = Shader.PropertyToID("_FlashAmount");
         private static readonly int FlashColorId  = Shader.PropertyToID("_FlashColor");
 
@@ -46,10 +45,9 @@ namespace BeatHero.Combat
         [SerializeField] private float   _squashOutTime  = 0.05f;
         [SerializeField] private float   _squashBackTime = 0.12f;
 
-        [Header("Hit FX - 히트 파티클(AnimationClip 직접 할당)")]
-        [SerializeField] private Animator      _hitVfxAnimator; // 전용 자식 VFX 오브젝트의 Animator
-        [SerializeField] private AnimationClip _hitVfxClip;     // 인스펙터에서 직접 할당
-        [SerializeField] private Vector3       _hitVfxOffset = Vector3.zero;
+        [Header("Hit FX - 참격 VFX (처치 피니셔와 공통)")]
+        [SerializeField] private SlashVfxPlayer _slashVfx;     // 평타·처치가 공유하는 참격 재생기
+        [SerializeField] private AnimationClip  _hitSlashClip; // 평타 참격 클립(SlashVfx.anim)
 
         private Animator            _animator;
         private BattleStateMachine  _battle;
@@ -65,8 +63,6 @@ namespace BeatHero.Combat
         private Coroutine     _flashRoutine;
         private Coroutine     _knockbackRoutine;
         private Coroutine     _squashRoutine;
-        private Coroutine     _hitVfxStopRoutine;
-        private PlayableGraph _hitVfxGraph;
 
         private void Awake()
         {
@@ -79,6 +75,7 @@ namespace BeatHero.Combat
                 _battle.OnBattleStarted          += SetMonster;
                 _battle.OnBeatUnitFired          += OnBeatUnit;
                 _battle.OnMonsterHit             += OnHit;
+                _battle.OnMonsterDefeated        += FreezeOnHurt;
                 _battle.OnMonsterCellEffectFired += PlayCellEffectFeedback;
                 _battle.OnBossPhaseChanged       += OnBossPhaseChanged;
             }
@@ -88,7 +85,6 @@ namespace BeatHero.Combat
         {
             _baseLocalPos = transform.localPosition;
             _baseScale    = transform.localScale;
-            if (_hitVfxAnimator != null) _hitVfxAnimator.gameObject.SetActive(false);
             if (_battle != null && _battle.CurrentMonster != null)
                 SetMonster(_battle.CurrentMonster);
         }
@@ -100,10 +96,10 @@ namespace BeatHero.Combat
                 _battle.OnBattleStarted          -= SetMonster;
                 _battle.OnBeatUnitFired          -= OnBeatUnit;
                 _battle.OnMonsterHit             -= OnHit;
+                _battle.OnMonsterDefeated        -= FreezeOnHurt;
                 _battle.OnMonsterCellEffectFired -= PlayCellEffectFeedback;
                 _battle.OnBossPhaseChanged       -= OnBossPhaseChanged;
             }
-            if (_hitVfxGraph.IsValid()) _hitVfxGraph.Destroy();
         }
 
         private void SetMonster(MonsterData data)
@@ -111,6 +107,9 @@ namespace BeatHero.Combat
             _currentMonster = data;
             _baseLocalPos   = transform.localPosition;
             if (_animator == null || _baseController == null) return;
+
+            // 이전 층에서 FreezeOnHurt로 speed=0 고정됐을 수 있으므로 복원.
+            _animator.speed = 1f;
 
             // MonsterBaseAnimator 상태머신을 공유하고 몬스터별 클립만 교체.
             // 클립 이름이 아닌 오브젝트 참조를 키로 사용해 이름 의존성 제거.
@@ -147,15 +146,17 @@ namespace BeatHero.Combat
             _sfxPlayedThisBeat.Clear();
         }
 
-        private void OnHit()
+        private void OnHit(bool isLethal)
         {
             if (_animator != null) _animator.SetTrigger(HurtHash);
 
-            // 4종 타격 피드백 동시 발동. 연타 대비 각 코루틴은 재시작.
+            // 타격 피드백 동시 발동. 연타 대비 각 코루틴은 재시작.
             RestartRoutine(ref _flashRoutine,     FlashRoutine());
             RestartRoutine(ref _knockbackRoutine, KnockbackRoutine());
             RestartRoutine(ref _squashRoutine,    SquashRoutine());
-            PlayHitVfx();
+
+            // 평타 참격 — 치명타(처치 타격) 땐 생략하고 돌진 피니셔의 치명타 참격만 보여준다.
+            if (!isLethal) _slashVfx?.Play(_hitSlashClip, transform.position);
         }
 
         // 돌고 있으면 멈추고 다시 시작 — 차지 등 연타 시 안전.
@@ -243,33 +244,26 @@ namespace BeatHero.Combat
             _squashRoutine = null;
         }
 
-        // 4. 히트 파티클: 할당된 AnimationClip을 컨트롤러 없이 단발 재생.
-        private void PlayHitVfx()
+        // HP가 0이 된 순간 호출 — Hurt 클립 마지막 프레임에서 정지(피격 포즈 유지).
+        // 넉백·스쿼시 등 transform 기반 FX는 그 위에서 계속 재생된다.
+        private void FreezeOnHurt()
         {
-            if (_hitVfxAnimator == null || _hitVfxClip == null) return;
-
-            _hitVfxAnimator.transform.position = transform.position + _hitVfxOffset;
-            if (!_hitVfxAnimator.gameObject.activeSelf) _hitVfxAnimator.gameObject.SetActive(true);
-
-            if (_hitVfxGraph.IsValid()) _hitVfxGraph.Destroy();
-            AnimationPlayableUtilities.PlayClip(_hitVfxAnimator, _hitVfxClip, out _hitVfxGraph);
-
-            if (_hitVfxStopRoutine != null) StopCoroutine(_hitVfxStopRoutine);
-            _hitVfxStopRoutine = StartCoroutine(StopHitVfxAfter(_hitVfxClip.length));
-        }
-
-        private IEnumerator StopHitVfxAfter(float seconds)
-        {
-            yield return new WaitForSeconds(seconds);
-            if (_hitVfxGraph.IsValid()) _hitVfxGraph.Destroy();
-            if (_hitVfxAnimator != null) _hitVfxAnimator.gameObject.SetActive(false);
-            _hitVfxStopRoutine = null;
+            if (_animator == null) return;
+            // OnHit에서 세팅된 hurt 트리거가 남아 있으면 다음 프레임에 Hurt가 한 번 더
+            // 발동(2회 재생)하고 이후 death 전이와도 경합하므로 반드시 소비시킨다.
+            _animator.ResetTrigger(HurtHash);
+            _animator.Play(HurtStateHash, 0, 1f); // Hurt 상태 마지막 프레임으로 점프
+            _animator.Update(0f);                 // SpriteRenderer에 즉시 반영
+            _animator.speed = 0f;                 // 정지
         }
 
         public void PlayDeath()
         {
             if (_animator == null) return;
-            _animator.SetTrigger(DeathHash);
+            _animator.speed = 1f;              // FreezeOnHurt로 멈춰 있던 상태 해제
+            _animator.ResetTrigger(HurtHash);  // 잔여 hurt 트리거 제거(Death가 묻히는 것 방지)
+            // 트리거 대신 Death 상태를 직접 재생 — 전이 경합 없이 확실히 재생.
+            _animator.Play(DeathStateHash, 0, 0f);
         }
 
         private void OnBossPhaseChanged()

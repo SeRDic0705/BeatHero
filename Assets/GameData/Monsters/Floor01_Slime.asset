@@ -55,7 +55,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  maxHp: 30
+  maxHp: 20
   attackPower: 10
   gridType: 0
   idleClip: {fileID: 7400000, guid: 8ee324c3841275f4e9353ea8c00f6268, type: 2}
@@ -88,7 +88,7 @@ MonoBehaviour:
     useInRandom: 1
   deathDialogue: "\uB0B4 \uC8FD\uC74C\uC744 \uC801\uC5D0\uAC8C \uC54C\uB9AC\uC9C0
     \uB9D0\uB77C"
-  bpm: 100
+  bpm: 160
   bgm: {fileID: 8300000, guid: dfef0d7f5360a4f4bbf65397116d7ce1, type: 3}
   patterns:
   - {fileID: 11400000, guid: 538f31141fd331048a54941017aec844, type: 2}

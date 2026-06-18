@@ -17,6 +17,11 @@ namespace BeatHero.Player
 
         [SerializeField] private PlayerAnimationController _anim;
 
+        [Header("참격 VFX (몬스터 통과 시 1회 — 치명타 피니셔)")]
+        [SerializeField] private Combat.SlashVfxPlayer _slashVfx;       // 평타와 공통으로 쓰는 참격 재생기
+        [SerializeField, UnityEngine.Serialization.FormerlySerializedAs("_slashVfxClip")]
+        private AnimationClip _finalSlashClip;                          // 치명타 참격 클립(평타와 다른 파일)
+
         public event Action<int, int> OnHpChanged;   // (current, max)
         public event Action<int>      OnManaChanged;  // current
         public event Action           OnDeath;
@@ -99,6 +104,33 @@ namespace BeatHero.Player
             }
             transform.position = target;
             _anim?.SetRunning(false);
+        }
+
+        // 최후의 일격 돌진 — finalAttack 애니메이션 + ease 곡선(기본 ease-out: 초반 빠르고 후반 느림).
+        // 돌진 중 플레이어 x가 몬스터 x를 지나치는 순간(좌표 교차) 참격 VFX 1회 재생.
+        public IEnumerator FinalAttackDash(Vector3 target, float duration, AnimationCurve ease, Vector3 monsterPos)
+        {
+            _anim?.TriggerFinalAttack();
+            Vector3 start = transform.position;
+            float crossX  = monsterPos.x;
+            float prevX   = start.x;
+            bool  slashed = false;
+            for (float t = 0f; t < duration; t += Time.deltaTime)
+            {
+                float n = duration > 0f ? t / duration : 1f;
+                float u = ease != null ? ease.Evaluate(n) : n;
+                transform.position = Vector3.Lerp(start, target, u);
+
+                // prevX와 현재 x가 crossX를 사이에 두면(부호 반전·일치) 통과 → 1회 재생
+                if (!slashed && (prevX - crossX) * (transform.position.x - crossX) <= 0f)
+                {
+                    slashed = true;
+                    _slashVfx?.Play(_finalSlashClip, monsterPos);
+                }
+                prevX = transform.position.x;
+                yield return null;
+            }
+            transform.position = target;
         }
 
         public IEnumerator ExitRight(float duration)

@@ -33,6 +33,17 @@ namespace BeatHero.Core
         [SerializeField] private float _blackoutMinWait    = 0.5f;
         [SerializeField] private float _enterDuration      = 1f;
 
+        // 최후의 일격 돌진 목표 = 몬스터 위치 + 오프셋(화면상 몬스터 우측, 살짝 뒤).
+        [SerializeField] private Vector3 _rushTargetOffset = new(0.7f, 0f, 0f);
+        // 돌진 속도 곡선 — 기본 ease-out(초반 빠르고 후반 느림). 인스펙터에서 곡선 조정 가능.
+        [SerializeField] private AnimationCurve _rushEase =
+            new(new Keyframe(0f, 0f, 0f, 2f), new Keyframe(1f, 1f, 0f, 0f));
+        // 돌진 종료 후 몬스터 사망 연출을 보여주기 위한 최소 대기(이후 우측 퇴장).
+        [SerializeField] private float _deathHoldDuration = 0.5f;
+
+        // 몬스터 처치 시 BGM 페이드아웃 길이 = 돌진 + 사망연출 대기 + 퇴장(아이리스 닫힘 완료 시점).
+        public float ClearFadeDuration => _rushDuration + _deathHoldDuration + _exitDuration;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -122,9 +133,12 @@ namespace BeatHero.Core
 
             InputReader.Instance?.SwitchToUIMap();
 
-            // 최후의 일격 전진
+            // 최후의 일격 전진 — 몬스터 살짝 뒤(화면상 우측)로 finalAttack + ease-out 돌진
+            // (돌진 중 몬스터 x 통과 시 참격 VFX 1회 재생)
             if (player != null && monsterView != null)
-                yield return StartCoroutine(player.RushTo(monsterView.transform.position, _rushDuration));
+                yield return StartCoroutine(player.FinalAttackDash(
+                    monsterView.transform.position + _rushTargetOffset, _rushDuration, _rushEase,
+                    monsterView.transform.position));
 
             // 사망 애니메이션 + SFX
             monsterView?.PlayDeath();
@@ -132,6 +146,9 @@ namespace BeatHero.Core
 
             // 사망 말풍선 — 전투 말풍선 제거 후 사망 대사 표시. 다음 층 SetFloorData(OnBattleStarted)에서 숨김.
             UnityEngine.Object.FindAnyObjectByType<MonsterSpeechBubble>()?.ShowDeath();
+
+            // 사망 연출을 보여주기 위한 최소 대기 후 퇴장
+            yield return new WaitForSeconds(_deathHoldDuration);
 
             // 오른쪽 퇴장 + 아이리스 닫힘 동시
             if (SceneLoader.Instance != null && player != null)
