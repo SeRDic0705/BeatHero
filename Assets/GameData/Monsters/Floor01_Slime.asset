@@ -63,7 +63,7 @@ MonoBehaviour:
   deathClip: {fileID: 7400000, guid: 0b9702d65b317d440b1d0b27924b82ba, type: 2}
   hitSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
   deathSfx: {fileID: 0}
-  isRandom: 1
+  isRandom: 0
   combatDialogues:
   - text: "\uB3D9\uD574\uBB3C\uACFC \uBC31\uB450\uC0B0\uC774"
     useInSequential: 1

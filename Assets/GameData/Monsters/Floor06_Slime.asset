@@ -63,7 +63,7 @@ MonoBehaviour:
   deathClip: {fileID: 7400000, guid: 3ccd50e0835440740a12a1bf1223b728, type: 2}
   hitSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
   deathSfx: {fileID: 0}
-  isRandom: 1
+  isRandom: 0
   combatDialogues: []
   deathDialogue: 
   bpm: 100
