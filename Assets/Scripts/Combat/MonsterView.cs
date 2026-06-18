@@ -2,8 +2,6 @@ using System.Collections;
 using BeatHero.Audio;
 using BeatHero.Data;
 using UnityEngine;
-using UnityEngine.Animations;
-using UnityEngine.Playables;
 
 namespace BeatHero.Combat
 {
@@ -47,10 +45,9 @@ namespace BeatHero.Combat
         [SerializeField] private float   _squashOutTime  = 0.05f;
         [SerializeField] private float   _squashBackTime = 0.12f;
 
-        [Header("Hit FX - 히트 파티클(AnimationClip 직접 할당)")]
-        [SerializeField] private Animator      _hitVfxAnimator; // 전용 자식 VFX 오브젝트의 Animator
-        [SerializeField] private AnimationClip _hitVfxClip;     // 인스펙터에서 직접 할당
-        [SerializeField] private Vector3       _hitVfxOffset = Vector3.zero;
+        [Header("Hit FX - 참격 VFX (처치 피니셔와 공통)")]
+        [SerializeField] private SlashVfxPlayer _slashVfx;     // 평타·처치가 공유하는 참격 재생기
+        [SerializeField] private AnimationClip  _hitSlashClip; // 평타 참격 클립(SlashVfx.anim)
 
         private Animator            _animator;
         private BattleStateMachine  _battle;
@@ -66,8 +63,6 @@ namespace BeatHero.Combat
         private Coroutine     _flashRoutine;
         private Coroutine     _knockbackRoutine;
         private Coroutine     _squashRoutine;
-        private Coroutine     _hitVfxStopRoutine;
-        private PlayableGraph _hitVfxGraph;
 
         private void Awake()
         {
@@ -90,7 +85,6 @@ namespace BeatHero.Combat
         {
             _baseLocalPos = transform.localPosition;
             _baseScale    = transform.localScale;
-            if (_hitVfxAnimator != null) _hitVfxAnimator.gameObject.SetActive(false);
             if (_battle != null && _battle.CurrentMonster != null)
                 SetMonster(_battle.CurrentMonster);
         }
@@ -106,7 +100,6 @@ namespace BeatHero.Combat
                 _battle.OnMonsterCellEffectFired -= PlayCellEffectFeedback;
                 _battle.OnBossPhaseChanged       -= OnBossPhaseChanged;
             }
-            if (_hitVfxGraph.IsValid()) _hitVfxGraph.Destroy();
         }
 
         private void SetMonster(MonsterData data)
@@ -153,15 +146,17 @@ namespace BeatHero.Combat
             _sfxPlayedThisBeat.Clear();
         }
 
-        private void OnHit()
+        private void OnHit(bool isLethal)
         {
             if (_animator != null) _animator.SetTrigger(HurtHash);
 
-            // 4종 타격 피드백 동시 발동. 연타 대비 각 코루틴은 재시작.
+            // 타격 피드백 동시 발동. 연타 대비 각 코루틴은 재시작.
             RestartRoutine(ref _flashRoutine,     FlashRoutine());
             RestartRoutine(ref _knockbackRoutine, KnockbackRoutine());
             RestartRoutine(ref _squashRoutine,    SquashRoutine());
-            PlayHitVfx();
+
+            // 평타 참격 — 치명타(처치 타격) 땐 생략하고 돌진 피니셔의 치명타 참격만 보여준다.
+            if (!isLethal) _slashVfx?.Play(_hitSlashClip, transform.position);
         }
 
         // 돌고 있으면 멈추고 다시 시작 — 차지 등 연타 시 안전.
@@ -247,29 +242,6 @@ namespace BeatHero.Combat
             }
             transform.localScale = _baseScale;
             _squashRoutine = null;
-        }
-
-        // 4. 히트 파티클: 할당된 AnimationClip을 컨트롤러 없이 단발 재생.
-        private void PlayHitVfx()
-        {
-            if (_hitVfxAnimator == null || _hitVfxClip == null) return;
-
-            _hitVfxAnimator.transform.position = transform.position + _hitVfxOffset;
-            if (!_hitVfxAnimator.gameObject.activeSelf) _hitVfxAnimator.gameObject.SetActive(true);
-
-            if (_hitVfxGraph.IsValid()) _hitVfxGraph.Destroy();
-            AnimationPlayableUtilities.PlayClip(_hitVfxAnimator, _hitVfxClip, out _hitVfxGraph);
-
-            if (_hitVfxStopRoutine != null) StopCoroutine(_hitVfxStopRoutine);
-            _hitVfxStopRoutine = StartCoroutine(StopHitVfxAfter(_hitVfxClip.length));
-        }
-
-        private IEnumerator StopHitVfxAfter(float seconds)
-        {
-            yield return new WaitForSeconds(seconds);
-            if (_hitVfxGraph.IsValid()) _hitVfxGraph.Destroy();
-            if (_hitVfxAnimator != null) _hitVfxAnimator.gameObject.SetActive(false);
-            _hitVfxStopRoutine = null;
         }
 
         // HP가 0이 된 순간 호출 — Hurt 클립 마지막 프레임에서 정지(피격 포즈 유지).

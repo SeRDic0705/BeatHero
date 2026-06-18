@@ -39,7 +39,7 @@ namespace BeatHero.Combat
         public event System.Action<int, int> OnMonsterHpChanged; // (current, max)
         public event System.Action<double, bool> OnBeatUnitFired; // beatDurationSec, hasGridEffect
         public event System.Action OnEffectiveBeatFired; // ResponsePhase + gridEffectShape != null 인 비트만
-        public event System.Action OnMonsterHit;         // 플레이어 공격이 몬스터에 실제로 데미지를 입혔을 때
+        public event System.Action<bool> OnMonsterHit;   // 플레이어 공격이 몬스터에 데미지를 입혔을 때 (isLethal = 이 타격으로 HP가 0이 됨)
         public event System.Action OnMonsterDefeated;     // 데미지로 몬스터 HP가 0이 된 순간(프레이즈 즉시 종료 직전)
         public event System.Action<CellEffectFeedback, Vector3> OnMonsterCellEffectFired;
         public event System.Action OnBossPhaseChanged; // 전환 완충 마디 박자마다 발동
@@ -543,7 +543,7 @@ namespace BeatHero.Combat
             int dmg = Mathf.RoundToInt(_playerConfig.attackPower * _chargeDamageMultiplier);
             _monsterHp = Mathf.Max(0, _monsterHp - dmg);
             OnMonsterHpChanged?.Invoke(_monsterHp, _monster.maxHp);
-            OnMonsterHit?.Invoke();
+            OnMonsterHit?.Invoke(_monsterHp <= 0);
             AudioManager.Instance?.PlaySFX(_monster.hitSfx);
             ResetCharge();
 

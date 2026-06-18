@@ -1,8 +1,6 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Animations;
-using UnityEngine.Playables;
 
 namespace BeatHero.Player
 {
@@ -19,13 +17,10 @@ namespace BeatHero.Player
 
         [SerializeField] private PlayerAnimationController _anim;
 
-        [Header("참격 VFX (몬스터 통과 시 1회)")]
-        [SerializeField] private Animator      _slashVfxAnimator; // 독립 VFX 오브젝트의 Animator
-        [SerializeField] private AnimationClip _slashVfxClip;     // 인스펙터 직접 할당
-        [SerializeField] private Vector3       _slashVfxOffset = Vector3.zero;
-
-        private PlayableGraph _slashGraph;
-        private Coroutine     _slashStopRoutine;
+        [Header("참격 VFX (몬스터 통과 시 1회 — 치명타 피니셔)")]
+        [SerializeField] private Combat.SlashVfxPlayer _slashVfx;       // 평타와 공통으로 쓰는 참격 재생기
+        [SerializeField, UnityEngine.Serialization.FormerlySerializedAs("_slashVfxClip")]
+        private AnimationClip _finalSlashClip;                          // 치명타 참격 클립(평타와 다른 파일)
 
         public event Action<int, int> OnHpChanged;   // (current, max)
         public event Action<int>      OnManaChanged;  // current
@@ -130,40 +125,12 @@ namespace BeatHero.Player
                 if (!slashed && (prevX - crossX) * (transform.position.x - crossX) <= 0f)
                 {
                     slashed = true;
-                    PlaySlashVfx(monsterPos);
+                    _slashVfx?.Play(_finalSlashClip, monsterPos);
                 }
                 prevX = transform.position.x;
                 yield return null;
             }
             transform.position = target;
-        }
-
-        // 참격 VFX — 할당된 AnimationClip을 컨트롤러 없이 단발 재생.
-        private void PlaySlashVfx(Vector3 worldPos)
-        {
-            if (_slashVfxAnimator == null || _slashVfxClip == null) return;
-
-            _slashVfxAnimator.transform.position = worldPos + _slashVfxOffset;
-            if (!_slashVfxAnimator.gameObject.activeSelf) _slashVfxAnimator.gameObject.SetActive(true);
-
-            if (_slashGraph.IsValid()) _slashGraph.Destroy();
-            AnimationPlayableUtilities.PlayClip(_slashVfxAnimator, _slashVfxClip, out _slashGraph);
-
-            if (_slashStopRoutine != null) StopCoroutine(_slashStopRoutine);
-            _slashStopRoutine = StartCoroutine(StopSlashVfxAfter(_slashVfxClip.length));
-        }
-
-        private IEnumerator StopSlashVfxAfter(float seconds)
-        {
-            yield return new WaitForSeconds(seconds);
-            if (_slashGraph.IsValid()) _slashGraph.Destroy();
-            if (_slashVfxAnimator != null) _slashVfxAnimator.gameObject.SetActive(false);
-            _slashStopRoutine = null;
-        }
-
-        private void OnDestroy()
-        {
-            if (_slashGraph.IsValid()) _slashGraph.Destroy();
         }
 
         public IEnumerator ExitRight(float duration)
