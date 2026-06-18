@@ -69,7 +69,7 @@ MonoBehaviour:
   bpm: 100
   bgm: {fileID: 8300000, guid: 48d74d6669d144242a9210060ef68ef2, type: 3}
   patterns:
-  - {fileID: 11400000, guid: 538f31141fd331048a54941017aec844, type: 2}
-  - {fileID: 11400000, guid: e03e3d53e375df943b88a45c2ed718ab, type: 2}
-  - {fileID: 11400000, guid: 1dfdb530074dc9b43b64dff832905a0e, type: 2}
-  - {fileID: 11400000, guid: d122fcdbaaa27e7418a547261dc6e203, type: 2}
+  - {fileID: 11400000, guid: 1d658da0beebc874caa7162522fe4cd7, type: 2}
+  - {fileID: 11400000, guid: 3ec7a56b759a3534aaf4f6444ccfa10a, type: 2}
+  - {fileID: 11400000, guid: 267f98dadac9b884088a55b978c0a7b1, type: 2}
+  - {fileID: 11400000, guid: 3098a4da917495c408a28009187f15c2, type: 2}

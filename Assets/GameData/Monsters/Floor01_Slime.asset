@@ -88,7 +88,7 @@ MonoBehaviour:
     useInRandom: 1
   deathDialogue: "\uB0B4 \uC8FD\uC74C\uC744 \uC801\uC5D0\uAC8C \uC54C\uB9AC\uC9C0
     \uB9D0\uB77C"
-  bpm: 100
+  bpm: 120
   bgm: {fileID: 8300000, guid: 71832af9e6f2e74449db3ead181295ef, type: 3}
   patterns:
   - {fileID: 11400000, guid: 538f31141fd331048a54941017aec844, type: 2}

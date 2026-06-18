@@ -23,13 +23,13 @@ MonoBehaviour:
     SerializationNodes: []
   beatUnits:
   - noteLength: 12
-    gridEffectShape: {fileID: 11400000, guid: 0938417db42e04c4bad51af2226ba808, type: 2}
-  - noteLength: 6
-    gridEffectShape: {fileID: 11400000, guid: 9c9f4f42b2bb96848b88c5f0c43f4cc8, type: 2}
-  - noteLength: 6
-    gridEffectShape: {fileID: 11400000, guid: 0938417db42e04c4bad51af2226ba808, type: 2}
+    gridEffectShape: {fileID: 11400000, guid: 5726d884699182a42afbde1afc0dd174, type: 2}
   - noteLength: 12
-    gridEffectShape: {fileID: 11400000, guid: 366aaea23239b4d49b9bf465f2c5f88d, type: 2}
+    gridEffectShape: {fileID: 11400000, guid: 702deeb125f755c42916cd8fe1564e5c, type: 2}
+  - noteLength: 6
+    gridEffectShape: {fileID: 11400000, guid: 5726d884699182a42afbde1afc0dd174, type: 2}
+  - noteLength: 6
+    gridEffectShape: {fileID: 11400000, guid: 4d1732ebf1380754f90a22a0affd7150, type: 2}
   - noteLength: 12
-    gridEffectShape: {fileID: 11400000, guid: 0938417db42e04c4bad51af2226ba808, type: 2}
+    gridEffectShape: {fileID: 11400000, guid: 5726d884699182a42afbde1afc0dd174, type: 2}
   damageMultiplier: 1
