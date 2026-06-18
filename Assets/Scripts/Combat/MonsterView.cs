@@ -14,9 +14,9 @@ namespace BeatHero.Combat
     [RequireComponent(typeof(SpriteRenderer), typeof(Animator))]
     public class MonsterView : MonoBehaviour
     {
-        private static readonly int HurtHash      = Animator.StringToHash("hurt");
-        private static readonly int DeathHash     = Animator.StringToHash("death");
-        private static readonly int HurtStateHash = Animator.StringToHash("Hurt");
+        private static readonly int HurtHash       = Animator.StringToHash("hurt");
+        private static readonly int HurtStateHash  = Animator.StringToHash("Hurt");
+        private static readonly int DeathStateHash = Animator.StringToHash("Death");
         private static readonly int FlashAmountId = Shader.PropertyToID("_FlashAmount");
         private static readonly int FlashColorId  = Shader.PropertyToID("_FlashColor");
 
@@ -249,6 +249,9 @@ namespace BeatHero.Combat
         private void FreezeOnHurt()
         {
             if (_animator == null) return;
+            // OnHit에서 세팅된 hurt 트리거가 남아 있으면 다음 프레임에 Hurt가 한 번 더
+            // 발동(2회 재생)하고 이후 death 전이와도 경합하므로 반드시 소비시킨다.
+            _animator.ResetTrigger(HurtHash);
             _animator.Play(HurtStateHash, 0, 1f); // Hurt 상태 마지막 프레임으로 점프
             _animator.Update(0f);                 // SpriteRenderer에 즉시 반영
             _animator.speed = 0f;                 // 정지
@@ -257,8 +260,10 @@ namespace BeatHero.Combat
         public void PlayDeath()
         {
             if (_animator == null) return;
-            _animator.speed = 1f; // FreezeOnHurt로 멈춰 있던 상태 해제
-            _animator.SetTrigger(DeathHash);
+            _animator.speed = 1f;              // FreezeOnHurt로 멈춰 있던 상태 해제
+            _animator.ResetTrigger(HurtHash);  // 잔여 hurt 트리거 제거(Death가 묻히는 것 방지)
+            // 트리거 대신 Death 상태를 직접 재생 — 전이 경합 없이 확실히 재생.
+            _animator.Play(DeathStateHash, 0, 0f);
         }
 
         private void OnBossPhaseChanged()
