@@ -89,7 +89,7 @@ MonoBehaviour:
   deathDialogue: "\uB0B4 \uC8FD\uC74C\uC744 \uC801\uC5D0\uAC8C \uC54C\uB9AC\uC9C0
     \uB9D0\uB77C"
   bpm: 100
-  bgm: {fileID: 8300000, guid: 2f6d91282d247a741b28b3d1e7cae124, type: 3}
+  bgm: {fileID: 8300000, guid: 71832af9e6f2e74449db3ead181295ef, type: 3}
   patterns:
   - {fileID: 11400000, guid: 538f31141fd331048a54941017aec844, type: 2}
   - {fileID: 11400000, guid: e03e3d53e375df943b88a45c2ed718ab, type: 2}
