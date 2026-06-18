@@ -61,7 +61,6 @@ MonoBehaviour:
   idleClip: {fileID: 7400000, guid: 24c5d061ed8770b4cac6f618461d52e4, type: 2}
   hurtClip: {fileID: 7400000, guid: 39e83921b6204994aa11a4a78c242508, type: 2}
   deathClip: {fileID: 7400000, guid: 3ccd50e0835440740a12a1bf1223b728, type: 2}
-  hitSfx: {fileID: 8300000, guid: 5ea4ec9291c9c0a4a80161e8557d8729, type: 3}
   deathSfx: {fileID: 8300000, guid: 8671b0c3114bde44590047299c823672, type: 3}
   isRandom: 0
   combatDialogues: []
