@@ -120,6 +120,24 @@ namespace BeatHero.Core
             _switchPending = false;
         }
 
+        // 클리어 연출용: 비트 클럭은 즉시 멈추되 BGM은 duration에 걸쳐 페이드아웃 후 정지.
+        // (다음 층 PrepareSong이 볼륨을 1로 복원하므로 별도 복원 불필요)
+        public void FadeOutAndStop(float duration)
+        {
+            _isPlaying = false;
+            _isPaused = false;
+            _switchPending = false;
+            if (duration <= 0f) { Stop(); return; }
+            StartCoroutine(FadeOutThenStop(duration));
+        }
+
+        private System.Collections.IEnumerator FadeOutThenStop(float duration)
+        {
+            yield return FadeOutSource(_activeSource, duration);
+            _activeSource.Stop();
+            _standbySource.Stop();
+        }
+
         public void Pause()
         {
             if (!_isPlaying || _isPaused) return;
