@@ -63,8 +63,44 @@ MonoBehaviour:
   deathClip: {fileID: 7400000, guid: 605ba141440d5724199bd8e26b1604e8, type: 2}
   deathSfx: {fileID: 8300000, guid: 8671b0c3114bde44590047299c823672, type: 3}
   isRandom: 1
-  combatDialogues: []
-  deathDialogue: 
+  combatDialogues:
+  - text: "\uB0E5? \uB0E5\uB0E5!"
+    useInSequential: 1
+    useInRandom: 1
+  - text: "\uB0E5~!"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uD558\uC545!!"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uB0D0\uC544\uC544\uC544"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uC0AC\uC2E4 \uB098 \uB9D0 \uD560 \uC218 \uC788\uC5B4."
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uB0D0\uC544\uC544\uC544\uC544\uC544\uC559"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uB0D0 \uB0D0 \uB0D0\uC639"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uB0D0\uC544\uC544\uC544\uC544 \uB0E5!"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uB0D0 \uB0D0 \uB0D0\uB0D0\uB0D0"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uB0E5 \uCE6B \uB543 \uCE6B"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uC560\uC624\uC624\uC639"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uC560\uC6A9!"
+    useInSequential: 0
+    useInRandom: 1
+  deathDialogue: "\uB0D0\uC544..."
   bpm: 120
   bgm: {fileID: 8300000, guid: 73937ce65d2838e4ab1136fb46b2b2ea, type: 3}
   patterns:
