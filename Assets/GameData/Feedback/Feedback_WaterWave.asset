@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c29b80fe10bb514ba2511bf44e0e2db, type: 3}
+  m_Name: Feedback_WaterWave
+  m_EditorClassIdentifier: BeatHero::BeatHero.Data.CellEffectFeedback
+  activateSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
+  vfxFrames:
+  - {fileID: 259538753, guid: aed99eadee49e5d4d857c4283e64a40a, type: 3}
+  - {fileID: 539053932, guid: aed99eadee49e5d4d857c4283e64a40a, type: 3}
+  - {fileID: -1883572016, guid: aed99eadee49e5d4d857c4283e64a40a, type: 3}
+  - {fileID: 698808654, guid: aed99eadee49e5d4d857c4283e64a40a, type: 3}
+  - {fileID: 1366909064, guid: aed99eadee49e5d4d857c4283e64a40a, type: 3}
+  vfxFps: 24

@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c29b80fe10bb514ba2511bf44e0e2db, type: 3}
-  m_Name: Feedback_001
+  m_Name: Feedback_ElectricLighting
   m_EditorClassIdentifier: BeatHero::BeatHero.Data.CellEffectFeedback
   activateSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
   vfxFrames:
-  - {fileID: 1288024808, guid: f4d2477fd62a199459780452843ca04d, type: 3}
-  - {fileID: -1706749001, guid: f4d2477fd62a199459780452843ca04d, type: 3}
-  - {fileID: -871904778, guid: f4d2477fd62a199459780452843ca04d, type: 3}
-  - {fileID: 454991810, guid: f4d2477fd62a199459780452843ca04d, type: 3}
-  - {fileID: -599329564, guid: f4d2477fd62a199459780452843ca04d, type: 3}
-  - {fileID: -1073165655, guid: f4d2477fd62a199459780452843ca04d, type: 3}
+  - {fileID: -1250030478, guid: 9db97d92d472bef4f8d190fd966f638a, type: 3}
+  - {fileID: -154331024, guid: 9db97d92d472bef4f8d190fd966f638a, type: 3}
+  - {fileID: 1125967592, guid: 9db97d92d472bef4f8d190fd966f638a, type: 3}
+  - {fileID: 228502780, guid: 9db97d92d472bef4f8d190fd966f638a, type: 3}
+  - {fileID: -1243028808, guid: 9db97d92d472bef4f8d190fd966f638a, type: 3}
+  - {fileID: -1442218203, guid: 9db97d92d472bef4f8d190fd966f638a, type: 3}
   vfxFps: 24

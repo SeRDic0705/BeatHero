@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c29b80fe10bb514ba2511bf44e0e2db, type: 3}
-  m_Name: Feedback_002
+  m_Name: Feedback_FireWork
   m_EditorClassIdentifier: BeatHero::BeatHero.Data.CellEffectFeedback
   activateSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
   vfxFrames:
-  - {fileID: 2110664200, guid: 8c002085390cf294a98e6ca3a762dfcb, type: 3}
-  - {fileID: -2024063969, guid: 8c002085390cf294a98e6ca3a762dfcb, type: 3}
-  - {fileID: -424379062, guid: 8c002085390cf294a98e6ca3a762dfcb, type: 3}
-  - {fileID: -576124781, guid: 8c002085390cf294a98e6ca3a762dfcb, type: 3}
-  - {fileID: -1546938663, guid: 8c002085390cf294a98e6ca3a762dfcb, type: 3}
-  - {fileID: -1665546478, guid: 8c002085390cf294a98e6ca3a762dfcb, type: 3}
+  - {fileID: 526653511, guid: 83bd0097212cd6b47b8ad6fa37ea59f7, type: 3}
+  - {fileID: 7758668, guid: 83bd0097212cd6b47b8ad6fa37ea59f7, type: 3}
+  - {fileID: -1582829004, guid: 83bd0097212cd6b47b8ad6fa37ea59f7, type: 3}
+  - {fileID: -141554517, guid: 83bd0097212cd6b47b8ad6fa37ea59f7, type: 3}
+  - {fileID: -143855231, guid: 83bd0097212cd6b47b8ad6fa37ea59f7, type: 3}
+  - {fileID: -157808609, guid: 83bd0097212cd6b47b8ad6fa37ea59f7, type: 3}
   vfxFps: 24

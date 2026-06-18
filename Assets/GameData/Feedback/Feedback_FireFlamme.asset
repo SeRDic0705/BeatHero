@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c29b80fe10bb514ba2511bf44e0e2db, type: 3}
+  m_Name: Feedback_FireFlamme
+  m_EditorClassIdentifier: BeatHero::BeatHero.Data.CellEffectFeedback
+  activateSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
+  vfxFrames:
+  - {fileID: -66295132, guid: dc49d52cf6e97f040a69a39e628e3204, type: 3}
+  - {fileID: -915612931, guid: dc49d52cf6e97f040a69a39e628e3204, type: 3}
+  - {fileID: 396890005, guid: dc49d52cf6e97f040a69a39e628e3204, type: 3}
+  - {fileID: 1090738731, guid: dc49d52cf6e97f040a69a39e628e3204, type: 3}
+  - {fileID: -2073713089, guid: dc49d52cf6e97f040a69a39e628e3204, type: 3}
+  - {fileID: 581928937, guid: dc49d52cf6e97f040a69a39e628e3204, type: 3}
+  vfxFps: 24
