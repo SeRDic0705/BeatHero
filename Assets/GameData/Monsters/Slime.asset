@@ -61,7 +61,6 @@ MonoBehaviour:
   idleClip: {fileID: 7400000, guid: c42aa71ad221ea349a7ee113bb662657, type: 2}
   hurtClip: {fileID: 7400000, guid: 58a4d227816c28f4a8c59266bf74969b, type: 2}
   deathClip: {fileID: 7400000, guid: 28a7dd162c70bb044953a047ddabf012, type: 2}
-  hitSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
   deathSfx: {fileID: 0}
   bpm: 155
   bgm: {fileID: 8300000, guid: c9c0238a25b072b47a4d6d89876c3227, type: 3}

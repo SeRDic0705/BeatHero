@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: PlayerConfig_Default
   m_EditorClassIdentifier: BeatHero::BeatHero.Data.PlayerConfig
   maxHp: 100
-  maxMana: 5
+  maxMana: 8
   attackPower: 10
+  hitSfx: {fileID: 8300000, guid: 5ea4ec9291c9c0a4a80161e8557d8729, type: 3}
