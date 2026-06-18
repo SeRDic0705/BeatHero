@@ -12,8 +12,12 @@ namespace BeatHero.UI
         [Header("Player")]
         [SerializeField] private Image    _playerHpFill;     // type=Filled(Horizontal)
         [SerializeField] private TMP_Text _playerHpText;     // "현재/최대"
-        [SerializeField] private TMP_Text _manaCurrentText;  // 현재 마나
-        [SerializeField] private TMP_Text _manaMaxText;      // "/최대마나"
+        [SerializeField] private TMP_Text _manaText;         // 배지 "현재/최대"
+        [SerializeField] private Image[]  _manaDots;         // 최대 마나 개수만큼 — 채움=현재 마나
+        // 도트 스프라이트는 자체 색이 있으므로, 채움=원색 그대로(흰색 틴트),
+        // 빔=어둡게 틴트해 흑백 모노톤 느낌을 준다.
+        [SerializeField] private Color    _manaDotFilled = Color.white;               // 채움: 스프라이트 원색
+        [SerializeField] private Color    _manaDotEmpty  = new(0.2f, 0.2f, 0.2f, 1f); // 빔: 어둡게(모노톤)
 
         [Header("Monster")]
         [SerializeField] private Image    _monsterHpFill;
@@ -118,8 +122,12 @@ namespace BeatHero.UI
 
         private void UpdateMana(int mana)
         {
-            if (_manaCurrentText != null) _manaCurrentText.text = mana.ToString();
-            if (_manaMaxText != null && _player != null) _manaMaxText.text = "/" + _player.MaxMana;
+            int max = _player != null ? _player.MaxMana : mana;
+            if (_manaText != null) _manaText.text = $"{mana}/{max}";
+            if (_manaDots != null)
+                for (int i = 0; i < _manaDots.Length; i++)
+                    if (_manaDots[i] != null)
+                        _manaDots[i].color = i < mana ? _manaDotFilled : _manaDotEmpty;
         }
 
         private void UpdateFloor(int floor)
