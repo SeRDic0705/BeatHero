@@ -1,35 +1,106 @@
 fileFormatVersion: 2
-guid: 08e3297867b5a02479c6408b921d07bc
-AssetOrigin:
-  serializedVersion: 1
-  productId: 228253
-  packageName: Pixel Effect Pack
-  packageVersion: 1.0
-  assetPath: Assets/Effect_Vol.1/Effect/YellowEffect.png
-  uploadId: 514832
+guid: eac39e6e430899d4082cec357f04695f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4143416247393803118
-    second: YellowEffect_0
+      213: 3873178262488315757
+    second: GreenEffect_0
   - first:
-      213: 6104404748322052120
-    second: YellowEffect_1
+      213: 3213418592456208863
+    second: GreenEffect_1
   - first:
-      213: 5314865894377339956
-    second: YellowEffect_2
+      213: -7350424141795463572
+    second: GreenEffect_2
   - first:
-      213: 6645222265174347237
-    second: YellowEffect_3
+      213: -6986237301826096385
+    second: GreenEffect_3
   - first:
-      213: -3531339311474216470
-    second: YellowEffect_4
+      213: -409519977365342069
+    second: GreenEffect_4
   - first:
-      213: 5097660259799619588
-    second: YellowEffect_5
+      213: -2615449897831931419
+    second: GreenEffect_5
   - first:
-      213: -9102031104343680176
-    second: YellowEffect_6
+      213: 2793907029342049484
+    second: GreenEffect_6
+  - first:
+      213: -5823843364644525028
+    second: GreenEffect_7
+  - first:
+      213: -5957531655952543689
+    second: GreenEffect_8
+  - first:
+      213: -577136977011698452
+    second: GreenEffect_9
+  - first:
+      213: 8761796485421122436
+    second: GreenEffect_10
+  - first:
+      213: 1823355386404405224
+    second: GreenEffect_11
+  - first:
+      213: -4531361985070204745
+    second: GreenEffect_12
+  - first:
+      213: -789700910208322839
+    second: GreenEffect_13
+  - first:
+      213: -8171492300226002957
+    second: GreenEffect_14
+  - first:
+      213: -5355016508337210239
+    second: GreenEffect_15
+  - first:
+      213: 7277185324814285634
+    second: GreenEffect_16
+  - first:
+      213: -7997075971177720055
+    second: GreenEffect_17
+  - first:
+      213: 5485007955085262609
+    second: GreenEffect_18
+  - first:
+      213: 7441541048705161004
+    second: GreenEffect_19
+  - first:
+      213: 7684283257414486973
+    second: GreenEffect_20
+  - first:
+      213: 3516583077162096751
+    second: GreenEffect_21
+  - first:
+      213: 4476451162921331664
+    second: GreenEffect_22
+  - first:
+      213: 1437163382780302371
+    second: GreenEffect_23
+  - first:
+      213: -8554657819094262416
+    second: GreenEffect_24
+  - first:
+      213: -6055269110416033845
+    second: GreenEffect_25
+  - first:
+      213: -8847967169421048485
+    second: GreenEffect_26
+  - first:
+      213: -7806343401439573174
+    second: GreenEffect_27
+  - first:
+      213: 2269614737689580948
+    second: GreenEffect_28
+  - first:
+      213: 8817921275562313388
+    second: GreenEffect_29
+  - first:
+      213: 1390816253480473419
+    second: GreenEffect_30
+  - first:
+      213: -3175856428642094126
+    second: GreenEffect_31
+  - first:
+      213: -54947216724962587
+    second: GreenEffect_32
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -76,7 +147,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 56
+  spritePixelsToUnits: 48
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -93,13 +164,13 @@ TextureImporter:
   ignorePngGamma: 0
   applyGammaDecoding: 0
   swizzle: 50462976
-  cookieLightType: 1
+  cookieLightType: 0
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
     maxTextureSize: 2048
     resizeAlgorithm: 0
-    textureFormat: 4
+    textureFormat: -1
     textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
@@ -112,7 +183,7 @@ TextureImporter:
     buildTarget: Standalone
     maxTextureSize: 2048
     resizeAlgorithm: 0
-    textureFormat: 4
+    textureFormat: -1
     textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
@@ -125,7 +196,7 @@ TextureImporter:
     buildTarget: Android
     maxTextureSize: 2048
     resizeAlgorithm: 0
-    textureFormat: 4
+    textureFormat: -1
     textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
@@ -138,7 +209,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: YellowEffect_0
+      name: GreenEffect_0
       rect:
         serializedVersion: 2
         x: 0
@@ -146,21 +217,21 @@ TextureImporter:
         width: 74
         height: 74
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: e6b5d7ecf1f508930800000000000000
-      internalID: 4143416247393803118
+      spriteID: d677167db1b40c530800000000000000
+      internalID: 3873178262488315757
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: YellowEffect_1
+      name: GreenEffect_1
       rect:
         serializedVersion: 2
         x: 74
@@ -168,21 +239,21 @@ TextureImporter:
         width: 74
         height: 74
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 81891fca6c337b450800000000000000
-      internalID: 6104404748322052120
+      spriteID: fd1fcf53f2b589c20800000000000000
+      internalID: 3213418592456208863
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: YellowEffect_2
+      name: GreenEffect_2
       rect:
         serializedVersion: 2
         x: 148
@@ -190,21 +261,21 @@ TextureImporter:
         width: 74
         height: 74
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 43c333f1f5232c940800000000000000
-      internalID: 5314865894377339956
+      spriteID: c6e63dfef2c0ef990800000000000000
+      internalID: -7350424141795463572
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: YellowEffect_3
+      name: GreenEffect_3
       rect:
         serializedVersion: 2
         x: 222
@@ -212,21 +283,21 @@ TextureImporter:
         width: 74
         height: 74
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 5edcb393172983c50800000000000000
-      internalID: 6645222265174347237
+      spriteID: ff2721c4036eb0f90800000000000000
+      internalID: -6986237301826096385
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: YellowEffect_4
+      name: GreenEffect_4
       rect:
         serializedVersion: 2
         x: 0
@@ -234,21 +305,21 @@ TextureImporter:
         width: 74
         height: 74
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: ae1f4362b992efec0800000000000000
-      internalID: -3531339311474216470
+      spriteID: b8876b410c7115af0800000000000000
+      internalID: -409519977365342069
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: YellowEffect_5
+      name: GreenEffect_5
       rect:
         serializedVersion: 2
         x: 74
@@ -256,21 +327,21 @@ TextureImporter:
         width: 74
         height: 74
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 4085bfa6ff68eb640800000000000000
-      internalID: 5097660259799619588
+      spriteID: 5e165e7dc2e04bbd0800000000000000
+      internalID: -2615449897831931419
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: YellowEffect_6
+      name: GreenEffect_6
       rect:
         serializedVersion: 2
         x: 148
@@ -278,15 +349,15 @@ TextureImporter:
         width: 74
         height: 74
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 05bd90b6fe61fa180800000000000000
-      internalID: -9102031104343680176
+      spriteID: cc45663f3a3f5c620800000000000000
+      internalID: 2793907029342049484
       vertices: []
       indices: 
       edges: []
@@ -295,7 +366,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 0a73c162acb47a54cb337564243963ab
     internalID: 0
     vertices: []
     indices: 
@@ -303,15 +374,17 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":4.0,"y":2.0},"gridSpriteSize":{"x":74.0,"y":74.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":2,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      YellowEffect_0: 4143416247393803118
-      YellowEffect_1: 6104404748322052120
-      YellowEffect_2: 5314865894377339956
-      YellowEffect_3: 6645222265174347237
-      YellowEffect_4: -3531339311474216470
-      YellowEffect_5: 5097660259799619588
-      YellowEffect_6: -9102031104343680176
+      GreenEffect_0: 3873178262488315757
+      GreenEffect_1: 3213418592456208863
+      GreenEffect_2: -7350424141795463572
+      GreenEffect_3: -6986237301826096385
+      GreenEffect_4: -409519977365342069
+      GreenEffect_5: -2615449897831931419
+      GreenEffect_6: 2793907029342049484
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eafb6407f78f809479d56bab1d713889, type: 3}
-  m_Name: Floor04_Slime
+  m_Name: Floor10_SkullSlime
   m_EditorClassIdentifier: BeatHero::BeatHero.Data.NormalMonsterData
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
     - {fileID: 11400000, guid: 3d798f6e495e4d14e8979b73b6b15233, type: 2}
-    - {fileID: 11400000, guid: 8bd5317b2e2ada645922f736fe44c515, type: 2}
+    - {fileID: 11400000, guid: 64b1abcacfc415b4095314a143449336, type: 2}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -58,17 +58,19 @@ MonoBehaviour:
   maxHp: 10
   attackPower: 10
   gridType: 0
-  idleClip: {fileID: 7400000, guid: ee14fbb103b30dc48a2ed3e6010c6e80, type: 2}
-  hurtClip: {fileID: 7400000, guid: 7e8c2ad9164bd49499889818d1809a99, type: 2}
-  deathClip: {fileID: 7400000, guid: 4b202f03722ab3845957a8916d401898, type: 2}
+  idleClip: {fileID: 7400000, guid: 74ef2b70c24f0054081858716067a163, type: 2}
+  hurtClip: {fileID: 7400000, guid: 8ffb6b1c37bde1d408667647df87ba3b, type: 2}
+  deathClip: {fileID: 7400000, guid: ecbd453d09ab0974c8dfe2c984363187, type: 2}
   deathSfx: {fileID: 8300000, guid: 8671b0c3114bde44590047299c823672, type: 3}
-  isRandom: 0
+  isRandom: 1
   combatDialogues: []
   deathDialogue: 
-  bpm: 100
-  bgm: {fileID: 8300000, guid: 48d74d6669d144242a9210060ef68ef2, type: 3}
+  bpm: 70
+  bgm: {fileID: 8300000, guid: 63c0d9f01fc5338478023355ae8b2e8a, type: 3}
   patterns:
-  - {fileID: 11400000, guid: 1d658da0beebc874caa7162522fe4cd7, type: 2}
-  - {fileID: 11400000, guid: 3ec7a56b759a3534aaf4f6444ccfa10a, type: 2}
-  - {fileID: 11400000, guid: 267f98dadac9b884088a55b978c0a7b1, type: 2}
-  - {fileID: 11400000, guid: 3098a4da917495c408a28009187f15c2, type: 2}
+  - {fileID: 11400000, guid: a778df39972ff474fbdba75076406de9, type: 2}
+  - {fileID: 11400000, guid: 3385c4cc96f5c634c92848c46e512c0f, type: 2}
+  - {fileID: 11400000, guid: e536ded63d7ea5646ae5565c5841d373, type: 2}
+  - {fileID: 11400000, guid: b3a9ae81c0eef8b479a13c73698d1016, type: 2}
+  - {fileID: 11400000, guid: b8703b8bcea427243a0ac2eaaa8e64ad, type: 2}
+  - {fileID: 11400000, guid: 136578af829518249909b09ebc5b8043, type: 2}

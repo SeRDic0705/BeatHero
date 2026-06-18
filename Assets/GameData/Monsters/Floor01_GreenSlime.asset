@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eafb6407f78f809479d56bab1d713889, type: 3}
-  m_Name: Floor01_Slime
+  m_Name: Floor01_GreenSlime
   m_EditorClassIdentifier: BeatHero::BeatHero.Data.NormalMonsterData
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
     - {fileID: 11400000, guid: 3d798f6e495e4d14e8979b73b6b15233, type: 2}
-    - {fileID: 11400000, guid: 57ec01806d6b6b746997e735b930f690, type: 2}
+    - {fileID: 11400000, guid: a1e99688201fdea4d83f91a70e5858f2, type: 2}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []

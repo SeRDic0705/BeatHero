@@ -1,35 +1,106 @@
 fileFormatVersion: 2
-guid: 08e3297867b5a02479c6408b921d07bc
-AssetOrigin:
-  serializedVersion: 1
-  productId: 228253
-  packageName: Pixel Effect Pack
-  packageVersion: 1.0
-  assetPath: Assets/Effect_Vol.1/Effect/YellowEffect.png
-  uploadId: 514832
+guid: 66a7f74128b48774390903dd77ac9a53
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4143416247393803118
-    second: YellowEffect_0
+      213: -6964408827017963023
+    second: BlueEffect_0
   - first:
-      213: 6104404748322052120
-    second: YellowEffect_1
+      213: 6540786737383818832
+    second: BlueEffect_1
   - first:
-      213: 5314865894377339956
-    second: YellowEffect_2
+      213: -1189861668985612456
+    second: BlueEffect_2
   - first:
-      213: 6645222265174347237
-    second: YellowEffect_3
+      213: -1092798933829336211
+    second: BlueEffect_3
   - first:
-      213: -3531339311474216470
-    second: YellowEffect_4
+      213: 5779726096018721886
+    second: BlueEffect_4
   - first:
-      213: 5097660259799619588
-    second: YellowEffect_5
+      213: 46672557281034287
+    second: BlueEffect_5
   - first:
-      213: -9102031104343680176
-    second: YellowEffect_6
+      213: 8433853752280468158
+    second: BlueEffect_6
+  - first:
+      213: -5419114802266454714
+    second: BlueEffect_7
+  - first:
+      213: -6833312598447982437
+    second: BlueEffect_8
+  - first:
+      213: -4794606882395544232
+    second: BlueEffect_9
+  - first:
+      213: -2847591458094576008
+    second: BlueEffect_10
+  - first:
+      213: 6885596418340363137
+    second: BlueEffect_11
+  - first:
+      213: 8101200146901857250
+    second: BlueEffect_12
+  - first:
+      213: -998847338859293450
+    second: BlueEffect_13
+  - first:
+      213: 4154392874427127361
+    second: BlueEffect_14
+  - first:
+      213: 2951481394537250143
+    second: BlueEffect_15
+  - first:
+      213: -4643051613630776007
+    second: BlueEffect_16
+  - first:
+      213: 8737705200173317567
+    second: BlueEffect_17
+  - first:
+      213: 954724472356445707
+    second: BlueEffect_18
+  - first:
+      213: -8763325686103990820
+    second: BlueEffect_19
+  - first:
+      213: -6216085403641661147
+    second: BlueEffect_20
+  - first:
+      213: 4937231147162106025
+    second: BlueEffect_21
+  - first:
+      213: -4341765614048001431
+    second: BlueEffect_22
+  - first:
+      213: -7641885527231348502
+    second: BlueEffect_23
+  - first:
+      213: -5573941765242229780
+    second: BlueEffect_24
+  - first:
+      213: -1110673463389987417
+    second: BlueEffect_25
+  - first:
+      213: 5811034873414640921
+    second: BlueEffect_26
+  - first:
+      213: -3046228938910698344
+    second: BlueEffect_27
+  - first:
+      213: -6965472185546072085
+    second: BlueEffect_28
+  - first:
+      213: 3832473102604663818
+    second: BlueEffect_29
+  - first:
+      213: 197617993050961763
+    second: BlueEffect_30
+  - first:
+      213: -551106717551088288
+    second: BlueEffect_31
+  - first:
+      213: -762396025695568522
+    second: BlueEffect_32
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -93,13 +164,13 @@ TextureImporter:
   ignorePngGamma: 0
   applyGammaDecoding: 0
   swizzle: 50462976
-  cookieLightType: 1
+  cookieLightType: 0
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
     maxTextureSize: 2048
     resizeAlgorithm: 0
-    textureFormat: 4
+    textureFormat: -1
     textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
@@ -112,7 +183,7 @@ TextureImporter:
     buildTarget: Standalone
     maxTextureSize: 2048
     resizeAlgorithm: 0
-    textureFormat: 4
+    textureFormat: -1
     textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
@@ -125,7 +196,7 @@ TextureImporter:
     buildTarget: Android
     maxTextureSize: 2048
     resizeAlgorithm: 0
-    textureFormat: 4
+    textureFormat: -1
     textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
@@ -138,7 +209,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: YellowEffect_0
+      name: BlueEffect_0
       rect:
         serializedVersion: 2
         x: 0
@@ -146,21 +217,21 @@ TextureImporter:
         width: 74
         height: 74
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: e6b5d7ecf1f508930800000000000000
-      internalID: 4143416247393803118
+      spriteID: 1f9dff22213795f90800000000000000
+      internalID: -6964408827017963023
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: YellowEffect_1
+      name: BlueEffect_1
       rect:
         serializedVersion: 2
         x: 74
@@ -168,21 +239,21 @@ TextureImporter:
         width: 74
         height: 74
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 81891fca6c337b450800000000000000
-      internalID: 6104404748322052120
+      spriteID: 056495112ea85ca50800000000000000
+      internalID: 6540786737383818832
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: YellowEffect_2
+      name: BlueEffect_2
       rect:
         serializedVersion: 2
         x: 148
@@ -190,21 +261,21 @@ TextureImporter:
         width: 74
         height: 74
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 43c333f1f5232c940800000000000000
-      internalID: 5314865894377339956
+      spriteID: 8575240cd13cc7fe0800000000000000
+      internalID: -1189861668985612456
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: YellowEffect_3
+      name: BlueEffect_3
       rect:
         serializedVersion: 2
         x: 222
@@ -212,21 +283,21 @@ TextureImporter:
         width: 74
         height: 74
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 5edcb393172983c50800000000000000
-      internalID: 6645222265174347237
+      spriteID: d634d2ad82995d0f0800000000000000
+      internalID: -1092798933829336211
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: YellowEffect_4
+      name: BlueEffect_4
       rect:
         serializedVersion: 2
         x: 0
@@ -234,21 +305,21 @@ TextureImporter:
         width: 74
         height: 74
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: ae1f4362b992efec0800000000000000
-      internalID: -3531339311474216470
+      spriteID: e5c40441346b53050800000000000000
+      internalID: 5779726096018721886
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: YellowEffect_5
+      name: BlueEffect_5
       rect:
         serializedVersion: 2
         x: 74
@@ -256,21 +327,21 @@ TextureImporter:
         width: 74
         height: 74
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 4085bfa6ff68eb640800000000000000
-      internalID: 5097660259799619588
+      spriteID: f20ce7d8170d5a000800000000000000
+      internalID: 46672557281034287
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: YellowEffect_6
+      name: BlueEffect_6
       rect:
         serializedVersion: 2
         x: 148
@@ -278,15 +349,15 @@ TextureImporter:
         width: 74
         height: 74
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 05bd90b6fe61fa180800000000000000
-      internalID: -9102031104343680176
+      spriteID: ebac540ad411b0570800000000000000
+      internalID: 8433853752280468158
       vertices: []
       indices: 
       edges: []
@@ -295,7 +366,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 46f4e6115d873844abe052e7b580522a
     internalID: 0
     vertices: []
     indices: 
@@ -303,15 +374,17 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":4.0,"y":2.0},"gridSpriteSize":{"x":74.0,"y":74.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":2,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      YellowEffect_0: 4143416247393803118
-      YellowEffect_1: 6104404748322052120
-      YellowEffect_2: 5314865894377339956
-      YellowEffect_3: 6645222265174347237
-      YellowEffect_4: -3531339311474216470
-      YellowEffect_5: 5097660259799619588
-      YellowEffect_6: -9102031104343680176
+      BlueEffect_0: -6964408827017963023
+      BlueEffect_1: 6540786737383818832
+      BlueEffect_2: -1189861668985612456
+      BlueEffect_3: -1092798933829336211
+      BlueEffect_4: 5779726096018721886
+      BlueEffect_5: 46672557281034287
+      BlueEffect_6: 8433853752280468158
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

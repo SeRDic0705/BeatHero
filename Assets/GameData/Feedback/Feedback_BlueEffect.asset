@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c29b80fe10bb514ba2511bf44e0e2db, type: 3}
+  m_Name: Feedback_BlueEffect
+  m_EditorClassIdentifier: BeatHero::BeatHero.Data.CellEffectFeedback
+  activateSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
+  vfxFrames:
+  - {fileID: -6964408827017963023, guid: 66a7f74128b48774390903dd77ac9a53, type: 3}
+  - {fileID: 6540786737383818832, guid: 66a7f74128b48774390903dd77ac9a53, type: 3}
+  - {fileID: -1189861668985612456, guid: 66a7f74128b48774390903dd77ac9a53, type: 3}
+  - {fileID: -1092798933829336211, guid: 66a7f74128b48774390903dd77ac9a53, type: 3}
+  - {fileID: 5779726096018721886, guid: 66a7f74128b48774390903dd77ac9a53, type: 3}
+  - {fileID: 46672557281034287, guid: 66a7f74128b48774390903dd77ac9a53, type: 3}
+  - {fileID: 8433853752280468158, guid: 66a7f74128b48774390903dd77ac9a53, type: 3}
+  vfxFps: 24
