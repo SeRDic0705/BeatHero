@@ -63,7 +63,28 @@ MonoBehaviour:
   deathClip: {fileID: 7400000, guid: 3ccd50e0835440740a12a1bf1223b728, type: 2}
   deathSfx: {fileID: 8300000, guid: 8671b0c3114bde44590047299c823672, type: 3}
   isRandom: 0
-  combatDialogues: []
+  combatDialogues:
+  - text: "\uB098\uB294 \uB300\uCE6D \uC88B\uC544 \uD574\uC11C"
+    useInSequential: 1
+    useInRandom: 0
+  - text: "\uBC15\uC790 \uB9C8\uC800 \uCABC\uAC1C \uBD24\uC5B4"
+    useInSequential: 1
+    useInRandom: 0
+  - text: "\uD55C\uBC15 \uC790\uC5D0 \uB450\uBC88 \uC774\uB3D9"
+    useInSequential: 1
+    useInRandom: 0
+  - text: "\uACF5\uACA9 \uBB3C\uB860 \uAC00\uB2A5 \uD558\uC9C0!"
+    useInSequential: 1
+    useInRandom: 0
+  - text: "\uB300 \uCE6D \uC870 \uC544"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uCF69\uCF69 \uC9C4\uC9C4 \uD638\uD638"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uCEE4 \uD50C \uC2DC \uB7EC"
+    useInSequential: 0
+    useInRandom: 1
   deathDialogue: 
   bpm: 80
   bgm: {fileID: 8300000, guid: 54328b57fe3264849820fa64d44d7893, type: 3}
