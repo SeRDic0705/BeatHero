@@ -13185,7 +13185,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f05c12ae41e595048b541643b306f2db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: BeatHero::BeatHero.Combat.BattleStateMachine
-  _judgmentWindowSec: 0.084
+  _judgmentWindowSec: 0.106
   _failZoneSec: 0.021
   _tapGraceSec: 0.15
   _callBeatSfx: {fileID: 8300000, guid: 44376458ef543b94e97e7090ae81c23c, type: 3}

@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eafb6407f78f809479d56bab1d713889, type: 3}
+  m_Name: Floor08_Slime
+  m_EditorClassIdentifier: BeatHero::BeatHero.Data.NormalMonsterData
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects:
+    - {fileID: 11400000, guid: 3d798f6e495e4d14e8979b73b6b15233, type: 2}
+    - {fileID: 11400000, guid: 2c371fce693ce174581921590c2b746e, type: 2}
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: effectFeedbacks
+      Entry: 7
+      Data: 0|System.Collections.Generic.Dictionary`2[[BeatHero.Data.CellEffect,
+        BeatHero],[BeatHero.Data.CellEffectFeedback, BeatHero]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 1|System.Collections.Generic.ObjectEqualityComparer`1[[BeatHero.Data.CellEffect,
+        BeatHero]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 10
+      Data: 0
+    - Name: $v
+      Entry: 10
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+  maxHp: 10
+  attackPower: 10
+  gridType: 0
+  idleClip: {fileID: 7400000, guid: 406736362100ed84da37e76b1b4d5978, type: 2}
+  hurtClip: {fileID: 7400000, guid: a7246c7f1797ef3468d6c765279cca32, type: 2}
+  deathClip: {fileID: 7400000, guid: 9b6d5b5fac62b8d40a550f8d151e9902, type: 2}
+  hitSfx: {fileID: 8300000, guid: 5ea4ec9291c9c0a4a80161e8557d8729, type: 3}
+  deathSfx: {fileID: 8300000, guid: 8671b0c3114bde44590047299c823672, type: 3}
+  isRandom: 0
+  combatDialogues: []
+  deathDialogue: 
+  bpm: 80
+  bgm: {fileID: 8300000, guid: f898ea717cf56254e905d3fc9004d2e3, type: 3}
+  patterns:
+  - {fileID: 11400000, guid: f97f6d633339fb34888f2135fe53d931, type: 2}
+  - {fileID: 11400000, guid: 1a9413a988ac9b94982a268a2d3cb8eb, type: 2}
+  - {fileID: 11400000, guid: 493b79a74d2ba1840a0e12864a2bb95d, type: 2}
+  - {fileID: 11400000, guid: 7ce85b4bcc4ec264c9aff2b1a794d514, type: 2}

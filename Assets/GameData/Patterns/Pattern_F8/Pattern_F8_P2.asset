@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a57f89c132e16e345996b36fce13ccde, type: 3}
+  m_Name: Pattern_F8_P2
+  m_EditorClassIdentifier: BeatHero::BeatHero.Data.PatternData
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  beatUnits:
+  - noteLength: 6
+    gridEffectShape: {fileID: 11400000, guid: a4c0f2f5d4de20f4da52caae5122e6c1, type: 2}
+  - noteLength: 6
+    gridEffectShape: {fileID: 11400000, guid: 4de1f494044f3f94b88a48eac7dc7a14, type: 2}
+  - noteLength: 6
+    gridEffectShape: {fileID: 11400000, guid: a4c0f2f5d4de20f4da52caae5122e6c1, type: 2}
+  - noteLength: 6
+    gridEffectShape: {fileID: 11400000, guid: 4de1f494044f3f94b88a48eac7dc7a14, type: 2}
+  - noteLength: 6
+    gridEffectShape: {fileID: 11400000, guid: 1212ab384df591641bf4d9bd96fa95b6, type: 2}
+  - noteLength: 6
+    gridEffectShape: {fileID: 11400000, guid: a741415747a4c5d4d83b74acaf338ae5, type: 2}
+  - noteLength: 6
+    gridEffectShape: {fileID: 11400000, guid: b05f85d97ffd7eb419a0aed50eb19315, type: 2}
+  - noteLength: 6
+    gridEffectShape: {fileID: 11400000, guid: 177776eacbfc5464993971652d5a5a41, type: 2}
+  damageMultiplier: 1

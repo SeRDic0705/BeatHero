@@ -17,7 +17,7 @@ MonoBehaviour:
     SerializedBytes: 
     ReferencedUnityObjects:
     - {fileID: 11400000, guid: 3d798f6e495e4d14e8979b73b6b15233, type: 2}
-    - {fileID: 11400000, guid: 57ec01806d6b6b746997e735b930f690, type: 2}
+    - {fileID: 11400000, guid: 6d87d1cc3aefc0a47bc51f4f591628db, type: 2}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -58,15 +58,16 @@ MonoBehaviour:
   maxHp: 10
   attackPower: 10
   gridType: 0
-  sprites:
-  - {fileID: 21300000, guid: b29ff03ba07dc694cb31247ebca1dfbc, type: 3}
-  - {fileID: 21300000, guid: 0cb4b2de106036649ac459242b6d39e0, type: 3}
-  animator: {fileID: 0}
-  hitSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
-  deathSfx: {fileID: 0}
-  deathVfxPrefab: {fileID: 0}
-  bpm: 100
-  bgm: {fileID: 8300000, guid: dfef0d7f5360a4f4bbf65397116d7ce1, type: 3}
+  idleClip: {fileID: 7400000, guid: ab4d6ce13f7d3d9418419cab9f2775a1, type: 2}
+  hurtClip: {fileID: 7400000, guid: 7a3803ccfd09f664c8a298cba1fff613, type: 2}
+  deathClip: {fileID: 7400000, guid: 95567c20943b3a3418b53d9622f8d709, type: 2}
+  hitSfx: {fileID: 8300000, guid: 5ea4ec9291c9c0a4a80161e8557d8729, type: 3}
+  deathSfx: {fileID: 8300000, guid: 8671b0c3114bde44590047299c823672, type: 3}
+  isRandom: 0
+  combatDialogues: []
+  deathDialogue: 
+  bpm: 95.5
+  bgm: {fileID: 8300000, guid: 2f6d91282d247a741b28b3d1e7cae124, type: 3}
   patterns:
   - {fileID: 11400000, guid: 63cf1bdb64336674da1cd1c5da3acc2e, type: 2}
   - {fileID: 11400000, guid: 247f76ab983c741499365d2658ac7c3f, type: 2}
