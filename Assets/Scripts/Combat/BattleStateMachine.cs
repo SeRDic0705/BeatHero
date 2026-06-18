@@ -114,7 +114,8 @@ namespace BeatHero.Combat
         }
 
         // 1단계: 현재 층에 등장할 몬스터·bpm·bgm·패턴을 미리 세팅/로드. 클럭은 아직 시작 안 함.
-        public void SetFloorData(MonsterData monster)
+        // keepPlayerHp=true면 플레이어 HP 유지(층 전환). false면 풀 회복(런 시작).
+        public void SetFloorData(MonsterData monster, bool keepPlayerHp = false)
         {
             StopAllCoroutines();
             _phraseRunning = false;
@@ -124,7 +125,7 @@ namespace BeatHero.Combat
             OnMonsterHpChanged?.Invoke(_monsterHp, _monster.maxHp);
             _hazards.Clear();
             _grid.Initialize(monster.gridType);
-            _player.Initialize(_playerConfig.maxHp);
+            _player.Initialize(_playerConfig.maxHp, keepPlayerHp);
 
             _pendingPhaseSwitch = false;
             _phase = monster.GetCurrentPhase(1f);
