@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Floor10_Slime
   m_EditorClassIdentifier: BeatHero::BeatHero.Data.NormalMonsterData
   serializationData:
-    SerializedFormat: 0
-    SerializedBytes: 01010f00000065006600660065006300740046006500650064006200610063006b0073002f000000000184000000530079007300740065006d002e0043006f006c006c0065006300740069006f006e0073002e00470065006e0065007200690063002e00440069006300740069006f006e00610072007900600032005b005b0042006500610074004800650072006f002e0044006100740061002e00430065006c006c004500660066006500630074002c00200042006500610074004800650072006f005d002c005b0042006500610074004800650072006f002e0044006100740061002e00430065006c006c0045006600660065006300740046006500650064006200610063006b002c00200042006500610074004800650072006f005d005d002c0020006d00730063006f0072006c00690062000000000001010800000063006f006d00700061007200650072002f010000000163000000530079007300740065006d002e0043006f006c006c0065006300740069006f006e0073002e00470065006e0065007200690063002e004f0062006a0065006300740045007100750061006c0069007400790043006f006d0070006100720065007200600031005b005b0042006500610074004800650072006f002e0044006100740061002e00430065006c006c004500660066006500630074002c00200042006500610074004800650072006f005d005d002c0020006d00730063006f0072006c00690062000100000005060100000000000000042e0b010200000024006b00000000000b01020000002400760001000000050705
+    SerializedFormat: 2
+    SerializedBytes: 
     ReferencedUnityObjects:
     - {fileID: 11400000, guid: 3d798f6e495e4d14e8979b73b6b15233, type: 2}
     - {fileID: 11400000, guid: 57ec01806d6b6b746997e735b930f690, type: 2}
@@ -22,15 +22,47 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
-    SerializationNodes: []
+    SerializationNodes:
+    - Name: effectFeedbacks
+      Entry: 7
+      Data: 0|System.Collections.Generic.Dictionary`2[[BeatHero.Data.CellEffect,
+        BeatHero],[BeatHero.Data.CellEffectFeedback, BeatHero]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 1|System.Collections.Generic.ObjectEqualityComparer`1[[BeatHero.Data.CellEffect,
+        BeatHero]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 10
+      Data: 0
+    - Name: $v
+      Entry: 10
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   maxHp: 10
   attackPower: 10
   gridType: 0
   idleClip: {fileID: 7400000, guid: 74ef2b70c24f0054081858716067a163, type: 2}
   hurtClip: {fileID: 7400000, guid: 8ffb6b1c37bde1d408667647df87ba3b, type: 2}
   deathClip: {fileID: 7400000, guid: ecbd453d09ab0974c8dfe2c984363187, type: 2}
-  hitSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
-  deathSfx: {fileID: 0}
+  hitSfx: {fileID: 8300000, guid: 5ea4ec9291c9c0a4a80161e8557d8729, type: 3}
+  deathSfx: {fileID: 8300000, guid: 8671b0c3114bde44590047299c823672, type: 3}
   isRandom: 1
   combatDialogues: []
   deathDialogue: 

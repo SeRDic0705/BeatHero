@@ -61,8 +61,8 @@ MonoBehaviour:
   idleClip: {fileID: 7400000, guid: 8ee324c3841275f4e9353ea8c00f6268, type: 2}
   hurtClip: {fileID: 7400000, guid: 561d8e00fecc62547a6810f81e326ea8, type: 2}
   deathClip: {fileID: 7400000, guid: 0b9702d65b317d440b1d0b27924b82ba, type: 2}
-  hitSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
-  deathSfx: {fileID: 0}
+  hitSfx: {fileID: 8300000, guid: 5ea4ec9291c9c0a4a80161e8557d8729, type: 3}
+  deathSfx: {fileID: 8300000, guid: 8671b0c3114bde44590047299c823672, type: 3}
   isRandom: 0
   combatDialogues:
   - text: "\uB3D9\uD574\uBB3C\uACFC \uBC31\uB450\uC0B0\uC774"
@@ -88,8 +88,8 @@ MonoBehaviour:
     useInRandom: 1
   deathDialogue: "\uB0B4 \uC8FD\uC74C\uC744 \uC801\uC5D0\uAC8C \uC54C\uB9AC\uC9C0
     \uB9D0\uB77C"
-  bpm: 100
-  bgm: {fileID: 8300000, guid: dfef0d7f5360a4f4bbf65397116d7ce1, type: 3}
+  bpm: 120
+  bgm: {fileID: 8300000, guid: 71832af9e6f2e74449db3ead181295ef, type: 3}
   patterns:
   - {fileID: 11400000, guid: 538f31141fd331048a54941017aec844, type: 2}
   - {fileID: 11400000, guid: e03e3d53e375df943b88a45c2ed718ab, type: 2}
