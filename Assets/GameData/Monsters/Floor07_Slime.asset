@@ -58,13 +58,14 @@ MonoBehaviour:
   maxHp: 10
   attackPower: 10
   gridType: 0
-  sprites:
-  - {fileID: 21300000, guid: b29ff03ba07dc694cb31247ebca1dfbc, type: 3}
-  - {fileID: 21300000, guid: 0cb4b2de106036649ac459242b6d39e0, type: 3}
-  animator: {fileID: 0}
+  idleClip: {fileID: 7400000, guid: d49f7c0474099094a8e723fd5d8b1f05, type: 2}
+  hurtClip: {fileID: 7400000, guid: d880addf12c199a49b07bd765e66c7fe, type: 2}
+  deathClip: {fileID: 7400000, guid: 2f7972905f5c02c41a4e23b1cf36ff2e, type: 2}
   hitSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
   deathSfx: {fileID: 0}
-  deathVfxPrefab: {fileID: 0}
+  isRandom: 1
+  combatDialogues: []
+  deathDialogue: 
   bpm: 100
   bgm: {fileID: 8300000, guid: dfef0d7f5360a4f4bbf65397116d7ce1, type: 3}
   patterns:
