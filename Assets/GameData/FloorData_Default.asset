@@ -22,11 +22,11 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   floors:
-  - {fileID: 11400000, guid: b6c075d01cefab341b89147701131406, type: 2}
   - {fileID: 11400000, guid: e7e7a59c4d2a4444dbed536ba4adced1, type: 2}
   - {fileID: 11400000, guid: 43253837497d77b4c9e988a9bbb2bc5a, type: 2}
   - {fileID: 11400000, guid: 00d1dc8a365a3594da5acfe7a0d24d8c, type: 2}
   - {fileID: 11400000, guid: 9a27ab3c27b216d4bb88bd7b466aa275, type: 2}
+  - {fileID: 11400000, guid: b6c075d01cefab341b89147701131406, type: 2}
   - {fileID: 11400000, guid: 087bd6ae1c531aa41b54dff921c6394c, type: 2}
   - {fileID: 11400000, guid: 69216a10d1b5ca04aa0fcb60d47c4e22, type: 2}
   - {fileID: 11400000, guid: 41d9ee1a3a65ac04497ef882d5d7230d, type: 2}
