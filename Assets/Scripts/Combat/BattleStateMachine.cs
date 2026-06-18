@@ -535,7 +535,7 @@ namespace BeatHero.Combat
             _monsterHp = Mathf.Max(0, _monsterHp - dmg);
             OnMonsterHpChanged?.Invoke(_monsterHp, _monster.maxHp);
             OnMonsterHit?.Invoke();
-            AudioManager.Instance?.PlaySFX(_monster.hitSfx);
+            AudioManager.Instance?.PlaySFX(_playerConfig.hitSfx); // 모든 몬스터 공통 피격음(플레이어 보유)
             ResetCharge();
         }
 
