@@ -24,8 +24,7 @@ namespace BeatHero.Data
 
         [BoxGroup("Effects")]
         public Dictionary<CellEffect, CellEffectFeedback> effectFeedbacks = new();
-        [BoxGroup("Effects")]
-        public AudioClip hitSfx;
+        // 피격음은 PlayerConfig.hitSfx로 통일됨(몬스터별 hitSfx 제거).
         [BoxGroup("Effects")]
         public AudioClip deathSfx;
 
