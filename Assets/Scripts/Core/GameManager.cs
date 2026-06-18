@@ -38,9 +38,11 @@ namespace BeatHero.Core
         // 돌진 속도 곡선 — 기본 ease-out(초반 빠르고 후반 느림). 인스펙터에서 곡선 조정 가능.
         [SerializeField] private AnimationCurve _rushEase =
             new(new Keyframe(0f, 0f, 0f, 2f), new Keyframe(1f, 1f, 0f, 0f));
+        // 돌진 종료 후 몬스터 사망 연출을 보여주기 위한 최소 대기(이후 우측 퇴장).
+        [SerializeField] private float _deathHoldDuration = 0.5f;
 
-        // 몬스터 처치 시 BGM 페이드아웃 길이 = 돌진 + 퇴장(아이리스 닫힘 완료 시점).
-        public float ClearFadeDuration => _rushDuration + _exitDuration;
+        // 몬스터 처치 시 BGM 페이드아웃 길이 = 돌진 + 사망연출 대기 + 퇴장(아이리스 닫힘 완료 시점).
+        public float ClearFadeDuration => _rushDuration + _deathHoldDuration + _exitDuration;
 
         private void Awake()
         {
@@ -141,6 +143,9 @@ namespace BeatHero.Core
 
             // 사망 말풍선 — 전투 말풍선 제거 후 사망 대사 표시. 다음 층 SetFloorData(OnBattleStarted)에서 숨김.
             UnityEngine.Object.FindAnyObjectByType<MonsterSpeechBubble>()?.ShowDeath();
+
+            // 사망 연출을 보여주기 위한 최소 대기 후 퇴장
+            yield return new WaitForSeconds(_deathHoldDuration);
 
             // 오른쪽 퇴장 + 아이리스 닫힘 동시
             if (SceneLoader.Instance != null && player != null)
