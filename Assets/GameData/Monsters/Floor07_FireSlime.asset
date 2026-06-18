@@ -91,7 +91,7 @@ MonoBehaviour:
   - text: "\uD06C\uC544\uC544\uC544\uC555"
     useInSequential: 0
     useInRandom: 1
-  deathDialogue: 
+  deathDialogue: "\uC88B\uC740... \uC2B9\uBD80\uC600\uB2E4..."
   bpm: 75
   bgm: {fileID: 8300000, guid: 84091d2b31485a34ca8bf4f23f9f8528, type: 3}
   patterns:
