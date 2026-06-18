@@ -7,11 +7,12 @@ namespace BeatHero.Player
     // 플레이어 런타임 스탯 — HP·마나·보호막 보유 및 이벤트 발생
     public class PlayerController : MonoBehaviour
     {
-        private const int MAX_MANA = 5;
+        private const int MAX_MANA = 10;
 
         public int Hp      { get; private set; }
         public int MaxHp   { get; private set; }
         public int Mana    { get; private set; }
+        public int MaxMana => MAX_MANA;
         public bool HasShield { get; private set; }
 
         [SerializeField] private PlayerAnimationController _anim;
@@ -29,6 +30,9 @@ namespace BeatHero.Player
             Mana      = 0;
             HasShield = false;
             _anim?.ResetState();
+            // 초기 HP/마나를 HUD에 알림 — 미발화 시 첫 피격 전까지 체력바가 0/0으로 표시됨
+            OnHpChanged?.Invoke(Hp, MaxHp);
+            OnManaChanged?.Invoke(Mana);
         }
 
         // 암전 직후 등 비주얼만 즉시 초기화할 때 사용 (스탯 건드리지 않음)

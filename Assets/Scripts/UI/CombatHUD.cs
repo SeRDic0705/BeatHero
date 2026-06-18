@@ -10,11 +10,14 @@ namespace BeatHero.UI
     public class CombatHUD : MonoBehaviour
     {
         [Header("Player")]
-        [SerializeField] private Slider _playerHpSlider;
-        [SerializeField] private Image[] _manaDots; // 5
+        [SerializeField] private Image    _playerHpFill;     // type=Filled(Horizontal)
+        [SerializeField] private TMP_Text _playerHpText;     // "현재/최대"
+        [SerializeField] private TMP_Text _manaCurrentText;  // 현재 마나
+        [SerializeField] private TMP_Text _manaMaxText;      // "/최대마나"
 
         [Header("Monster")]
-        [SerializeField] private Slider _monsterHpSlider;
+        [SerializeField] private Image    _monsterHpFill;
+        [SerializeField] private TMP_Text _monsterHpText;
 
         [Header("Floor")]
         [SerializeField] private TMP_Text _floorText;
@@ -99,23 +102,24 @@ namespace BeatHero.UI
 
         private void UpdatePlayerHp(int current, int max)
         {
-            if (_playerHpSlider == null) return;
-            _playerHpSlider.maxValue = max;
-            _playerHpSlider.value    = current;
+            if (_playerHpFill != null)
+                _playerHpFill.fillAmount = max > 0 ? (float)current / max : 0f;
+            if (_playerHpText != null)
+                _playerHpText.text = $"{current}/{max}";
         }
 
         private void UpdateMonsterHp(int current, int max)
         {
-            if (_monsterHpSlider == null) return;
-            _monsterHpSlider.maxValue = max;
-            _monsterHpSlider.value    = current;
+            if (_monsterHpFill != null)
+                _monsterHpFill.fillAmount = max > 0 ? (float)current / max : 0f;
+            if (_monsterHpText != null)
+                _monsterHpText.text = $"{current}/{max}";
         }
 
         private void UpdateMana(int mana)
         {
-            if (_manaDots == null) return;
-            for (int i = 0; i < _manaDots.Length; i++)
-                _manaDots[i].color = i < mana ? Color.yellow : new Color(1f, 1f, 1f, 0.2f);
+            if (_manaCurrentText != null) _manaCurrentText.text = mana.ToString();
+            if (_manaMaxText != null && _player != null) _manaMaxText.text = "/" + _player.MaxMana;
         }
 
         private void UpdateFloor(int floor)

@@ -14,6 +14,8 @@ namespace BeatHero.Combat
     {
         private const int   BEATS_PER_PHASE      = 4;
         private const float CHARGE_MULT_PER_BEAT = 0.5f;
+        private const int   MANA_GAIN_MOVE       = 2; // 일반 이동 시 획득
+        private const int   MANA_GAIN_DODGE      = 3; // 회피(위험 타일에서 이동) 시 획득
 
         [Header("Input Timing")]
         [SerializeField] private float _judgmentWindowSec = 0.021f; // 판정구간 반폭 (비트 전후 각각)
@@ -40,6 +42,8 @@ namespace BeatHero.Combat
         public event System.Action OnMonsterHit;         // 플레이어 공격이 몬스터에 실제로 데미지를 입혔을 때
         public event System.Action<CellEffectFeedback, Vector3> OnMonsterCellEffectFired;
         public event System.Action OnBossPhaseChanged; // 전환 완충 마디 박자마다 발동
+        public event System.Action OnCallPhaseStarted;     // CallPhase(공격 예고) 시작
+        public event System.Action OnResponsePhaseStarted; // ResponsePhase(플레이어 대응) 시작
 
         public MonsterData CurrentMonster => _monster;
         private MonsterData     _monster;
@@ -183,6 +187,7 @@ namespace BeatHero.Combat
             _grid.SetResponsePhase(false);
             double secPerUnit = _conductor.SecPerBeat / PatternPlayer.UNITS_PER_BEAT;
             int unitOffset = 0;
+            bool firstNote = true;
 
             foreach (var bu in _patternPlayer.CurrentPattern.beatUnits)
             {
@@ -197,6 +202,9 @@ namespace BeatHero.Combat
                 // noteStartDsp + _pauseDelta = 프레이즈 경계 포함 모든 일시정지 반영한 목표 시각.
                 yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= noteStartDsp + _pauseDelta);
 
+                // CallPhase 시작 알림은 첫 비트가 "실제로" 발화되는 이 시점에. 코루틴 시작 시점에 울리면
+                // 다음 프레이즈는 ResponsePhase 종료 직후(=다음 CallPhase 약 1박 전) 시작되므로 한 박 빨리 울린다.
+                if (firstNote) { OnCallPhaseStarted?.Invoke(); firstNote = false; }
                 OnBeatUnitFired?.Invoke(secPerUnit * (int)bu.noteLength, bu.gridEffectShape != null);
                 _grid.ShowShape(bu.gridEffectShape);
 
@@ -210,6 +218,7 @@ namespace BeatHero.Combat
             // CallPhase 마지막 박자를 1박 동안 표시 후 제거 (즉시 ClearShape하면 마지막 장판이 1프레임만 보임)
             yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= phraseStartDsp + _pauseDelta);
             _grid.SetResponsePhase(true);
+            OnResponsePhaseStarted?.Invoke();
             _grid.ClearShape();
             double secPerUnit = _conductor.SecPerBeat / PatternPlayer.UNITS_PER_BEAT;
             int unitOffset = 0;
@@ -308,7 +317,7 @@ namespace BeatHero.Combat
             if (moved)
             {
                 _player.transform.position = _grid.GetTileWorldPosition(_grid.PlayerPosition);
-                _player.AddMana(_tileWasDangerAtWindowOpen ? 2 : 1);
+                _player.AddMana(_tileWasDangerAtWindowOpen ? MANA_GAIN_DODGE : MANA_GAIN_MOVE);
             }
 
             // 이동 시 차지 취소 (이동과 공격 배타적)
@@ -323,6 +332,7 @@ namespace BeatHero.Combat
                 if (h.Position == _grid.PlayerPosition)
                 {
                     _player.TakeDamage(CalcMonsterDamage());
+                    if (_attackHeld) CancelCharge(); // 피격 시 차지 취소
                     return;
                 }
 
@@ -332,6 +342,7 @@ namespace BeatHero.Combat
             if (effect is DamageEffect)
             {
                 _player.TakeDamage(CalcMonsterDamage());
+                if (_attackHeld) CancelCharge(); // 피격 시 차지 취소
             }
             else if (effect is PersistentHazardEffect hazardEffect)
             {

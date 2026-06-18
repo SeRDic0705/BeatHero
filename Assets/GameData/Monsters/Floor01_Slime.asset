@@ -55,15 +55,39 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  maxHp: 10
+  maxHp: 30
   attackPower: 10
   gridType: 0
-  idleClip: {fileID: 7400000, guid: c932e2e535d7a104fb564195cd869c8b, type: 2}
-  hurtClip: {fileID: 7400000, guid: c932e2e535d7a104fb564195cd869c8b, type: 2}
-  deathClip: {fileID: 7400000, guid: c932e2e535d7a104fb564195cd869c8b, type: 2}
+  idleClip: {fileID: 7400000, guid: 8ee324c3841275f4e9353ea8c00f6268, type: 2}
+  hurtClip: {fileID: 7400000, guid: 561d8e00fecc62547a6810f81e326ea8, type: 2}
+  deathClip: {fileID: 7400000, guid: 0b9702d65b317d440b1d0b27924b82ba, type: 2}
   hitSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
   deathSfx: {fileID: 0}
   isRandom: 1
+  combatDialogues:
+  - text: "\uB3D9\uD574\uBB3C\uACFC \uBC31\uB450\uC0B0\uC774"
+    useInSequential: 1
+    useInRandom: 0
+  - text: "\uB9C8\uB974\uACE0 \uB2F3\uB3C4\uB85D"
+    useInSequential: 1
+    useInRandom: 0
+  - text: "\uD558\uB290\uB2D8\uC774 \uBCF4\uC6B0\uD558\uC0AC"
+    useInSequential: 1
+    useInRandom: 0
+  - text: "\uC6B0\uB9AC\uB098\uB77C \uB9CC\uC138"
+    useInSequential: 1
+    useInRandom: 0
+  - text: "\uD3F4\uC9DD\uD3F4\uC9DD"
+    useInSequential: 0
+    useInRandom: 0
+  - text: "\uCAC0\uB4DD\uCAC0\uB4DD"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uB9D0\uCE89\uB9D0\uCE89"
+    useInSequential: 0
+    useInRandom: 1
+  deathDialogue: "\uB0B4 \uC8FD\uC74C\uC744 \uC801\uC5D0\uAC8C \uC54C\uB9AC\uC9C0
+    \uB9D0\uB77C"
   bpm: 100
   bgm: {fileID: 8300000, guid: dfef0d7f5360a4f4bbf65397116d7ce1, type: 3}
   patterns:
