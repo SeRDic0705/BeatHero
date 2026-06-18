@@ -14,8 +14,8 @@ namespace BeatHero.Combat
     {
         private const int   BEATS_PER_PHASE      = 4;
         private const float CHARGE_MULT_PER_BEAT = 0.5f;
-        private const int   MANA_GAIN_MOVE       = 2; // 일반 이동 시 획득
-        private const int   MANA_GAIN_DODGE      = 3; // 회피(위험 타일에서 이동) 시 획득
+        private const int   MANA_GAIN_MOVE       = 1; // 일반 이동 시 획득
+        private const int   MANA_GAIN_DODGE      = 2; // 회피(위험 타일에서 이동) 시 획득
 
         [Header("Input Timing")]
         [SerializeField] private float _judgmentWindowSec = 0.021f; // 판정구간 반폭 (비트 전후 각각)

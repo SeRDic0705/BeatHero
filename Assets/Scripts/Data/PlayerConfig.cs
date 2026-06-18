@@ -9,7 +9,7 @@ namespace BeatHero.Data
         [BoxGroup("Stats")]
         public int maxHp = 100;
         [BoxGroup("Stats")]
-        public int maxMana = 10;
+        public int maxMana = 8;
         [BoxGroup("Stats")]
         public int attackPower = 10;
     }
