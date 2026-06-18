@@ -39,6 +39,14 @@ namespace BeatHero.Combat
         [SerializeField] private Color _transitionFlashColor = Color.white;
         [SerializeField] private float _transitionFlashDuration = 0.2f;
 
+        [Header("Danger Blink (비트마다 장판 재점화 — 연속 동일 패턴 구분)")]
+        [SerializeField] private Color _dangerBlinkColor = Color.black;          // 깜빡(off) 색
+        [SerializeField, Range(0f, 0.5f)] private float _dangerBlinkFraction = 0.15f; // 비트 길이 대비 깜빡 비율
+        [SerializeField] private float _dangerBlinkMin = 0.03f;                  // 최소 깜빡 시간(가독성 하한)
+        [SerializeField] private float _dangerBlinkMax = 0.08f;                  // 최대 깜빡 시간
+        private bool _dangerBlink;
+        private Coroutine _blinkRoutine;
+
         public void Initialize(GridType gridType)
         {
             GridWidth = GridHeight = gridType == GridType.Boss5x5 ? 5 : 3;
@@ -49,10 +57,12 @@ namespace BeatHero.Combat
         }
 
         // CallPhase: 현재 BeatUnit의 GridEffectShape을 표시
-        public void ShowShape(GridEffectShape shape)
+        // beatDurationSec > 0이면 비트 시작에 장판을 짧게 off(검정)로 깜빡인 뒤 주의색을 켠다.
+        // 연속 동일 패턴/8분음표가 한 장판처럼 보이지 않도록 매 비트 재점화.
+        public void ShowShape(GridEffectShape shape, double beatDurationSec = 0)
         {
             _dangerMap = new CellEffect[GridWidth, GridHeight];
-            if (shape == null) { RefreshVisuals(); return; }
+            if (shape == null) { StopDangerBlink(); RefreshVisuals(); return; }
 
             if (shape is GridEffectShape3x3 s3 && GridWidth == 3)
                 for (int x = 0; x < 3; x++)
@@ -63,13 +73,39 @@ namespace BeatHero.Combat
                     for (int y = 0; y < 5; y++)
                         _dangerMap[x, y] = s5.cells[x, y];
 
-            RefreshVisuals();
+            if (beatDurationSec > 0) StartDangerBlink(beatDurationSec);
+            else { StopDangerBlink(); RefreshVisuals(); }
         }
 
         public void ClearShape()
         {
+            StopDangerBlink();
             _dangerMap = new CellEffect[GridWidth, GridHeight];
             RefreshVisuals();
+        }
+
+        // 비트 시작: 위험 타일을 짧게 off로 깜빡 후 주의색 복귀. 매 비트 재시작.
+        private void StartDangerBlink(double beatDurationSec)
+        {
+            if (_blinkRoutine != null) StopCoroutine(_blinkRoutine);
+            _blinkRoutine = StartCoroutine(DangerBlinkRoutine(beatDurationSec));
+        }
+
+        private void StopDangerBlink()
+        {
+            if (_blinkRoutine != null) { StopCoroutine(_blinkRoutine); _blinkRoutine = null; }
+            _dangerBlink = false;
+        }
+
+        private IEnumerator DangerBlinkRoutine(double beatDurationSec)
+        {
+            _dangerBlink = true;
+            RefreshVisuals();   // 위험 타일 → off(검정)
+            float dur = Mathf.Clamp((float)beatDurationSec * _dangerBlinkFraction, _dangerBlinkMin, _dangerBlinkMax);
+            yield return new WaitForSeconds(dur);
+            _dangerBlink = false;
+            RefreshVisuals();   // 위험 타일 → 실제 주의색
+            _blinkRoutine = null;
         }
 
         // ResponsePhase용: 타일 색상 변경 없이 _dangerMap만 갱신 (시각 피드백은 VFX가 담당)
@@ -195,7 +231,7 @@ namespace BeatHero.Combat
                     else if (_dangerMap[x, y] is ShieldEffect)
                         sr.color = COLOR_SHIELD;
                     else if (_dangerMap[x, y] != null && !_isResponsePhase)
-                        sr.color = COLOR_DANGER_CALL;
+                        sr.color = _dangerBlink ? _dangerBlinkColor : COLOR_DANGER_CALL;
                     else
                         sr.color = COLOR_NORMAL;
                 }
