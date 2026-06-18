@@ -66,8 +66,8 @@ MonoBehaviour:
   isRandom: 0
   combatDialogues: []
   deathDialogue: 
-  bpm: 100
-  bgm: {fileID: 8300000, guid: dfef0d7f5360a4f4bbf65397116d7ce1, type: 3}
+  bpm: 70
+  bgm: {fileID: 8300000, guid: 63c0d9f01fc5338478023355ae8b2e8a, type: 3}
   patterns:
   - {fileID: 11400000, guid: 63cf1bdb64336674da1cd1c5da3acc2e, type: 2}
   - {fileID: 11400000, guid: 247f76ab983c741499365d2658ac7c3f, type: 2}
