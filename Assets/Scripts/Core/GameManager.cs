@@ -134,8 +134,11 @@ namespace BeatHero.Core
             InputReader.Instance?.SwitchToUIMap();
 
             // 최후의 일격 전진 — 몬스터 살짝 뒤(화면상 우측)로 finalAttack + ease-out 돌진
+            // (돌진 중 몬스터 x 통과 시 참격 VFX 1회 재생)
             if (player != null && monsterView != null)
-                yield return StartCoroutine(player.FinalAttackDash(monsterView.transform.position + _rushTargetOffset, _rushDuration, _rushEase));
+                yield return StartCoroutine(player.FinalAttackDash(
+                    monsterView.transform.position + _rushTargetOffset, _rushDuration, _rushEase,
+                    monsterView.transform.position));
 
             // 사망 애니메이션 + SFX
             monsterView?.PlayDeath();

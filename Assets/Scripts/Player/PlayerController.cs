@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Animations;
+using UnityEngine.Playables;
 
 namespace BeatHero.Player
 {
@@ -16,6 +18,14 @@ namespace BeatHero.Player
         public bool HasShield { get; private set; }
 
         [SerializeField] private PlayerAnimationController _anim;
+
+        [Header("참격 VFX (몬스터 통과 시 1회)")]
+        [SerializeField] private Animator      _slashVfxAnimator; // 독립 VFX 오브젝트의 Animator
+        [SerializeField] private AnimationClip _slashVfxClip;     // 인스펙터 직접 할당
+        [SerializeField] private Vector3       _slashVfxOffset = Vector3.zero;
+
+        private PlayableGraph _slashGraph;
+        private Coroutine     _slashStopRoutine;
 
         public event Action<int, int> OnHpChanged;   // (current, max)
         public event Action<int>      OnManaChanged;  // current
@@ -102,18 +112,58 @@ namespace BeatHero.Player
         }
 
         // 최후의 일격 돌진 — finalAttack 애니메이션 + ease 곡선(기본 ease-out: 초반 빠르고 후반 느림).
-        public IEnumerator FinalAttackDash(Vector3 target, float duration, AnimationCurve ease)
+        // 돌진 중 플레이어 x가 몬스터 x를 지나치는 순간(좌표 교차) 참격 VFX 1회 재생.
+        public IEnumerator FinalAttackDash(Vector3 target, float duration, AnimationCurve ease, Vector3 monsterPos)
         {
             _anim?.TriggerFinalAttack();
             Vector3 start = transform.position;
+            float crossX  = monsterPos.x;
+            float prevX   = start.x;
+            bool  slashed = false;
             for (float t = 0f; t < duration; t += Time.deltaTime)
             {
                 float n = duration > 0f ? t / duration : 1f;
                 float u = ease != null ? ease.Evaluate(n) : n;
                 transform.position = Vector3.Lerp(start, target, u);
+
+                // prevX와 현재 x가 crossX를 사이에 두면(부호 반전·일치) 통과 → 1회 재생
+                if (!slashed && (prevX - crossX) * (transform.position.x - crossX) <= 0f)
+                {
+                    slashed = true;
+                    PlaySlashVfx(monsterPos);
+                }
+                prevX = transform.position.x;
                 yield return null;
             }
             transform.position = target;
+        }
+
+        // 참격 VFX — 할당된 AnimationClip을 컨트롤러 없이 단발 재생.
+        private void PlaySlashVfx(Vector3 worldPos)
+        {
+            if (_slashVfxAnimator == null || _slashVfxClip == null) return;
+
+            _slashVfxAnimator.transform.position = worldPos + _slashVfxOffset;
+            if (!_slashVfxAnimator.gameObject.activeSelf) _slashVfxAnimator.gameObject.SetActive(true);
+
+            if (_slashGraph.IsValid()) _slashGraph.Destroy();
+            AnimationPlayableUtilities.PlayClip(_slashVfxAnimator, _slashVfxClip, out _slashGraph);
+
+            if (_slashStopRoutine != null) StopCoroutine(_slashStopRoutine);
+            _slashStopRoutine = StartCoroutine(StopSlashVfxAfter(_slashVfxClip.length));
+        }
+
+        private IEnumerator StopSlashVfxAfter(float seconds)
+        {
+            yield return new WaitForSeconds(seconds);
+            if (_slashGraph.IsValid()) _slashGraph.Destroy();
+            if (_slashVfxAnimator != null) _slashVfxAnimator.gameObject.SetActive(false);
+            _slashStopRoutine = null;
+        }
+
+        private void OnDestroy()
+        {
+            if (_slashGraph.IsValid()) _slashGraph.Destroy();
         }
 
         public IEnumerator ExitRight(float duration)
