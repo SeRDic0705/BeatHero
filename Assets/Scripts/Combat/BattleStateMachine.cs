@@ -208,7 +208,7 @@ namespace BeatHero.Combat
                 // 다음 프레이즈는 ResponsePhase 종료 직후(=다음 CallPhase 약 1박 전) 시작되므로 한 박 빨리 울린다.
                 if (firstNote) { OnCallPhaseStarted?.Invoke(); firstNote = false; }
                 OnBeatUnitFired?.Invoke(secPerUnit * (int)bu.noteLength, bu.gridEffectShape != null);
-                _grid.ShowShape(bu.gridEffectShape);
+                _grid.ShowShape(bu.gridEffectShape, secPerUnit * (int)bu.noteLength);
 
                 unitOffset += (int)bu.noteLength;
             }
