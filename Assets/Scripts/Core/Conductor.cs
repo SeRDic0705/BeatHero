@@ -14,6 +14,7 @@ namespace BeatHero.Core
 
         public event Action<int> OnBeat;
         public event Action<double, float> OnSongScheduled; // (dspSongStartTime, bpm)
+        public event Action<double, float> OnFloorLeadIn;   // (beat0Dsp, bpm) — StartFloor에서만 발화(리드인 연출용)
         public event Action OnPaused;
         public event Action<double> OnResumed; // (pausedDurationSec)
 
@@ -109,6 +110,8 @@ namespace BeatHero.Core
             _activeSource.PlayScheduled(_dspSongStartTime);
             _isPlaying = true;
             OnSongScheduled?.Invoke(_dspSongStartTime, _bpm);
+            // 리드인 1마디(StartFloor ~ beat0) 연출용 — 페이즈 전환과 달리 층 시작에서만 발화.
+            OnFloorLeadIn?.Invoke(_dspSongStartTime, _bpm);
         }
 
         public void Stop()

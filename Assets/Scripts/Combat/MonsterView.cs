@@ -1,5 +1,6 @@
 using System.Collections;
 using BeatHero.Audio;
+using BeatHero.Core;
 using BeatHero.Data;
 using UnityEngine;
 
@@ -19,6 +20,8 @@ namespace BeatHero.Combat
         private static readonly int DeathStateHash = Animator.StringToHash("Death");
         private static readonly int FlashAmountId = Shader.PropertyToID("_FlashAmount");
         private static readonly int FlashColorId  = Shader.PropertyToID("_FlashColor");
+
+        private const int LEAD_IN_BEATS = 4; // 리드인 1마디 = 4박(Conductor.BEATS_PER_MEASURE와 동일)
 
         // 모든 몬스터가 공유하는 상태머신. Inspector에서 MonsterBaseAnimator 연결.
         [SerializeField] private RuntimeAnimatorController _baseController;
@@ -51,6 +54,7 @@ namespace BeatHero.Combat
 
         private Animator            _animator;
         private BattleStateMachine  _battle;
+        private Conductor           _conductor;
         private SpriteRenderer      _renderer;
         private MaterialPropertyBlock _mpb;
 
@@ -63,6 +67,7 @@ namespace BeatHero.Combat
         private Coroutine     _flashRoutine;
         private Coroutine     _knockbackRoutine;
         private Coroutine     _squashRoutine;
+        private Coroutine     _leadInRoutine;
 
         private void Awake()
         {
@@ -79,6 +84,8 @@ namespace BeatHero.Combat
                 _battle.OnMonsterCellEffectFired += PlayCellEffectFeedback;
                 _battle.OnBossPhaseChanged       += OnBossPhaseChanged;
             }
+            _conductor = Object.FindAnyObjectByType<Conductor>();
+            if (_conductor != null) _conductor.OnFloorLeadIn += OnFloorLeadIn;
         }
 
         private void Start()
@@ -100,6 +107,7 @@ namespace BeatHero.Combat
                 _battle.OnMonsterCellEffectFired -= PlayCellEffectFeedback;
                 _battle.OnBossPhaseChanged       -= OnBossPhaseChanged;
             }
+            if (_conductor != null) _conductor.OnFloorLeadIn -= OnFloorLeadIn;
         }
 
         private void SetMonster(MonsterData data)
@@ -144,6 +152,29 @@ namespace BeatHero.Combat
             _animator.speed = _idleClipLength / (float)beatDurationSec;
             _animator.Play(Animator.StringToHash("Idle"), 0, 0f);
             _sfxPlayedThisBeat.Clear();
+        }
+
+        // 층 시작(StartFloor) ~ 첫 비트(beat0) 사이 1마디 동안 Idle을 박자에 맞춰 4번 재생.
+        // beat0부터는 OnBeatUnit(프레이즈)이 이어받으므로 그 전까지만 흔든다.
+        private void OnFloorLeadIn(double beat0Dsp, float bpm)
+        {
+            if (_leadInRoutine != null) StopCoroutine(_leadInRoutine);
+            _leadInRoutine = StartCoroutine(LeadInBob(beat0Dsp, bpm));
+        }
+
+        private IEnumerator LeadInBob(double beat0Dsp, float bpm)
+        {
+            if (_currentMonster == null || _animator == null || bpm <= 0f) yield break;
+            double secPerBeat = 60.0 / bpm;
+            for (int i = 0; i < LEAD_IN_BEATS; i++)
+            {
+                double beatDsp = beat0Dsp - (LEAD_IN_BEATS - i) * secPerBeat;
+                while (AudioSettings.dspTime < beatDsp) yield return null;
+                if (AudioSettings.dspTime >= beat0Dsp) break; // beat0 도달 — 프레이즈가 이어받음
+                _animator.speed = (float)(_idleClipLength / secPerBeat);
+                _animator.Play(Animator.StringToHash("Idle"), 0, 0f);
+            }
+            _leadInRoutine = null;
         }
 
         private void OnHit(bool isLethal)
