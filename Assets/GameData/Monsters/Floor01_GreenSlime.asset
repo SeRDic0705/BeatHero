@@ -109,7 +109,7 @@ MonoBehaviour:
   - text: "\uBAB0 [Space Bar] \uBAB0 \uCE89"
     useInSequential: 0
     useInRandom: 1
-  deathDialogue: "\uB0A0 \uC5B4\uB5BB\uAC8C \uC774\uAE34 \uAC70\uC9C0??"
+  deathDialogue: "\uB0B4\uAC00 \uC65C \uC9C4 \uAC70\uC9C0??"
   bpm: 120
   bgm: {fileID: 8300000, guid: 71832af9e6f2e74449db3ead181295ef, type: 3}
   patterns:

@@ -63,7 +63,22 @@ MonoBehaviour:
   deathClip: {fileID: 7400000, guid: 4b202f03722ab3845957a8916d401898, type: 2}
   deathSfx: {fileID: 8300000, guid: 8671b0c3114bde44590047299c823672, type: 3}
   isRandom: 0
-  combatDialogues: []
+  combatDialogues:
+  - text: 
+    useInSequential: 1
+    useInRandom: 0
+  - text: 
+    useInSequential: 1
+    useInRandom: 0
+  - text: 
+    useInSequential: 1
+    useInRandom: 0
+  - text: 
+    useInSequential: 1
+    useInRandom: 0
+  - text: 
+    useInSequential: 1
+    useInRandom: 0
   deathDialogue: 
   bpm: 100
   bgm: {fileID: 8300000, guid: 48d74d6669d144242a9210060ef68ef2, type: 3}
