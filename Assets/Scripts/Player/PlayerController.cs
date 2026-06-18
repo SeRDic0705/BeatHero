@@ -28,10 +28,12 @@ namespace BeatHero.Player
         public event Action           OnShieldGained;
         public event Action           OnShieldLost;
 
-        public void Initialize(int maxHp)
+        // keepHp=true면 현재 HP 유지(층 전환 시) — 설계상 HP는 층을 넘어가도 유지된다.
+        // keepHp=false면 풀 회복(런 시작/재시작).
+        public void Initialize(int maxHp, bool keepHp = false)
         {
             MaxHp     = maxHp;
-            Hp        = maxHp;
+            Hp        = keepHp ? Mathf.Min(Hp, maxHp) : maxHp;
             Mana      = 0;
             HasShield = false;
             _anim?.ResetState();

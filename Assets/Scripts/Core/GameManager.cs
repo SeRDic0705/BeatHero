@@ -181,7 +181,7 @@ namespace BeatHero.Core
             OnFloorChanged?.Invoke(CurrentFloor);
             var monster = _floorData.GetMonster(CurrentFloor);
             if (monster != null)
-                _battle.SetFloorData(monster);
+                _battle.SetFloorData(monster, keepPlayerHp: true); // 층 전환 — HP 유지(설계)
 
             // 보스 클리어 결과창 (암전 중 표시)
             if (IsBossFloor(completedFloor) && _resultScreen != null)
