@@ -23,11 +23,11 @@ MonoBehaviour:
     SerializationNodes: []
   beatUnits:
   - noteLength: 12
-    gridEffectShape: {fileID: 11400000, guid: b2d0141c2ca7e9846a9e9ad6c82b916e, type: 2}
+    gridEffectShape: {fileID: 11400000, guid: f9adbf14f6f62bc409ae98e85cad6ba9, type: 2}
   - noteLength: 12
-    gridEffectShape: {fileID: 11400000, guid: bf0b8a013757a164885ea0d1fc066ac9, type: 2}
+    gridEffectShape: {fileID: 11400000, guid: 0d5897a2269357646af42f7e6ba68977, type: 2}
   - noteLength: 12
-    gridEffectShape: {fileID: 11400000, guid: 0fc15dedacdeb0d469e59c443f7152b3, type: 2}
+    gridEffectShape: {fileID: 11400000, guid: b1dcd34f5ddba5941a174f039b1bb3ea, type: 2}
   - noteLength: 12
-    gridEffectShape: {fileID: 11400000, guid: c7b8a42d81da17946ba05e3285a03517, type: 2}
+    gridEffectShape: {fileID: 11400000, guid: aa7905b8076c876419f74b03c86f5464, type: 2}
   damageMultiplier: 1
