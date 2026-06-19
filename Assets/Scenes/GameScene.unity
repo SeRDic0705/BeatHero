@@ -1636,12 +1636,12 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 3246695597259797208, guid: 0c892d541b1e4a541b4769f3e7c772f0, type: 3}
+  m_Sprite: {fileID: -1440993705, guid: f8059ed3c06260640b43b1d2e2d410a6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 4, y: 1.8}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -13173,6 +13173,10 @@ MonoBehaviour:
   _cellSize: 1
   _transitionFlashColor: {r: 1, g: 1, b: 1, a: 1}
   _transitionFlashDuration: 0.2
+  _dangerBlinkColor: {r: 0, g: 0, b: 0, a: 1}
+  _dangerBlinkFraction: 0.15
+  _dangerBlinkMin: 0.03
+  _dangerBlinkMax: 0.08
 --- !u!114 &1667971345
 MonoBehaviour:
   m_ObjectHideFlags: 0
