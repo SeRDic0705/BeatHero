@@ -85,7 +85,7 @@ MonoBehaviour:
   - text: "\uCEE4 \uD50C \uC2DC \uB7EC"
     useInSequential: 0
     useInRandom: 1
-  deathDialogue: 
+  deathDialogue: "\uC870\uAE08 \uC624\uB978\uCABD\uC744 \uBCA0\uC5C8\uC5B4\uC57C\uC9C0..."
   bpm: 80
   bgm: {fileID: 8300000, guid: 54328b57fe3264849820fa64d44d7893, type: 3}
   patterns:

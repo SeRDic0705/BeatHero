@@ -63,14 +63,41 @@ MonoBehaviour:
   deathClip: {fileID: 7400000, guid: ecbd453d09ab0974c8dfe2c984363187, type: 2}
   deathSfx: {fileID: 8300000, guid: 8671b0c3114bde44590047299c823672, type: 3}
   isRandom: 1
-  combatDialogues: []
-  deathDialogue: 
+  combatDialogues:
+  - text: "\uB098\uB294... \uACE0\uC778 \uC2AC\uB77C\uC784..."
+    useInSequential: 1
+    useInRandom: 0
+  - text: "\uC5EC\uAE30,"
+    useInSequential: 1
+    useInRandom: 0
+  - text: "\uD574\uACE8 \uC548\uC5D0 \uC788\uC9C0."
+    useInSequential: 1
+    useInRandom: 0
+  - text: "\uD55C \uBAA8\uAE08 \uB9DB \uBCFC \uD14C\uB0D0?"
+    useInSequential: 1
+    useInRandom: 0
+  - text: "\uC77C\uCCB4\uC720\uC2EC\uC870"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uC544\uC9C1 \uC548 \uC369\uC5C8\uC5B4!"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uBC15\uC790\uB77C\uBA74 \uD1B5\uB2EC\uD588\uC9C0"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uB2EC\uD070\uD55C \uD574\uACE8 \uC2AC\uB77C\uC784"
+    useInSequential: 0
+    useInRandom: 1
+  deathDialogue: "\uC6D0\uD6A8\uB300\uC0AC\uB2D8..."
   bpm: 140
   bgm: {fileID: 8300000, guid: 63c0d9f01fc5338478023355ae8b2e8a, type: 3}
   patterns:
-  - {fileID: 11400000, guid: a778df39972ff474fbdba75076406de9, type: 2}
-  - {fileID: 11400000, guid: 3385c4cc96f5c634c92848c46e512c0f, type: 2}
-  - {fileID: 11400000, guid: e536ded63d7ea5646ae5565c5841d373, type: 2}
-  - {fileID: 11400000, guid: b3a9ae81c0eef8b479a13c73698d1016, type: 2}
-  - {fileID: 11400000, guid: b8703b8bcea427243a0ac2eaaa8e64ad, type: 2}
-  - {fileID: 11400000, guid: 136578af829518249909b09ebc5b8043, type: 2}
+  - {fileID: 11400000, guid: f0796b76502961f45b858be8a04b6854, type: 2}
+  - {fileID: 11400000, guid: c623c988cc816c94b967e68aacb48c28, type: 2}
+  - {fileID: 11400000, guid: 98ba6d1640976924baba5f1888e5200f, type: 2}
+  - {fileID: 11400000, guid: a53bd710a72796d4fbf59fd5ad81f49a, type: 2}
+  - {fileID: 11400000, guid: 91adf34000b65554faefde797f38f0a5, type: 2}
+  - {fileID: 11400000, guid: f710a3da37ad65345a4fdc1bd9cb458a, type: 2}
+  - {fileID: 11400000, guid: 1bc18aead87eb214f8456f953e92eb50, type: 2}
+  - {fileID: 11400000, guid: 0a0d4b7a546667c4da51342c22d6e1d2, type: 2}
+  - {fileID: 11400000, guid: b871df1917b2d414281382149abcc150, type: 2}
