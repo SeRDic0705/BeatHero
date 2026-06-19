@@ -55,8 +55,8 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  maxHp: 200
-  attackPower: 10
+  maxHp: 70
+  attackPower: 5
   gridType: 0
   idleClip: {fileID: 7400000, guid: 86b9b202797fd6848a03a03ce660c2cf, type: 2}
   hurtClip: {fileID: 7400000, guid: 35dad1cb9e6a93c4cb5f060295c21c99, type: 2}
@@ -70,19 +70,39 @@ MonoBehaviour:
   - text: "\uB0B4\uAC00 \uB418\uC5C8\uC5B4\uC57C \uD574"
     useInSequential: 1
     useInRandom: 0
-  - text: 
+  - text: "\uC218 \uBC15\uC790\uB97C \uAC08\uACE0\uB2E6\uC740"
     useInSequential: 1
     useInRandom: 0
-  - text: 
+  - text: "\uD544\uC0B4\uAE30!!!"
     useInSequential: 1
     useInRandom: 0
-  deathDialogue: 
+  - text: "\uBD84\uB178\uC5D0 \uD0C0\uBC84\uB838\uC9C0"
+    useInSequential: 1
+    useInRandom: 0
+  - text: "\uBD88\uB369\uC774\uC5D0 \uD0C4 \uAC8C \uC544\uB0D0"
+    useInSequential: 1
+    useInRandom: 0
+  - text: "\uBD88\uB369\uC774\uB294 \uBA40\uB9AC \uD574\uB77C."
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uC5B8\uC820\uAC00\uB294... \uB0B4\uAC00...!"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uB9AC\uBB34\uB8E8 \uD15C\uD398\uC2A4\uD2B8...?"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uC804\uC0DD\uD574\uC11C... \uC2AC\uB77C\uC784...?"
+    useInSequential: 0
+    useInRandom: 1
+  deathDialogue: "\uD6C4\uBCF4\uB294 \uB0B4\uAC00 \uC544\uB2C8\uB77C....."
   bpm: 95
   bgm: {fileID: 8300000, guid: 284a20a266a82094991030dfee0e8247, type: 3}
   patterns:
-  - {fileID: 11400000, guid: a778df39972ff474fbdba75076406de9, type: 2}
-  - {fileID: 11400000, guid: 3385c4cc96f5c634c92848c46e512c0f, type: 2}
-  - {fileID: 11400000, guid: e536ded63d7ea5646ae5565c5841d373, type: 2}
-  - {fileID: 11400000, guid: b3a9ae81c0eef8b479a13c73698d1016, type: 2}
-  - {fileID: 11400000, guid: b8703b8bcea427243a0ac2eaaa8e64ad, type: 2}
-  - {fileID: 11400000, guid: 136578af829518249909b09ebc5b8043, type: 2}
+  - {fileID: 11400000, guid: 49037099c8a96824096159dc8a7761d7, type: 2}
+  - {fileID: 11400000, guid: 8d66a5cbb53cc4a4ebdfce1f14c32b79, type: 2}
+  - {fileID: 11400000, guid: 59b5a3dc47eae724bb207628de529a71, type: 2}
+  - {fileID: 11400000, guid: d6f985391aa4cb948bf594b260965ac7, type: 2}
+  - {fileID: 11400000, guid: 76f74db62236e0e4fbb889837ce0b1d3, type: 2}
+  - {fileID: 11400000, guid: c33c0f2ea00954b40b2bd76606192c41, type: 2}
+  - {fileID: 11400000, guid: ea538361496ef2d45ab3deb8bf34c80e, type: 2}
+  - {fileID: 11400000, guid: 44f035639b6becb4388e3d824ca4ca6d, type: 2}
