@@ -268,6 +268,17 @@ namespace BeatHero.Core
                 },
                 {
                     ""name"": """",
+                    ""id"": ""23df1a46-2d7c-491b-8ce1-d1115592599b"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""090ac1ef-2516-4b46-af98-936bc3d7927a"",
                     ""path"": ""<Keyboard>/escape"",
                     ""interactions"": """",
