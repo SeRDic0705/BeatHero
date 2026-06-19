@@ -3755,8 +3755,8 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 0.18788025
-      value: 0.13673162
+      time: 0.46287107
+      value: 0.27255222
       inSlope: 2.0816891
       outSlope: 2.0816891
       tangentMode: 0
@@ -3764,8 +3764,8 @@ MonoBehaviour:
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.48745102
-      value: 0.8675385
+      time: 0.54161566
+      value: 0.8532512
       inSlope: 0.8825841
       outSlope: 0.8825841
       tangentMode: 0
@@ -13173,6 +13173,10 @@ MonoBehaviour:
   _cellSize: 1
   _transitionFlashColor: {r: 1, g: 1, b: 1, a: 1}
   _transitionFlashDuration: 0.2
+  _dangerBlinkColor: {r: 0, g: 0, b: 0, a: 1}
+  _dangerBlinkFraction: 0.15
+  _dangerBlinkMin: 0.03
+  _dangerBlinkMax: 0.08
 --- !u!114 &1667971345
 MonoBehaviour:
   m_ObjectHideFlags: 0
