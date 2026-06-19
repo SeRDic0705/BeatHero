@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c29b80fe10bb514ba2511bf44e0e2db, type: 3}
+  m_Name: Feedback_RedBomb
+  m_EditorClassIdentifier: BeatHero::BeatHero.Data.CellEffectFeedback
+  activateSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
+  vfxFrames:
+  - {fileID: 6286595657586805340, guid: 79e81e1c61e572c48845f53307572350, type: 3}
+  - {fileID: 1613127925512473047, guid: 79e81e1c61e572c48845f53307572350, type: 3}
+  - {fileID: 5333967998348892124, guid: 79e81e1c61e572c48845f53307572350, type: 3}
+  - {fileID: 2398322965701019735, guid: 79e81e1c61e572c48845f53307572350, type: 3}
+  - {fileID: -7465866551671254797, guid: 79e81e1c61e572c48845f53307572350, type: 3}
+  - {fileID: -8314221879049074932, guid: 79e81e1c61e572c48845f53307572350, type: 3}
+  vfxFps: 24

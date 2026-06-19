@@ -1,0 +1,415 @@
+fileFormatVersion: 2
+guid: 501e6ebce007a644eb03102d264b3a41
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 975995062621840166
+    second: SkullEffect_0
+  - first:
+      213: 5525712137204338885
+    second: SkullEffect_1
+  - first:
+      213: -6107777536446265344
+    second: SkullEffect_2
+  - first:
+      213: 6696016089536163155
+    second: SkullEffect_3
+  - first:
+      213: 9105069701358364474
+    second: SkullEffect_4
+  - first:
+      213: -2347951934111891106
+    second: SkullEffect_5
+  - first:
+      213: 1795710585263266816
+    second: SkullEffect_6
+  - first:
+      213: -1287365086429260801
+    second: SkullEffect_7
+  - first:
+      213: -6439673992986291190
+    second: SkullEffect_8
+  - first:
+      213: -1316678740013716727
+    second: SkullEffect_9
+  - first:
+      213: -4115380300843285926
+    second: SkullEffect_10
+  - first:
+      213: -6057684918156283238
+    second: SkullEffect_11
+  - first:
+      213: -7695665457637401743
+    second: SkullEffect_12
+  - first:
+      213: 3521716326219675436
+    second: SkullEffect_13
+  - first:
+      213: 2472374586398229619
+    second: SkullEffect_14
+  - first:
+      213: 1987715648488721257
+    second: SkullEffect_15
+  - first:
+      213: 4449198458586486700
+    second: SkullEffect_16
+  - first:
+      213: -3911922102669932929
+    second: SkullEffect_17
+  - first:
+      213: 601652011277943057
+    second: SkullEffect_18
+  - first:
+      213: 6924975807188131248
+    second: SkullEffect_19
+  - first:
+      213: 2837414112604221504
+    second: SkullEffect_20
+  - first:
+      213: 1054567165708593843
+    second: SkullEffect_21
+  - first:
+      213: -8574501274748437014
+    second: SkullEffect_22
+  - first:
+      213: -3757485137064969502
+    second: SkullEffect_23
+  - first:
+      213: -3329922750952722851
+    second: SkullEffect_24
+  - first:
+      213: -4619278212237682910
+    second: SkullEffect_25
+  - first:
+      213: -9134440567360058695
+    second: SkullEffect_26
+  - first:
+      213: -2163234970995473407
+    second: SkullEffect_27
+  - first:
+      213: 5326537485367622759
+    second: SkullEffect_28
+  - first:
+      213: 8655901593186236364
+    second: SkullEffect_29
+  - first:
+      213: 70584300555211005
+    second: SkullEffect_30
+  - first:
+      213: -3504341189781783082
+    second: SkullEffect_31
+  - first:
+      213: 3759409973436855089
+    second: SkullEffect_32
+  - first:
+      213: 5723894895470703311
+    second: SkullEffect_33
+  - first:
+      213: 4292012760017110031
+    second: SkullEffect_34
+  - first:
+      213: -98126414923082042
+    second: SkullEffect_35
+  - first:
+      213: 5352610089047071055
+    second: SkullEffect_36
+  - first:
+      213: 7993274285082515440
+    second: SkullEffect_37
+  - first:
+      213: 409605242623859347
+    second: SkullEffect_38
+  - first:
+      213: -5132177695547456176
+    second: SkullEffect_39
+  - first:
+      213: 2199394550102551915
+    second: SkullEffect_40
+  - first:
+      213: -2236878215624432069
+    second: SkullEffect_41
+  - first:
+      213: 1645070970916987540
+    second: SkullEffect_42
+  - first:
+      213: 3600447088525547049
+    second: SkullEffect_43
+  - first:
+      213: 4934399260582176434
+    second: SkullEffect_44
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 220
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: SkullEffect_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 210
+        height: 210
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6232c12a65e6b8d00800000000000000
+      internalID: 975995062621840166
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkullEffect_1
+      rect:
+        serializedVersion: 2
+        x: 210
+        y: 0
+        width: 210
+        height: 210
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c0112d89e54fac40800000000000000
+      internalID: 5525712137204338885
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkullEffect_2
+      rect:
+        serializedVersion: 2
+        x: 420
+        y: 0
+        width: 210
+        height: 210
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0088205e0b0dc3ba0800000000000000
+      internalID: -6107777536446265344
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkullEffect_3
+      rect:
+        serializedVersion: 2
+        x: 630
+        y: 0
+        width: 210
+        height: 210
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 35d6a1b08270dec50800000000000000
+      internalID: 6696016089536163155
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkullEffect_4
+      rect:
+        serializedVersion: 2
+        x: 840
+        y: 0
+        width: 210
+        height: 210
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a3723a417a4bb5e70800000000000000
+      internalID: 9105069701358364474
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkullEffect_5
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 0
+        width: 210
+        height: 210
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e51c199e7266a6fd0800000000000000
+      internalID: -2347951934111891106
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkullEffect_6
+      rect:
+        serializedVersion: 2
+        x: 1260
+        y: 0
+        width: 210
+        height: 210
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 00c96026345abe810800000000000000
+      internalID: 1795710585263266816
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 048c5d6102829d1428e65b88705900c8
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":7.0,"y":1.0},"gridSpriteSize":{"x":210.0,"y":210.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":2,"keepEmptyRects":false,"isAlternate":false}'
+    nameFileIdTable:
+      SkullEffect_0: 975995062621840166
+      SkullEffect_1: 5525712137204338885
+      SkullEffect_2: -6107777536446265344
+      SkullEffect_3: 6696016089536163155
+      SkullEffect_4: 9105069701358364474
+      SkullEffect_5: -2347951934111891106
+      SkullEffect_6: 1795710585263266816
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

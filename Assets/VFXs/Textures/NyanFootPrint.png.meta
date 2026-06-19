@@ -1,0 +1,395 @@
+fileFormatVersion: 2
+guid: cda78452e499fb54690123508faeb6b2
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 7693972991751707193
+    second: NyanFootPrint_0
+  - first:
+      213: 5181869436768955628
+    second: NyanFootPrint_1
+  - first:
+      213: -941382571864529321
+    second: NyanFootPrint_2
+  - first:
+      213: -6614572324285989274
+    second: NyanFootPrint_3
+  - first:
+      213: -7803827816299839475
+    second: NyanFootPrint_4
+  - first:
+      213: 7537648450610371548
+    second: NyanFootPrint_5
+  - first:
+      213: -6266701277889364197
+    second: NyanFootPrint_6
+  - first:
+      213: -1623474992281410929
+    second: NyanFootPrint_7
+  - first:
+      213: 4617144297498839273
+    second: NyanFootPrint_8
+  - first:
+      213: 7915830889446955055
+    second: NyanFootPrint_9
+  - first:
+      213: -139784895925891079
+    second: NyanFootPrint_10
+  - first:
+      213: 9120148263119276368
+    second: NyanFootPrint_11
+  - first:
+      213: 5907828293959802319
+    second: NyanFootPrint_12
+  - first:
+      213: 7079402000303794132
+    second: NyanFootPrint_13
+  - first:
+      213: 995010513417946226
+    second: NyanFootPrint_14
+  - first:
+      213: 3193209189556004252
+    second: NyanFootPrint_15
+  - first:
+      213: -5337135555767744571
+    second: NyanFootPrint_16
+  - first:
+      213: 7615814565925397887
+    second: NyanFootPrint_17
+  - first:
+      213: -4729535766447686437
+    second: NyanFootPrint_18
+  - first:
+      213: -6171280976698974140
+    second: NyanFootPrint_19
+  - first:
+      213: -3836829037368018550
+    second: NyanFootPrint_20
+  - first:
+      213: 2165979614543401643
+    second: NyanFootPrint_21
+  - first:
+      213: -277306508563382888
+    second: NyanFootPrint_22
+  - first:
+      213: -9071203593317377335
+    second: NyanFootPrint_23
+  - first:
+      213: -3916238391816372421
+    second: NyanFootPrint_24
+  - first:
+      213: 4730765925588392719
+    second: NyanFootPrint_25
+  - first:
+      213: 7596372960066846283
+    second: NyanFootPrint_26
+  - first:
+      213: -5536185871545255127
+    second: NyanFootPrint_27
+  - first:
+      213: -15150715276611750
+    second: NyanFootPrint_28
+  - first:
+      213: -2532639655175383920
+    second: NyanFootPrint_29
+  - first:
+      213: 5187828279408431479
+    second: NyanFootPrint_30
+  - first:
+      213: -8652622988676832323
+    second: NyanFootPrint_31
+  - first:
+      213: -1651156912927551037
+    second: NyanFootPrint_32
+  - first:
+      213: 175450177541815814
+    second: NyanFootPrint_33
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 220
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: NyanFootPrint_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 300
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 93a5fccebab76ca60800000000000000
+      internalID: 7693972991751707193
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NyanFootPrint_1
+      rect:
+        serializedVersion: 2
+        x: 300
+        y: 0
+        width: 300
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cec211b4cc2b9e740800000000000000
+      internalID: 5181869436768955628
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NyanFootPrint_2
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 0
+        width: 300
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 756654ed9898fe2f0800000000000000
+      internalID: -941382571864529321
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NyanFootPrint_3
+      rect:
+        serializedVersion: 2
+        x: 900
+        y: 0
+        width: 300
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66ebdcd34815434a0800000000000000
+      internalID: -6614572324285989274
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NyanFootPrint_4
+      rect:
+        serializedVersion: 2
+        x: 1200
+        y: 0
+        width: 300
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d00c22192fb33b390800000000000000
+      internalID: -7803827816299839475
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NyanFootPrint_5
+      rect:
+        serializedVersion: 2
+        x: 1500
+        y: 0
+        width: 300
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cdb9764645b1b9860800000000000000
+      internalID: 7537648450610371548
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NyanFootPrint_6
+      rect:
+        serializedVersion: 2
+        x: 1800
+        y: 0
+        width: 300
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b1ffae1e3643809a0800000000000000
+      internalID: -6266701277889364197
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5f526c12180ddf645a3c302e6d9066ca
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":7.0,"y":1.0},"gridSpriteSize":{"x":300.0,"y":300.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":2,"keepEmptyRects":false,"isAlternate":false}'
+    nameFileIdTable:
+      NyanFootPrint_0: 7693972991751707193
+      NyanFootPrint_1: 5181869436768955628
+      NyanFootPrint_2: -941382571864529321
+      NyanFootPrint_3: -6614572324285989274
+      NyanFootPrint_4: -7803827816299839475
+      NyanFootPrint_5: 7537648450610371548
+      NyanFootPrint_6: -6266701277889364197
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

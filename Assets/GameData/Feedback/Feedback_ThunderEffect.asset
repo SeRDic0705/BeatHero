@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c29b80fe10bb514ba2511bf44e0e2db, type: 3}
+  m_Name: Feedback_ThunderEffect
+  m_EditorClassIdentifier: BeatHero::BeatHero.Data.CellEffectFeedback
+  activateSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
+  vfxFrames:
+  - {fileID: 6032972246876082220, guid: a29a15b176a2a67489ea2700cc27bb16, type: 3}
+  - {fileID: -7974334314510058712, guid: a29a15b176a2a67489ea2700cc27bb16, type: 3}
+  - {fileID: -7419469082364510714, guid: a29a15b176a2a67489ea2700cc27bb16, type: 3}
+  - {fileID: 4171446366699529209, guid: a29a15b176a2a67489ea2700cc27bb16, type: 3}
+  - {fileID: -8640275030725934787, guid: a29a15b176a2a67489ea2700cc27bb16, type: 3}
+  vfxFps: 24

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c29b80fe10bb514ba2511bf44e0e2db, type: 3}
+  m_Name: Feedback_SkullEffect
+  m_EditorClassIdentifier: BeatHero::BeatHero.Data.CellEffectFeedback
+  activateSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
+  vfxFrames:
+  - {fileID: 975995062621840166, guid: 501e6ebce007a644eb03102d264b3a41, type: 3}
+  - {fileID: 5525712137204338885, guid: 501e6ebce007a644eb03102d264b3a41, type: 3}
+  - {fileID: -6107777536446265344, guid: 501e6ebce007a644eb03102d264b3a41, type: 3}
+  - {fileID: 6696016089536163155, guid: 501e6ebce007a644eb03102d264b3a41, type: 3}
+  - {fileID: 9105069701358364474, guid: 501e6ebce007a644eb03102d264b3a41, type: 3}
+  - {fileID: -2347951934111891106, guid: 501e6ebce007a644eb03102d264b3a41, type: 3}
+  - {fileID: 1795710585263266816, guid: 501e6ebce007a644eb03102d264b3a41, type: 3}
+  vfxFps: 24

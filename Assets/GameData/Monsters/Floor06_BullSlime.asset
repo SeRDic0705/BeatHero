@@ -1,0 +1,99 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eafb6407f78f809479d56bab1d713889, type: 3}
+  m_Name: Floor06_BullSlime
+  m_EditorClassIdentifier: BeatHero::BeatHero.Data.NormalMonsterData
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects:
+    - {fileID: 11400000, guid: 3d798f6e495e4d14e8979b73b6b15233, type: 2}
+    - {fileID: 11400000, guid: 1a7fabcfbb0442b489b69c04fc1d23d2, type: 2}
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: effectFeedbacks
+      Entry: 7
+      Data: 0|System.Collections.Generic.Dictionary`2[[BeatHero.Data.CellEffect,
+        BeatHero],[BeatHero.Data.CellEffectFeedback, BeatHero]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 1|System.Collections.Generic.ObjectEqualityComparer`1[[BeatHero.Data.CellEffect,
+        BeatHero]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 10
+      Data: 0
+    - Name: $v
+      Entry: 10
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+  maxHp: 170
+  attackPower: 10
+  gridType: 0
+  idleClip: {fileID: 7400000, guid: 24c5d061ed8770b4cac6f618461d52e4, type: 2}
+  hurtClip: {fileID: 7400000, guid: 39e83921b6204994aa11a4a78c242508, type: 2}
+  deathClip: {fileID: 7400000, guid: 3ccd50e0835440740a12a1bf1223b728, type: 2}
+  deathSfx: {fileID: 8300000, guid: 8671b0c3114bde44590047299c823672, type: 3}
+  isRandom: 0
+  combatDialogues:
+  - text: "\uB098\uB294 \uB300\uCE6D \uC88B\uC544 \uD574\uC11C"
+    useInSequential: 1
+    useInRandom: 0
+  - text: "\uBC15\uC790 \uB9C8\uC800 \uCABC\uAC1C \uBD24\uC5B4"
+    useInSequential: 1
+    useInRandom: 0
+  - text: "\uD55C\uBC15 \uC790\uC5D0 \uB450\uBC88 \uC774\uB3D9"
+    useInSequential: 1
+    useInRandom: 0
+  - text: "\uACF5\uACA9 \uBB3C\uB860 \uAC00\uB2A5 \uD558\uC9C0!"
+    useInSequential: 1
+    useInRandom: 0
+  - text: "\uB300 \uCE6D \uC870 \uC544"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uCF69\uCF69 \uC9C4\uC9C4 \uD638\uD638"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uCEE4 \uD50C \uC2DC \uB7EC"
+    useInSequential: 0
+    useInRandom: 1
+  deathDialogue: 
+  bpm: 80
+  bgm: {fileID: 8300000, guid: 54328b57fe3264849820fa64d44d7893, type: 3}
+  patterns:
+  - {fileID: 11400000, guid: c2ab0b66af05a1b4bab5fb2c42bb2fe1, type: 2}
+  - {fileID: 11400000, guid: 36d0bd4ac51d4a942a799108104fbf64, type: 2}
+  - {fileID: 11400000, guid: 8df6101856f1b344a80caf7f6239704e, type: 2}
+  - {fileID: 11400000, guid: bc3f548368f75244cb3963245c1fc60e, type: 2}
+  - {fileID: 11400000, guid: 91e6059b4b2b3564881dac0a5780dc5e, type: 2}
+  - {fileID: 11400000, guid: c25e266615cd3aa4095f696fefcdbee1, type: 2}
+  - {fileID: 11400000, guid: 418c21e3c176beb42adab5ad6453eeb9, type: 2}
+  - {fileID: 11400000, guid: b1c689a29627e2a49924b04f8a524ee8, type: 2}
