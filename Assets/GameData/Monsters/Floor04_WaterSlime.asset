@@ -64,22 +64,31 @@ MonoBehaviour:
   deathSfx: {fileID: 8300000, guid: 8671b0c3114bde44590047299c823672, type: 3}
   isRandom: 0
   combatDialogues:
-  - text: 
+  - text: "\uB09C \uBE14\uB8E8 \uC2AC\uB77C\uC784."
     useInSequential: 1
     useInRandom: 0
-  - text: 
+  - text: "\uC544\uB798\uCE35\uC758 \uD5C8\uC811\uB4E4\uACFC\uB294"
     useInSequential: 1
     useInRandom: 0
-  - text: 
+  - text: "\uC0C9\uC774 \uB2E4\uB974\uC9C0!"
     useInSequential: 1
     useInRandom: 0
-  - text: 
+  - text: "\uBE48 \uD2C8\uC774 \uC5C6\uC744 \uAC70\uC57C."
     useInSequential: 1
     useInRandom: 0
-  - text: 
+  - text: "\uD558\uD558\uD558\uD558\uD558!"
     useInSequential: 1
     useInRandom: 0
-  deathDialogue: 
+  - text: "\uC774\uAC83\uB3C4 \uD53C\uD574 \uBD10\uB77C!"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uC815\uC2E0\uC5C6\uC9C0?"
+    useInSequential: 0
+    useInRandom: 1
+  - text: "\uB0A0 \uACF5\uACA9\uD560 \uC218 \uC788\uC744\uAE4C?"
+    useInSequential: 0
+    useInRandom: 1
+  deathDialogue: "\uB108....\uAC15\uD558\uC796\uC544....?"
   bpm: 100
   bgm: {fileID: 8300000, guid: 48d74d6669d144242a9210060ef68ef2, type: 3}
   patterns:

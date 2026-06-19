@@ -17,7 +17,7 @@ MonoBehaviour:
     SerializedBytes: 
     ReferencedUnityObjects:
     - {fileID: 11400000, guid: 3d798f6e495e4d14e8979b73b6b15233, type: 2}
-    - {fileID: 11400000, guid: 64b1abcacfc415b4095314a143449336, type: 2}
+    - {fileID: 11400000, guid: 89eea10caf9a1a848a1cbe2b58e1c5d7, type: 2}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -65,7 +65,7 @@ MonoBehaviour:
   isRandom: 1
   combatDialogues: []
   deathDialogue: 
-  bpm: 70
+  bpm: 140
   bgm: {fileID: 8300000, guid: 63c0d9f01fc5338478023355ae8b2e8a, type: 3}
   patterns:
   - {fileID: 11400000, guid: a778df39972ff474fbdba75076406de9, type: 2}

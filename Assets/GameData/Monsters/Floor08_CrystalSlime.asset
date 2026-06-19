@@ -73,19 +73,19 @@ MonoBehaviour:
   - text: "\uC2DD\uC744\uAE4C\uBD10"
     useInSequential: 1
     useInRandom: 0
-  - text: "\uB2E4\uAC00\uAC00\uC9C0\uB3C4 \uBABB\uD55C"
+  - text: "\uB2E4\uAC00\uAC00\uC9C0\uB3C4 \uBABB \uD55C"
     useInSequential: 1
     useInRandom: 0
-  - text: "\uB0B4... \uCC9C\uB144\uC758 \uC0AC\uB791\uC744."
+  - text: "\uB0B4... \uCC9C \uBC15\uC790\uC758 \uC0AC\uB791\uC744."
     useInSequential: 1
     useInRandom: 0
   - text: "\uAC00\uB9CC \uB450\uC9C0 \uC54A\uACA0\uC5B4."
     useInSequential: 1
     useInRandom: 0
-  - text: "\uC190\uB140\uAE4C\uC9C0 \uC0C1\uC0C1\uD588\uB294\uB370!"
+  - text: "\uC190\uB140 \uAE4C\uC9C0 \uC0C1\uC0C1\uD588\uB294\uB370!"
     useInSequential: 0
     useInRandom: 1
-  - text: "\uBCF5\uC218\uD574\uC8FC\uB9C8..."
+  - text: "\uBCF5\uC218 \uD574\uC8FC\uB9C8..."
     useInSequential: 0
     useInRandom: 1
   - text: "\uC808\uB300 \uC6A9\uC11C \uC548 \uD574..!!"
@@ -99,3 +99,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1a9413a988ac9b94982a268a2d3cb8eb, type: 2}
   - {fileID: 11400000, guid: 493b79a74d2ba1840a0e12864a2bb95d, type: 2}
   - {fileID: 11400000, guid: 7ce85b4bcc4ec264c9aff2b1a794d514, type: 2}
+  - {fileID: 11400000, guid: fc7620ad3b8b48843b7b4a1c03cff93c, type: 2}
+  - {fileID: 11400000, guid: dfe24db91de3bc74b8e2e9215f9ae9df, type: 2}
