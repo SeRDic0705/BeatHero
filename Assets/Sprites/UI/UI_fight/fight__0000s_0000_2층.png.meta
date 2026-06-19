@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 84392fb045ae7194a80b32d61e2ba58c
+guid: 961ac6a3d4e34bc4ab8b4181eeec2a38
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1955448553306655712
-    second: Background_0
+      213: 7732092360568765858
+    second: "fight__0000s_0000_2\uCE35_0"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Background_0
+      name: "fight__0000s_0000_2\uCE35_0"
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1920
-        height: 1080
+        width: 360
+        height: 111
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 024fa93b6e9dcd4e0800000000000000
-      internalID: -1955448553306655712
+      spriteID: 2ad763a1909ed4b60800000000000000
+      internalID: 7732092360568765858
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Background_0: -1955448553306655712
+      "fight__0000s_0000_2\uCE35_0": 7732092360568765858
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
