@@ -14,7 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: BeatHero::BeatHero.Data.CellEffectFeedback
   activateSfx: {fileID: 8300000, guid: 02c259cf2f86ef74091de68d20d9ca3a, type: 3}
   vfxFrames:
-  - {fileID: 975995062621840166, guid: 501e6ebce007a644eb03102d264b3a41, type: 3}
   - {fileID: 5525712137204338885, guid: 501e6ebce007a644eb03102d264b3a41, type: 3}
   - {fileID: -6107777536446265344, guid: 501e6ebce007a644eb03102d264b3a41, type: 3}
   - {fileID: 6696016089536163155, guid: 501e6ebce007a644eb03102d264b3a41, type: 3}
