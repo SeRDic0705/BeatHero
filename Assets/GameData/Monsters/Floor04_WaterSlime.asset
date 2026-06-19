@@ -55,8 +55,8 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  maxHp: 60
-  attackPower: 5
+  maxHp: 90
+  attackPower: 3
   gridType: 0
   idleClip: {fileID: 7400000, guid: ee14fbb103b30dc48a2ed3e6010c6e80, type: 2}
   hurtClip: {fileID: 7400000, guid: 7e8c2ad9164bd49499889818d1809a99, type: 2}
@@ -73,10 +73,13 @@ MonoBehaviour:
   - text: "\uC0C9\uC774 \uB2E4\uB974\uC9C0!"
     useInSequential: 1
     useInRandom: 0
-  - text: "\uBE48 \uD2C8\uC774 \uC5C6\uC744 \uAC70\uC57C."
+  - text: "\uADF8\uB7EC\uB2C8... \uD78C\uD2B8\uB2E4."
     useInSequential: 1
     useInRandom: 0
-  - text: "\uD558\uD558\uD558\uD558\uD558!"
+  - text: "\uC544\uC2AC\uC544\uC2AC\uD558\uAC8C \uD53C\uD558\uBA74"
+    useInSequential: 1
+    useInRandom: 0
+  - text: "\uB9C8\uB098\uAC00 \uB450 \uBC30\uB85C \uCC2C\uB2E4."
     useInSequential: 1
     useInRandom: 0
   - text: "\uC774\uAC83\uB3C4 \uD53C\uD574 \uBD10\uB77C!"

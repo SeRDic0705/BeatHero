@@ -55,14 +55,14 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  maxHp: 80
+  maxHp: 100
   attackPower: 5
   gridType: 0
   idleClip: {fileID: 7400000, guid: 6ebc593be6e4f8e4fbba2a319bbbd2ec, type: 2}
   hurtClip: {fileID: 7400000, guid: 2c1210f696fc6844aae3cb364b410bd4, type: 2}
   deathClip: {fileID: 7400000, guid: 605ba141440d5724199bd8e26b1604e8, type: 2}
   deathSfx: {fileID: 8300000, guid: 8671b0c3114bde44590047299c823672, type: 3}
-  isRandom: 1
+  isRandom: 0
   combatDialogues:
   - text: "\uB0E5? \uB0E5\uB0E5!"
     useInSequential: 1
@@ -104,9 +104,7 @@ MonoBehaviour:
   bpm: 120
   bgm: {fileID: 8300000, guid: 73937ce65d2838e4ab1136fb46b2b2ea, type: 3}
   patterns:
-  - {fileID: 11400000, guid: a778df39972ff474fbdba75076406de9, type: 2}
-  - {fileID: 11400000, guid: 3385c4cc96f5c634c92848c46e512c0f, type: 2}
-  - {fileID: 11400000, guid: e536ded63d7ea5646ae5565c5841d373, type: 2}
-  - {fileID: 11400000, guid: b3a9ae81c0eef8b479a13c73698d1016, type: 2}
-  - {fileID: 11400000, guid: b8703b8bcea427243a0ac2eaaa8e64ad, type: 2}
-  - {fileID: 11400000, guid: 136578af829518249909b09ebc5b8043, type: 2}
+  - {fileID: 11400000, guid: f5e0742c2af0aaf4c84d61acd8878f3f, type: 2}
+  - {fileID: 11400000, guid: 6c9bada614acf2d428d0835422d77ee0, type: 2}
+  - {fileID: 11400000, guid: 5c16866e35230b64e88680d502201bf7, type: 2}
+  - {fileID: 11400000, guid: ba680968d4251f04fa91e3ced9b8a29c, type: 2}
