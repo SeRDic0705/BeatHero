@@ -12,10 +12,12 @@ namespace BeatHero.Combat
     // 의존: Conductor, GridManager, PatternPlayer, PlayerController, PlayerConfig, InputReader
     public class BattleStateMachine : MonoBehaviour
     {
-        private const int   BEATS_PER_PHASE      = 4;
-        private const float CHARGE_MULT_PER_BEAT = 0.5f;
-        private const int   MANA_GAIN_MOVE       = 1; // 일반 이동 시 획득
-        private const int   MANA_GAIN_DODGE      = 2; // 회피(위험 타일에서 이동) 시 획득
+        private const int   BEATS_PER_PHASE = 4;
+        private const int   MANA_GAIN_MOVE  = 1; // 일반 이동 시 획득
+        private const int   MANA_GAIN_DODGE = 2; // 회피(위험 타일에서 이동) 시 획득
+
+        [Header("Charge Attack")]
+        [SerializeField] private float _chargeMultPerBeat = 0.5f;   // 차지 유지 1박당 데미지 배율 증가량
 
         [Header("Input Timing")]
         [SerializeField] private float _judgmentWindowSec = 0.021f; // 판정구간 반폭 (비트 전후 각각)
@@ -262,7 +264,12 @@ namespace BeatHero.Combat
 
                 if (preAttackJudge)
                 {
-                    if (_attackKeyDown && _player.Mana > 0) { _attackHeld = true; _playerAnim?.SetChargeStage(1); }
+                    if (_attackKeyDown && _player.SpendMana(1))
+                    {
+                        _attackHeld = true;
+                        _chargeBeats++;
+                        _playerAnim?.SetChargeStage(1);
+                    }
                     else if (!_attackKeyDown) FireAttack();
                 }
 
@@ -286,7 +293,6 @@ namespace BeatHero.Combat
                 {
                     if (_player.SpendMana(1))
                     {
-                        _chargeDamageMultiplier += CHARGE_MULT_PER_BEAT;
                         _chargeBeats++;
                         _playerAnim?.SetChargeStage(Mathf.Min(_chargeBeats, 3) + 1);
                     }
@@ -500,9 +506,10 @@ namespace BeatHero.Combat
             // 윈도우가 열린 구간에서만 첫 입력 처리 후 슬롯 소진
             if (!_inputWindowOpen) return;
             if (_beatInputConsumed) return;
-            if (_player.Mana <= 0) return; // 마나 부족 시 차지 시작 불가
+            if (!_player.SpendMana(1)) return; // 마나 부족 시 차지 시작 불가, 첫 비트 마나 소모
             _beatInputConsumed = true;
             _attackHeld = true;
+            _chargeBeats++;
             _playerAnim?.SetChargeStage(1);
         }
 
@@ -523,6 +530,7 @@ namespace BeatHero.Combat
             // 유효 구간 안이면 즉시 발동 — window-close 대기 없이 SFX·HP 반영
             if (_inputWindowOpen)
             {
+                _beatInputConsumed = true; // 릴리즈 즉시 슬롯 닫아 이동 중복 방지
                 FireAttack();
                 return;
             }
@@ -536,12 +544,14 @@ namespace BeatHero.Combat
 
         private void FireAttack()
         {
-            // 차지 공격(multiplier > 1)은 유지 중 이미 마나를 지불했으므로 추가 비용 없음
-            // 탭 공격(multiplier = 1)은 기존대로 마나 1 소비
-            if (_chargeDamageMultiplier <= 1f && !_player.SpendMana(1)) return;
+            // 탭 공격(차지 0단계): 여기서 마나 1 소비, 기본 공격력
+            // 차지 공격: 시작/유지 비트에서 이미 마나 소비 → (공격력 + 차지배율) × 차지단계
+            if (_chargeBeats == 0 && !_player.SpendMana(1)) return;
             _hasPendingMove = false; // 공격 발동 → 같은 비트 이동 무효
             _playerAnim?.TriggerAttack();
-            int dmg = Mathf.RoundToInt(_playerConfig.attackPower * _chargeDamageMultiplier);
+            int dmg = _chargeBeats > 0
+                ? Mathf.RoundToInt(_playerConfig.attackPower * (1 + _chargeMultPerBeat) * _chargeBeats)
+                : _playerConfig.attackPower;
             _monsterHp = Mathf.Max(0, _monsterHp - dmg);
             OnMonsterHpChanged?.Invoke(_monsterHp, _monster.maxHp);
             OnMonsterHit?.Invoke(_monsterHp <= 0);
