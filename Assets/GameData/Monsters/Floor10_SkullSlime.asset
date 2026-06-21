@@ -55,8 +55,8 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  maxHp: 200
-  attackPower: 7
+  maxHp: 100
+  attackPower: 3
   gridType: 0
   idleClip: {fileID: 7400000, guid: 74ef2b70c24f0054081858716067a163, type: 2}
   hurtClip: {fileID: 7400000, guid: 8ffb6b1c37bde1d408667647df87ba3b, type: 2}
