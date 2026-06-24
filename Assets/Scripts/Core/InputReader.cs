@@ -10,8 +10,9 @@ namespace BeatHero.Core
         public static InputReader Instance { get; private set; }
 
         public event Action<Vector2> OnMoveInput;
-        public event Action OnAttackPressed;
-        public event Action OnAttackReleased;
+        public event Action OnBasicAttackPressed;
+        public event Action OnChargeAttackPressed;
+        public event Action OnChargeAttackReleased;
         public event Action OnPausePressed;
 
         private InputSystem_Actions _actions;
@@ -44,10 +45,15 @@ namespace BeatHero.Core
         void InputSystem_Actions.IGameActions.OnMove(InputAction.CallbackContext ctx)
             => OnMoveInput?.Invoke(ctx.ReadValue<Vector2>());
 
-        void InputSystem_Actions.IGameActions.OnAttack(InputAction.CallbackContext ctx)
+        void InputSystem_Actions.IGameActions.OnBasicAttack(InputAction.CallbackContext ctx)
         {
-            if (ctx.started) OnAttackPressed?.Invoke();
-            if (ctx.canceled) OnAttackReleased?.Invoke();
+            if (ctx.started) OnBasicAttackPressed?.Invoke();
+        }
+
+        void InputSystem_Actions.IGameActions.OnChargeAttack(InputAction.CallbackContext ctx)
+        {
+            if (ctx.started) OnChargeAttackPressed?.Invoke();
+            if (ctx.canceled) OnChargeAttackReleased?.Invoke();
         }
 
         void InputSystem_Actions.IGameActions.OnPause(InputAction.CallbackContext ctx)

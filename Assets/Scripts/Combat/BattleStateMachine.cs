@@ -22,7 +22,6 @@ namespace BeatHero.Combat
         [Header("Input Timing")]
         [SerializeField] private float _judgmentWindowSec = 0.021f; // 판정구간 반폭 (비트 전후 각각)
         [SerializeField] private float _failZoneSec       = 0.021f; // 판정 실패구간 반폭 (판정구간 바깥)
-        [SerializeField] private float _tapGraceSec       = 0.15f;  // 탭 릴리즈 유예 (새 프레스 한정)
 
         [Header("Audio")]
         [SerializeField] private AudioClip _callBeatSfx;
@@ -78,12 +77,12 @@ namespace BeatHero.Combat
         private bool    _hasPendingMove;
 
         // 비트 전 선행 입력 버퍼 + 소진 플래그 (타임스탬프는 DSP 기준 — Time.time 미사용)
-        private double  _lastMoveTime          = -1.0;
+        private double  _lastMoveTime               = -1.0;
         private Vector2 _lastMoveDir;
-        private double  _lastAttackPressTime   = -1.0;
-        private double  _lastAttackReleaseTime = -1.0;
-        private double  _tapGraceEndTime       = -1.0;
-        private bool    _attackKeyDown;      // 공격 키가 물리적으로 눌린 상태
+        private double  _lastBasicAttackPressTime   = -1.0;
+        private double  _lastAttackPressTime        = -1.0;
+        private double  _lastAttackReleaseTime      = -1.0;
+        private bool    _chargeKeyDown;      // K키가 물리적으로 눌린 상태
         private bool    _beatInputConsumed;  // true면 이번 비트 추가 입력 무시
 
         private void Awake()
@@ -96,9 +95,10 @@ namespace BeatHero.Combat
 
         private void Start()
         {
-            _input.OnMoveInput      += OnMoveInput;
-            _input.OnAttackPressed  += OnAttackPressed;
-            _input.OnAttackReleased += OnAttackReleased;
+            _input.OnMoveInput           += OnMoveInput;
+            _input.OnBasicAttackPressed  += OnBasicAttackPressed;
+            _input.OnChargeAttackPressed  += OnChargeAttackPressed;
+            _input.OnChargeAttackReleased += OnChargeAttackReleased;
         }
 
         private void OnDestroy()
@@ -109,9 +109,10 @@ namespace BeatHero.Combat
             _player.OnDeath      -= OnPlayerDeath;
             if (_input != null)
             {
-                _input.OnMoveInput      -= OnMoveInput;
-                _input.OnAttackPressed  -= OnAttackPressed;
-                _input.OnAttackReleased -= OnAttackReleased;
+                _input.OnMoveInput            -= OnMoveInput;
+                _input.OnBasicAttackPressed   -= OnBasicAttackPressed;
+                _input.OnChargeAttackPressed  -= OnChargeAttackPressed;
+                _input.OnChargeAttackReleased -= OnChargeAttackReleased;
             }
         }
 
@@ -241,40 +242,46 @@ namespace BeatHero.Combat
                 double preJudgStart = beatTime - _judgmentWindowSec;
                 double preFailStart = preJudgStart - _failZoneSec;
 
-                if (_attackHeld && !_attackKeyDown)
+                if (_attackHeld && !_chargeKeyDown)
                 {
                     bool inPreBuffer = _lastAttackReleaseTime >= preJudgStart;
-                    bool inTapGrace  = _tapGraceEndTime > 0f && _lastAttackReleaseTime <= _tapGraceEndTime;
-                    if (inPreBuffer || inTapGrace) FireAttack();
+                    if (inPreBuffer) FireAttack();
                     else CancelCharge();
                     _lastAttackReleaseTime = -1f;
-                    _tapGraceEndTime       = -1f;
                 }
 
-                bool preMoveJudge   = _lastMoveTime >= preJudgStart;
-                bool preMovesFail   = !preMoveJudge && _lastMoveTime >= preFailStart;
-                bool preAttackJudge = _lastAttackPressTime >= preJudgStart;
-                bool preAttackFail  = !preAttackJudge && _lastAttackPressTime >= preFailStart;
+                bool preMoveJudge        = _lastMoveTime >= preJudgStart;
+                bool preMovesFail        = !preMoveJudge && _lastMoveTime >= preFailStart;
+                bool preBasicAttackJudge = _lastBasicAttackPressTime >= preJudgStart;
+                bool preBasicAttackFail  = !preBasicAttackJudge && _lastBasicAttackPressTime >= preFailStart;
+                bool preChargeJudge      = _lastAttackPressTime >= preJudgStart;
+                bool preChargeFail       = !preChargeJudge && _lastAttackPressTime >= preFailStart;
 
                 bool continuingCharge = _attackHeld;
 
-                _beatInputConsumed = preMoveJudge || preMovesFail || preAttackJudge || preAttackFail;
+                _beatInputConsumed = preMoveJudge || preMovesFail || preBasicAttackJudge || preBasicAttackFail || preChargeJudge || preChargeFail;
                 _hasPendingMove    = preMoveJudge;
                 _pendingMove       = preMoveJudge ? _lastMoveDir : Vector2.zero;
 
-                if (preAttackJudge)
+                if (preBasicAttackJudge && !_attackHeld)
                 {
-                    if (_attackKeyDown && _player.SpendMana(1))
+                    _beatInputConsumed = true;
+                    FireAttack(); // _chargeBeats == 0 → 기본공격, FireAttack 내에서 마나 소모
+                }
+                else if (preChargeJudge)
+                {
+                    if (_chargeKeyDown && _player.SpendMana(1))
                     {
                         _attackHeld = true;
                         _chargeBeats++;
                         _playerAnim?.SetChargeStage(1);
                     }
-                    else if (!_attackKeyDown) FireAttack();
+                    // K키가 이미 릴리즈됐으면 무시 (차지는 홀드 필수)
                 }
 
-                _lastMoveTime        = -1.0;
-                _lastAttackPressTime = -1.0;
+                _lastMoveTime             = -1.0;
+                _lastAttackPressTime      = -1.0;
+                _lastBasicAttackPressTime = -1.0;
 
                 _tileWasDangerAtWindowOpen = _grid.GetDangerAt(_grid.PlayerPosition) != null;
                 _inputWindowOpen = true;
@@ -285,18 +292,15 @@ namespace BeatHero.Combat
                 _inputWindowOpen   = false;
                 _beatInputConsumed = false;
 
-                if (_attackHeld && !_attackKeyDown)
+                if (_attackHeld && !_chargeKeyDown)
                     FireAttack();
-                else if (!continuingCharge && _attackHeld && _attackKeyDown)
-                    _tapGraceEndTime = AudioSettings.dspTime + _tapGraceSec;
-                else if (continuingCharge && _attackHeld && _attackKeyDown)
+                else if (_attackHeld && _chargeKeyDown)
                 {
                     if (_player.SpendMana(1))
                     {
                         _chargeBeats++;
                         _playerAnim?.SetChargeStage(Mathf.Min(_chargeBeats, 3) + 1);
                     }
-                    _tapGraceEndTime = -1f;
                 }
 
                 if (_hasPendingMove) ProcessMovement(_pendingMove);
@@ -495,27 +499,38 @@ namespace BeatHero.Combat
             _hasPendingMove = true;
         }
 
-        private void OnAttackPressed()
+        private void OnBasicAttackPressed()
         {
-            _attackKeyDown = true;
             if (_state != State.ResponsePhase) return;
+            if (_attackHeld) return; // 차지 중 기본공격 무시
 
-            // 버퍼는 항상 최신 입력으로 갱신
-            _lastAttackPressTime = AudioSettings.dspTime;
+            _lastBasicAttackPressTime = AudioSettings.dspTime;
 
-            // 윈도우가 열린 구간에서만 첫 입력 처리 후 슬롯 소진
             if (!_inputWindowOpen) return;
             if (_beatInputConsumed) return;
-            if (!_player.SpendMana(1)) return; // 마나 부족 시 차지 시작 불가, 첫 비트 마나 소모
+            _beatInputConsumed = true;
+            FireAttack(); // _chargeBeats == 0 → 기본공격, 마나는 FireAttack 내에서 소모
+        }
+
+        private void OnChargeAttackPressed()
+        {
+            _chargeKeyDown = true;
+            if (_state != State.ResponsePhase) return;
+
+            _lastAttackPressTime = AudioSettings.dspTime;
+
+            if (!_inputWindowOpen) return;
+            if (_beatInputConsumed) return;
+            if (!_player.SpendMana(1)) return;
             _beatInputConsumed = true;
             _attackHeld = true;
             _chargeBeats++;
             _playerAnim?.SetChargeStage(1);
         }
 
-        private void OnAttackReleased()
+        private void OnChargeAttackReleased()
         {
-            _attackKeyDown = false;
+            _chargeKeyDown = false;
             if (!_attackHeld) return;
 
             _lastAttackReleaseTime = AudioSettings.dspTime;
@@ -527,19 +542,13 @@ namespace BeatHero.Combat
                 return;
             }
 
-            // 유효 구간 안이면 즉시 발동 — window-close 대기 없이 SFX·HP 반영
             if (_inputWindowOpen)
             {
-                _beatInputConsumed = true; // 릴리즈 즉시 슬롯 닫아 이동 중복 방지
+                _beatInputConsumed = true;
                 FireAttack();
                 return;
             }
-            if (_tapGraceEndTime > 0.0 && AudioSettings.dspTime <= _tapGraceEndTime)
-            {
-                FireAttack();
-                return;
-            }
-            // 그 외: 다음 비트 pre-buffer 또는 window-close 안전망에서 처리
+            // 유예 구간 없음 — pre-buffer에서만 처리
         }
 
         private void FireAttack()
@@ -585,7 +594,6 @@ namespace BeatHero.Combat
             _chargeBeats            = 0;
             _chargeDamageMultiplier = 1f;
             _lastAttackReleaseTime  = -1f;
-            _tapGraceEndTime        = -1f;
             _playerAnim?.SetChargeStage(0);
         }
 
