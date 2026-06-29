@@ -104,9 +104,18 @@ namespace BeatHero.Core
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""Attack"",
+                    ""name"": ""BasicAttack"",
                     ""type"": ""Button"",
-                    ""id"": ""6c2ab1b8-8984-453a-af3d-a3c78ae1679a"",
+                    ""id"": ""a7f23d12-bc45-6789-ef01-234567890abc"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ChargeAttack"",
+                    ""type"": ""Button"",
+                    ""id"": ""b8e34f23-cd56-789a-f012-34567890bcde"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -257,23 +266,23 @@ namespace BeatHero.Core
                 },
                 {
                     ""name"": """",
-                    ""id"": ""b3c1c7f0-bd20-4ee7-a0f1-899b24bca6d7"",
-                    ""path"": ""<Keyboard>/enter"",
+                    ""id"": ""c9f45a34-de67-89ab-0123-4567890cdef0"",
+                    ""path"": ""<Keyboard>/j"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Attack"",
+                    ""action"": ""BasicAttack"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""23df1a46-2d7c-491b-8ce1-d1115592599b"",
-                    ""path"": ""<Keyboard>/space"",
+                    ""id"": ""da056b45-ef78-9abc-1234-567890def012"",
+                    ""path"": ""<Keyboard>/k"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Attack"",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ChargeAttack"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -873,7 +882,8 @@ namespace BeatHero.Core
             // Game
             m_Game = asset.FindActionMap("Game", throwIfNotFound: true);
             m_Game_Move = m_Game.FindAction("Move", throwIfNotFound: true);
-            m_Game_Attack = m_Game.FindAction("Attack", throwIfNotFound: true);
+            m_Game_BasicAttack = m_Game.FindAction("BasicAttack", throwIfNotFound: true);
+            m_Game_ChargeAttack = m_Game.FindAction("ChargeAttack", throwIfNotFound: true);
             m_Game_Pause = m_Game.FindAction("Pause", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
@@ -969,7 +979,8 @@ namespace BeatHero.Core
         private readonly InputActionMap m_Game;
         private List<IGameActions> m_GameActionsCallbackInterfaces = new List<IGameActions>();
         private readonly InputAction m_Game_Move;
-        private readonly InputAction m_Game_Attack;
+        private readonly InputAction m_Game_BasicAttack;
+        private readonly InputAction m_Game_ChargeAttack;
         private readonly InputAction m_Game_Pause;
         /// <summary>
         /// Provides access to input actions defined in input action map "Game".
@@ -987,9 +998,13 @@ namespace BeatHero.Core
             /// </summary>
             public InputAction @Move => m_Wrapper.m_Game_Move;
             /// <summary>
-            /// Provides access to the underlying input action "Game/Attack".
+            /// Provides access to the underlying input action "Game/BasicAttack".
             /// </summary>
-            public InputAction @Attack => m_Wrapper.m_Game_Attack;
+            public InputAction @BasicAttack => m_Wrapper.m_Game_BasicAttack;
+            /// <summary>
+            /// Provides access to the underlying input action "Game/ChargeAttack".
+            /// </summary>
+            public InputAction @ChargeAttack => m_Wrapper.m_Game_ChargeAttack;
             /// <summary>
             /// Provides access to the underlying input action "Game/Pause".
             /// </summary>
@@ -1023,9 +1038,12 @@ namespace BeatHero.Core
                 @Move.started += instance.OnMove;
                 @Move.performed += instance.OnMove;
                 @Move.canceled += instance.OnMove;
-                @Attack.started += instance.OnAttack;
-                @Attack.performed += instance.OnAttack;
-                @Attack.canceled += instance.OnAttack;
+                @BasicAttack.started += instance.OnBasicAttack;
+                @BasicAttack.performed += instance.OnBasicAttack;
+                @BasicAttack.canceled += instance.OnBasicAttack;
+                @ChargeAttack.started += instance.OnChargeAttack;
+                @ChargeAttack.performed += instance.OnChargeAttack;
+                @ChargeAttack.canceled += instance.OnChargeAttack;
                 @Pause.started += instance.OnPause;
                 @Pause.performed += instance.OnPause;
                 @Pause.canceled += instance.OnPause;
@@ -1043,9 +1061,12 @@ namespace BeatHero.Core
                 @Move.started -= instance.OnMove;
                 @Move.performed -= instance.OnMove;
                 @Move.canceled -= instance.OnMove;
-                @Attack.started -= instance.OnAttack;
-                @Attack.performed -= instance.OnAttack;
-                @Attack.canceled -= instance.OnAttack;
+                @BasicAttack.started -= instance.OnBasicAttack;
+                @BasicAttack.performed -= instance.OnBasicAttack;
+                @BasicAttack.canceled -= instance.OnBasicAttack;
+                @ChargeAttack.started -= instance.OnChargeAttack;
+                @ChargeAttack.performed -= instance.OnChargeAttack;
+                @ChargeAttack.canceled -= instance.OnChargeAttack;
                 @Pause.started -= instance.OnPause;
                 @Pause.performed -= instance.OnPause;
                 @Pause.canceled -= instance.OnPause;
@@ -1357,12 +1378,19 @@ namespace BeatHero.Core
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnMove(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "Attack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "BasicAttack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnAttack(InputAction.CallbackContext context);
+            void OnBasicAttack(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "ChargeAttack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnChargeAttack(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "Pause" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
