@@ -15,6 +15,7 @@ namespace BeatHero.Player
 
         [SerializeField] private Animator          _animator;
         [SerializeField] private ChargeAuraEffect  _chargeAura;
+        [SerializeField] private BlockShieldEffect _blockShield;
 
         private void Awake()
         {
@@ -37,6 +38,10 @@ namespace BeatHero.Player
         public void TriggerFinalAttack() => _animator.SetTrigger(FinalAtkHash);
         public void TriggerHurt()        => _animator.SetTrigger(HurtHash);
 
+        public void TriggerBlock()        => _blockShield?.ShowReady();
+        public void TriggerBlockAbsorb()  => _blockShield?.PlayAbsorb();
+        public void ClearBlock()          => _blockShield?.Hide();
+
         public void TriggerDeath()
         {
             // 사망 시 미소비 트리거를 모두 클리어해서 Death → Hurt 오전환 방지
@@ -56,6 +61,7 @@ namespace BeatHero.Player
             _animator.ResetTrigger(AttackHash);
             _animator.ResetTrigger(FinalAtkHash);
             _chargeAura?.SetStage(0);
+            _blockShield?.Hide();
             // Death 상태에서 Idle로 가는 트랜지션이 없으므로 강제 점프
             _animator.Play(IdleHash, 0, 0f);
         }

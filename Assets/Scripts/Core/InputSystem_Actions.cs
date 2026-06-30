@@ -129,6 +129,15 @@ namespace BeatHero.Core
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Block"",
+                    ""type"": ""Button"",
+                    ""id"": ""ec34a567-f890-1234-ab56-78901234cdef"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -294,6 +303,17 @@ namespace BeatHero.Core
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Pause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fd45b678-9012-3456-bc78-90123456ef01"",
+                    ""path"": ""<Keyboard>/l"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Block"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -885,6 +905,7 @@ namespace BeatHero.Core
             m_Game_BasicAttack = m_Game.FindAction("BasicAttack", throwIfNotFound: true);
             m_Game_ChargeAttack = m_Game.FindAction("ChargeAttack", throwIfNotFound: true);
             m_Game_Pause = m_Game.FindAction("Pause", throwIfNotFound: true);
+            m_Game_Block = m_Game.FindAction("Block", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -982,6 +1003,7 @@ namespace BeatHero.Core
         private readonly InputAction m_Game_BasicAttack;
         private readonly InputAction m_Game_ChargeAttack;
         private readonly InputAction m_Game_Pause;
+        private readonly InputAction m_Game_Block;
         /// <summary>
         /// Provides access to input actions defined in input action map "Game".
         /// </summary>
@@ -1009,6 +1031,10 @@ namespace BeatHero.Core
             /// Provides access to the underlying input action "Game/Pause".
             /// </summary>
             public InputAction @Pause => m_Wrapper.m_Game_Pause;
+            /// <summary>
+            /// Provides access to the underlying input action "Game/Block".
+            /// </summary>
+            public InputAction @Block => m_Wrapper.m_Game_Block;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -1047,6 +1073,9 @@ namespace BeatHero.Core
                 @Pause.started += instance.OnPause;
                 @Pause.performed += instance.OnPause;
                 @Pause.canceled += instance.OnPause;
+                @Block.started += instance.OnBlock;
+                @Block.performed += instance.OnBlock;
+                @Block.canceled += instance.OnBlock;
             }
 
             /// <summary>
@@ -1070,6 +1099,9 @@ namespace BeatHero.Core
                 @Pause.started -= instance.OnPause;
                 @Pause.performed -= instance.OnPause;
                 @Pause.canceled -= instance.OnPause;
+                @Block.started -= instance.OnBlock;
+                @Block.performed -= instance.OnBlock;
+                @Block.canceled -= instance.OnBlock;
             }
 
             /// <summary>
@@ -1398,6 +1430,13 @@ namespace BeatHero.Core
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnPause(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Block" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnBlock(InputAction.CallbackContext context);
         }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

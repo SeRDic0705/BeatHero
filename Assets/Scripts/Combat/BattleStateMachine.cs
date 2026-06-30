@@ -19,6 +19,9 @@ namespace BeatHero.Combat
         [Header("Charge Attack")]
         [SerializeField] private float _chargeMultPerBeat = 0.5f;   // 차지 유지 1박당 데미지 배율 증가량
 
+        [Header("Block")]
+        [SerializeField] private int _blockManaCost = 1;
+
         [Header("Input Timing")]
         [SerializeField] private float _judgmentWindowSec = 0.021f; // 판정구간 반폭 (비트 전후 각각)
         [SerializeField] private float _failZoneSec       = 0.021f; // 판정 실패구간 반폭 (판정구간 바깥)
@@ -40,6 +43,7 @@ namespace BeatHero.Combat
         public event System.Action<int, int> OnMonsterHpChanged; // (current, max)
         public event System.Action<double, bool> OnBeatUnitFired; // beatDurationSec, hasGridEffect
         public event System.Action OnEffectiveBeatFired; // ResponsePhase + gridEffectShape != null 인 비트만
+        public event System.Action OnPlayerBlockAbsorbed; // 방어로 피해를 흡수한 순간
         public event System.Action<bool> OnMonsterHit;   // 플레이어 공격이 몬스터에 데미지를 입혔을 때 (isLethal = 이 타격으로 HP가 0이 됨)
         public event System.Action OnMonsterDefeated;     // 데미지로 몬스터 HP가 0이 된 순간(프레이즈 즉시 종료 직전)
         public event System.Action<CellEffectFeedback, Vector3> OnMonsterCellEffectFired;
@@ -82,6 +86,8 @@ namespace BeatHero.Combat
         private double  _lastBasicAttackPressTime   = -1.0;
         private double  _lastAttackPressTime        = -1.0;
         private double  _lastAttackReleaseTime      = -1.0;
+        private double  _lastBlockPressTime         = -1.0;
+        private bool    _blockActive;        // 이번 박자 JudgeTile에서 피해 무효화 예약
         private bool    _chargeKeyDown;      // K키가 물리적으로 눌린 상태
         private bool    _beatInputConsumed;  // true면 이번 비트 추가 입력 무시
 
@@ -99,6 +105,7 @@ namespace BeatHero.Combat
             _input.OnBasicAttackPressed  += OnBasicAttackPressed;
             _input.OnChargeAttackPressed  += OnChargeAttackPressed;
             _input.OnChargeAttackReleased += OnChargeAttackReleased;
+            _input.OnBlockPressed        += OnBlockPressed;
         }
 
         private void OnDestroy()
@@ -113,6 +120,7 @@ namespace BeatHero.Combat
                 _input.OnBasicAttackPressed   -= OnBasicAttackPressed;
                 _input.OnChargeAttackPressed  -= OnChargeAttackPressed;
                 _input.OnChargeAttackReleased -= OnChargeAttackReleased;
+                _input.OnBlockPressed         -= OnBlockPressed;
             }
         }
 
@@ -256,10 +264,13 @@ namespace BeatHero.Combat
                 bool preBasicAttackFail  = !preBasicAttackJudge && _lastBasicAttackPressTime >= preFailStart;
                 bool preChargeJudge      = _lastAttackPressTime >= preJudgStart;
                 bool preChargeFail       = !preChargeJudge && _lastAttackPressTime >= preFailStart;
+                bool preBlockJudge       = _lastBlockPressTime >= preJudgStart;
+                bool preBlockFail        = !preBlockJudge && _lastBlockPressTime >= preFailStart;
 
                 bool continuingCharge = _attackHeld;
 
-                _beatInputConsumed = preMoveJudge || preMovesFail || preBasicAttackJudge || preBasicAttackFail || preChargeJudge || preChargeFail;
+                _beatInputConsumed = preMoveJudge || preMovesFail || preBasicAttackJudge || preBasicAttackFail
+                                   || preChargeJudge || preChargeFail || preBlockJudge || preBlockFail;
                 _hasPendingMove    = preMoveJudge;
                 _pendingMove       = preMoveJudge ? _lastMoveDir : Vector2.zero;
 
@@ -278,10 +289,16 @@ namespace BeatHero.Combat
                     }
                     // K키가 이미 릴리즈됐으면 무시 (차지는 홀드 필수)
                 }
+                else if (preBlockJudge && !_attackHeld)
+                {
+                    _beatInputConsumed = true;
+                    TryActivateBlock();
+                }
 
                 _lastMoveTime             = -1.0;
                 _lastAttackPressTime      = -1.0;
                 _lastBasicAttackPressTime = -1.0;
+                _lastBlockPressTime       = -1.0;
 
                 _tileWasDangerAtWindowOpen = _grid.GetDangerAt(_grid.PlayerPosition) != null;
                 _inputWindowOpen = true;
@@ -339,17 +356,26 @@ namespace BeatHero.Combat
 
         private void JudgeTile()
         {
+            bool blocked = _blockActive;
+            _blockActive = false;
+
             // 장애물 위에 있으면 데미지
             foreach (var h in _hazards)
                 if (h.Position == _grid.PlayerPosition)
                 {
+                    if (blocked) { FireBlockAbsorbFeedback(); return; }
                     _player.TakeDamage(CalcMonsterDamage());
                     if (_attackHeld) CancelCharge(); // 피격 시 차지 취소
                     return;
                 }
 
             var effect = _grid.GetDangerAt(_grid.PlayerPosition);
-            if (effect == null) return;
+            if (effect == null)
+            {
+                if (blocked) _playerAnim?.ClearBlock();
+                return;
+            }
+            if (blocked) { FireBlockAbsorbFeedback(); return; }
 
             if (effect is DamageEffect)
             {
@@ -549,6 +575,34 @@ namespace BeatHero.Combat
                 return;
             }
             // 유예 구간 없음 — pre-buffer에서만 처리
+        }
+
+        private void OnBlockPressed()
+        {
+            if (_state != State.ResponsePhase) return;
+            if (_attackHeld) return; // 차지 중 방어 불가
+
+            _lastBlockPressTime = AudioSettings.dspTime;
+
+            if (!_inputWindowOpen) return;
+            if (_beatInputConsumed) return;
+            _beatInputConsumed = true;
+            TryActivateBlock();
+        }
+
+        private void FireBlockAbsorbFeedback()
+        {
+            _playerAnim?.TriggerBlockAbsorb();
+            AudioManager.Instance?.PlaySFX(_playerConfig.blockAbsorbSfx);
+            OnPlayerBlockAbsorbed?.Invoke();
+        }
+
+        private void TryActivateBlock()
+        {
+            if (!_player.SpendMana(_blockManaCost)) return;
+            _blockActive = true;
+            _playerAnim?.TriggerBlock();
+            AudioManager.Instance?.PlaySFX(_playerConfig.blockSfx);
         }
 
         private void FireAttack()

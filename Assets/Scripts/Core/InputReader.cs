@@ -13,6 +13,7 @@ namespace BeatHero.Core
         public event Action OnBasicAttackPressed;
         public event Action OnChargeAttackPressed;
         public event Action OnChargeAttackReleased;
+        public event Action OnBlockPressed;
         public event Action OnPausePressed;
 
         private InputSystem_Actions _actions;
@@ -54,6 +55,11 @@ namespace BeatHero.Core
         {
             if (ctx.started) OnChargeAttackPressed?.Invoke();
             if (ctx.canceled) OnChargeAttackReleased?.Invoke();
+        }
+
+        void InputSystem_Actions.IGameActions.OnBlock(InputAction.CallbackContext ctx)
+        {
+            if (ctx.started) OnBlockPressed?.Invoke();
         }
 
         void InputSystem_Actions.IGameActions.OnPause(InputAction.CallbackContext ctx)
