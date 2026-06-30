@@ -4,12 +4,13 @@ using UnityEngine;
 namespace BeatHero.Player
 {
     // 방어 피드백 이펙트.
-    // ReadyRing(SpriteRenderer+Animator) — 방어 대기 중 펄스 링.
-    // AbsorbBurst(ParticleSystem) — 피해 흡수 시 버스트. 평소 비활성.
+    // GuardRing(SpriteRenderer+Animator) — 가드 성공 시 확장 페이드 원샷.
+    // AbsorbBurst(ParticleSystem) — 가드 성공 시 파티클 버스트.
+    // 둘 다 평소 비활성, PlayAbsorb() 호출 시에만 활성화.
     public class BlockShieldEffect : MonoBehaviour
     {
-        [Header("Ready Ring (Sprite)")]
-        [SerializeField] private GameObject    _readyRing;     // 방어 대기 링 오브젝트 (SpriteRenderer + Animator)
+        [Header("Guard Ring (Sprite)")]
+        [SerializeField] private GameObject    _guardRing;     // 가드 성공 링 오브젝트 (SpriteRenderer + Animator)
 
         [Header("Absorb Burst (Particle)")]
         [SerializeField] private ParticleSystem _absorbBurst;  // 피해 흡수 버스트
@@ -22,22 +23,28 @@ namespace BeatHero.Player
         [SerializeField] private float _absorbLifetime   = 0.45f;
         [SerializeField] private float _absorbRadius     = 0.65f;
 
+        [Header("Guard Ring Settings")]
+        [SerializeField] private float _guardRingDuration = 0.5f;
+
         private void Start()
         {
-            if (_absorbBurst != null)
-                _absorbBurst.gameObject.SetActive(false);
+            if (_guardRing   != null) _guardRing.SetActive(false);
+            if (_absorbBurst != null) _absorbBurst.gameObject.SetActive(false);
         }
 
-        public void ShowReady()
-        {
-            if (_readyRing != null)
-                _readyRing.SetActive(true);
-        }
+        // 가드 발동 시 — 시각 피드백 없음 (오디오는 BattleStateMachine에서 처리)
+        public void ShowReady() { }
 
+        // 가드 성공(피해 흡수) 시 — GuardRing + AbsorbBurst 동시 재생
         public void PlayAbsorb()
         {
-            if (_readyRing != null)
-                _readyRing.SetActive(false);
+            if (_guardRing != null)
+            {
+                _guardRing.SetActive(true);
+                var animator = _guardRing.GetComponent<Animator>();
+                if (animator != null) animator.Play(0, 0, 0f);
+                StartCoroutine(DisableAfterDelay(_guardRing, _guardRingDuration));
+            }
 
             if (_absorbBurst != null)
             {
@@ -51,8 +58,14 @@ namespace BeatHero.Player
 
         public void Hide()
         {
-            if (_readyRing   != null) _readyRing.SetActive(false);
+            if (_guardRing   != null) _guardRing.SetActive(false);
             if (_absorbBurst != null) _absorbBurst.gameObject.SetActive(false);
+        }
+
+        private IEnumerator DisableAfterDelay(GameObject go, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            if (go != null) go.SetActive(false);
         }
 
         private IEnumerator DisableAbsorbBurst(float delay)

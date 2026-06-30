@@ -1914,7 +1914,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bae8706d7cda9445acfaab456c8257e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: BeatHero::BeatHero.Player.BlockShieldEffect
-  _readyRing: {fileID: 1079437854}
+  _guardRing: {fileID: 1079437854}
   _absorbBurst: {fileID: 365163210}
   _absorbColorStart: {r: 1, g: 1, b: 1, a: 1}
   _absorbColorEnd: {r: 0.4, g: 0.8, b: 1, a: 0}
@@ -1922,6 +1922,7 @@ MonoBehaviour:
   _absorbSpeed: 2.2
   _absorbLifetime: 0.45
   _absorbRadius: 0.65
+  _guardRingDuration: 0.5
 --- !u!1 &292098611
 GameObject:
   m_ObjectHideFlags: 0
@@ -10537,7 +10538,7 @@ GameObject:
   - component: {fileID: 1079437857}
   - component: {fileID: 1079437856}
   m_Layer: 0
-  m_Name: ReadyRing
+  m_Name: GuardRing
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10568,7 +10569,7 @@ Animator:
   m_GameObject: {fileID: 1079437854}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 64f64471000695a438243253a96f9686, type: 2}
+  m_Controller: {fileID: 9100000, guid: 9554b7fc54f3cc444a4dc97d26131100, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
