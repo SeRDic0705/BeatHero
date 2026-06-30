@@ -43,6 +43,7 @@ namespace BeatHero.Combat
         public event System.Action<int, int> OnMonsterHpChanged; // (current, max)
         public event System.Action<double, bool> OnBeatUnitFired; // beatDurationSec, hasGridEffect
         public event System.Action OnEffectiveBeatFired; // ResponsePhase + gridEffectShape != null 인 비트만
+        public event System.Action OnPlayerBlockAbsorbed; // 방어로 피해를 흡수한 순간
         public event System.Action<bool> OnMonsterHit;   // 플레이어 공격이 몬스터에 데미지를 입혔을 때 (isLethal = 이 타격으로 HP가 0이 됨)
         public event System.Action OnMonsterDefeated;     // 데미지로 몬스터 HP가 0이 된 순간(프레이즈 즉시 종료 직전)
         public event System.Action<CellEffectFeedback, Vector3> OnMonsterCellEffectFired;
@@ -362,7 +363,7 @@ namespace BeatHero.Combat
             foreach (var h in _hazards)
                 if (h.Position == _grid.PlayerPosition)
                 {
-                    if (blocked) return; // 방어로 무효화
+                    if (blocked) { FireBlockAbsorbFeedback(); return; }
                     _player.TakeDamage(CalcMonsterDamage());
                     if (_attackHeld) CancelCharge(); // 피격 시 차지 취소
                     return;
@@ -370,7 +371,7 @@ namespace BeatHero.Combat
 
             var effect = _grid.GetDangerAt(_grid.PlayerPosition);
             if (effect == null) return;
-            if (blocked) return; // 방어로 무효화
+            if (blocked) { FireBlockAbsorbFeedback(); return; }
 
             if (effect is DamageEffect)
             {
@@ -585,10 +586,19 @@ namespace BeatHero.Combat
             TryActivateBlock();
         }
 
+        private void FireBlockAbsorbFeedback()
+        {
+            _playerAnim?.TriggerBlockAbsorb();
+            AudioManager.Instance?.PlaySFX(_playerConfig.blockAbsorbSfx);
+            OnPlayerBlockAbsorbed?.Invoke();
+        }
+
         private void TryActivateBlock()
         {
             if (!_player.SpendMana(_blockManaCost)) return;
             _blockActive = true;
+            _playerAnim?.TriggerBlock();
+            AudioManager.Instance?.PlaySFX(_playerConfig.blockSfx);
         }
 
         private void FireAttack()

@@ -16,5 +16,10 @@ namespace BeatHero.Data
         // 몬스터 피격음 — 모든 몬스터 공통(플레이어 공격 1회당 재생). 몬스터별 hitSfx 대체.
         [BoxGroup("SFX")]
         public AudioClip hitSfx;
+
+        [BoxGroup("SFX")]
+        public AudioClip blockSfx;        // 방어 발동 시 효과음
+        [BoxGroup("SFX")]
+        public AudioClip blockAbsorbSfx;  // 방어로 피해 흡수 시 효과음
     }
 }
