@@ -1,10 +1,11 @@
+using System.Collections;
 using UnityEngine;
 
 namespace BeatHero.Player
 {
     // 방어 피드백 이펙트.
     // ReadyRing(SpriteRenderer+Animator) — 방어 대기 중 펄스 링.
-    // AbsorbBurst(ParticleSystem) — 피해 흡수 시 버스트.
+    // AbsorbBurst(ParticleSystem) — 피해 흡수 시 버스트. 평소 비활성.
     public class BlockShieldEffect : MonoBehaviour
     {
         [Header("Ready Ring (Sprite)")]
@@ -21,6 +22,12 @@ namespace BeatHero.Player
         [SerializeField] private float _absorbLifetime   = 0.45f;
         [SerializeField] private float _absorbRadius     = 0.65f;
 
+        private void Start()
+        {
+            if (_absorbBurst != null)
+                _absorbBurst.gameObject.SetActive(false);
+        }
+
         public void ShowReady()
         {
             if (_readyRing != null)
@@ -32,18 +39,27 @@ namespace BeatHero.Player
             if (_readyRing != null)
                 _readyRing.SetActive(false);
 
-            ApplyAbsorbConfig();
             if (_absorbBurst != null)
             {
+                _absorbBurst.gameObject.SetActive(true);
+                ApplyAbsorbConfig();
                 _absorbBurst.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
                 _absorbBurst.Play();
+                StartCoroutine(DisableAbsorbBurst(_absorbLifetime + 0.1f));
             }
         }
 
         public void Hide()
         {
             if (_readyRing   != null) _readyRing.SetActive(false);
-            if (_absorbBurst != null) _absorbBurst.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            if (_absorbBurst != null) _absorbBurst.gameObject.SetActive(false);
+        }
+
+        private IEnumerator DisableAbsorbBurst(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            if (_absorbBurst != null)
+                _absorbBurst.gameObject.SetActive(false);
         }
 
         private void ApplyAbsorbConfig()
