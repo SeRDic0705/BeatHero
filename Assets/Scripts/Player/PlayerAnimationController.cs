@@ -40,6 +40,7 @@ namespace BeatHero.Player
 
         public void TriggerBlock()        => _blockShield?.ShowReady();
         public void TriggerBlockAbsorb()  => _blockShield?.PlayAbsorb();
+        public void ClearBlock()          => _blockShield?.Hide();
 
         public void TriggerDeath()
         {

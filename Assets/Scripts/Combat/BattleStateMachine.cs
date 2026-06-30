@@ -370,7 +370,11 @@ namespace BeatHero.Combat
                 }
 
             var effect = _grid.GetDangerAt(_grid.PlayerPosition);
-            if (effect == null) return;
+            if (effect == null)
+            {
+                if (blocked) _playerAnim?.ClearBlock();
+                return;
+            }
             if (blocked) { FireBlockAbsorbFeedback(); return; }
 
             if (effect is DamageEffect)
