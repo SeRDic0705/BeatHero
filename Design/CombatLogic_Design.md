@@ -148,6 +148,27 @@ ActiveHazard {
 
 ---
 
+## 타이밍 미스 인디케이터 (TimingIndicator)
+
+입력이 판정윈도우 밖에 들어와 무시되었을 때 BeatBar 위쪽에 텍스트로 피드백.
+
+```
+|-- preFailStart --|-- preJudgStart --|==BEAT==|-- windowClose --|-- lateZoneEnd --|
+      (Fast zone)     (pre-buffer OK)    (판정창)     (Slow zone = failZoneSec)
+```
+
+| 판정 | 조건 | 표시 | 색상 |
+|---|---|---|---|
+| **Fast** | 입력 시각이 `[preFailStart, preJudgStart)` | "Fast" | 주황 #FF8C00 |
+| **Slow** | 입력 시각이 `(windowClose, windowClose + failZoneSec)` | "Slow" | 하늘 #00BFFF |
+
+- 정상 히트(`_beatInputConsumed = true` 상태에서 in-window 입력) 시 이벤트 미발화
+- 플레이어가 아무것도 입력하지 않은 경우 이벤트 미발화
+- 이벤트: `BattleStateMachine.OnTimingMissed(TimingResult)`
+- 구현 상세: `Design/TimingIndicator_Design.md`
+
+---
+
 ## 비트 UI (시각적 메트로놈)
 
 - 화면 하단에 4분음표 기준으로만 박자 표시 (크립트 오브 더 네크로맨서 참고)

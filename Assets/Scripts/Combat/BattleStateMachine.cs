@@ -8,6 +8,9 @@ using UnityEngine;
 
 namespace BeatHero.Combat
 {
+    // 타이밍 판정 결과 — Fast/Slow 피드백 및 추후 Perfect 확장에 사용
+    public enum TimingResult { Fast, Slow }
+
     // Call & Response 전투 루프 총괄.
     // 의존: Conductor, GridManager, PatternPlayer, PlayerController, PlayerConfig, InputReader
     public class BattleStateMachine : MonoBehaviour
@@ -50,6 +53,7 @@ namespace BeatHero.Combat
         public event System.Action OnBossPhaseChanged; // 전환 완충 마디 박자마다 발동
         public event System.Action OnCallPhaseStarted;     // CallPhase(공격 예고) 시작
         public event System.Action OnResponsePhaseStarted; // ResponsePhase(플레이어 대응) 시작
+        public event System.Action<TimingResult> OnTimingMissed; // 입력이 판정윈도우 밖(Fast/Slow)일 때
 
         public MonsterData CurrentMonster => _monster;
         private MonsterData     _monster;
@@ -90,6 +94,10 @@ namespace BeatHero.Combat
         private bool    _blockActive;        // 이번 박자 JudgeTile에서 피해 무효화 예약
         private bool    _chargeKeyDown;      // K키가 물리적으로 눌린 상태
         private bool    _beatInputConsumed;  // true면 이번 비트 추가 입력 무시
+
+        // 타이밍 미스 감지
+        private double _lateZoneEndDsp;     // Late Zone(Slow 감지) 종료 DSP 절대시각
+        private bool   _slowInputReceived;  // Late Zone 구간 내 입력 수신 여부
 
         private void Awake()
         {
@@ -266,6 +274,7 @@ namespace BeatHero.Combat
                 bool preChargeFail       = !preChargeJudge && _lastAttackPressTime >= preFailStart;
                 bool preBlockJudge       = _lastBlockPressTime >= preJudgStart;
                 bool preBlockFail        = !preBlockJudge && _lastBlockPressTime >= preFailStart;
+                bool fastHappened        = preMovesFail || preBasicAttackFail || preChargeFail || preBlockFail;
 
                 bool continuingCharge = _attackHeld;
 
@@ -306,8 +315,12 @@ namespace BeatHero.Combat
                 // 판정 윈도우 닫힘 = 비트 + 판정구간 반폭 (DSP 절대시각 기준)
                 double windowCloseDsp = noteStartDsp + _judgmentWindowSec;
                 yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= windowCloseDsp + _pauseDelta);
-                _inputWindowOpen   = false;
-                _beatInputConsumed = false;
+
+                bool hadInWindowPress  = _beatInputConsumed;
+                _inputWindowOpen       = false;
+                _beatInputConsumed     = false;
+                _slowInputReceived     = false;
+                _lateZoneEndDsp        = windowCloseDsp + _failZoneSec;
 
                 if (_attackHeld && !_chargeKeyDown)
                     FireAttack();
@@ -323,6 +336,11 @@ namespace BeatHero.Combat
                 if (_hasPendingMove) ProcessMovement(_pendingMove);
                 JudgeTile();
                 _grid.SetHazards(_hazards);
+
+                if (fastHappened)
+                    OnTimingMissed?.Invoke(TimingResult.Fast);
+                else if (_slowInputReceived && !hadInWindowPress)
+                    OnTimingMissed?.Invoke(TimingResult.Slow);
 
                 unitOffset += (int)bu.noteLength;
             }
@@ -518,7 +536,11 @@ namespace BeatHero.Combat
             _lastMoveTime = AudioSettings.dspTime;
 
             // 윈도우가 열린 구간에서만 첫 입력 처리 후 슬롯 소진
-            if (!_inputWindowOpen) return;
+            if (!_inputWindowOpen)
+            {
+                if (AudioSettings.dspTime < _lateZoneEndDsp) _slowInputReceived = true;
+                return;
+            }
             if (_beatInputConsumed) return;
             _beatInputConsumed = true;
             _pendingMove    = dir;
@@ -532,7 +554,11 @@ namespace BeatHero.Combat
 
             _lastBasicAttackPressTime = AudioSettings.dspTime;
 
-            if (!_inputWindowOpen) return;
+            if (!_inputWindowOpen)
+            {
+                if (AudioSettings.dspTime < _lateZoneEndDsp) _slowInputReceived = true;
+                return;
+            }
             if (_beatInputConsumed) return;
             _beatInputConsumed = true;
             FireAttack(); // _chargeBeats == 0 → 기본공격, 마나는 FireAttack 내에서 소모
@@ -545,7 +571,11 @@ namespace BeatHero.Combat
 
             _lastAttackPressTime = AudioSettings.dspTime;
 
-            if (!_inputWindowOpen) return;
+            if (!_inputWindowOpen)
+            {
+                if (AudioSettings.dspTime < _lateZoneEndDsp) _slowInputReceived = true;
+                return;
+            }
             if (_beatInputConsumed) return;
             if (!_player.SpendMana(1)) return;
             _beatInputConsumed = true;
@@ -574,6 +604,7 @@ namespace BeatHero.Combat
                 FireAttack();
                 return;
             }
+            if (AudioSettings.dspTime < _lateZoneEndDsp) _slowInputReceived = true;
             // 유예 구간 없음 — pre-buffer에서만 처리
         }
 
@@ -584,7 +615,11 @@ namespace BeatHero.Combat
 
             _lastBlockPressTime = AudioSettings.dspTime;
 
-            if (!_inputWindowOpen) return;
+            if (!_inputWindowOpen)
+            {
+                if (AudioSettings.dspTime < _lateZoneEndDsp) _slowInputReceived = true;
+                return;
+            }
             if (_beatInputConsumed) return;
             _beatInputConsumed = true;
             TryActivateBlock();
