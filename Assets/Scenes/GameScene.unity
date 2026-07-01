@@ -18755,8 +18755,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: BeatHero::BeatHero.Combat.BattleStateMachine
   _chargeMultPerBeat: 0.5
   _blockManaCost: 1
-  _judgmentWindowSec: 0.042
+  _judgmentWindowSec: 0.084
   _failZoneSec: 0.042
+  _perfectWindowSec: 0.042
   _callBeatSfx: {fileID: 8300000, guid: 44376458ef543b94e97e7090ae81c23c, type: 3}
   _pitchSweepOnTransition: 1
   _conductor: {fileID: 2136934201}
@@ -19926,6 +19927,7 @@ MonoBehaviour:
   _battleSM: {fileID: 1667971345}
   _fastColor: {r: 1, g: 0.549, b: 0, a: 1}
   _slowColor: {r: 0, g: 0.749, b: 1, a: 1}
+  _perfectColor: {r: 1, g: 0.843, b: 0, a: 1}
   _driftY: 60
   _duration: 0.8
 --- !u!114 &1878971751

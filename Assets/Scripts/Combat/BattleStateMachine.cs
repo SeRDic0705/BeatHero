@@ -8,16 +8,17 @@ using UnityEngine;
 
 namespace BeatHero.Combat
 {
-    // 타이밍 판정 결과 — Fast/Slow 피드백 및 추후 Perfect 확장에 사용
-    public enum TimingResult { Fast, Slow }
+    // 타이밍 판정 결과 — Fast/Slow/Perfect 피드백에 사용
+    public enum TimingResult { Fast, Slow, Perfect }
 
     // Call & Response 전투 루프 총괄.
     // 의존: Conductor, GridManager, PatternPlayer, PlayerController, PlayerConfig, InputReader
     public class BattleStateMachine : MonoBehaviour
     {
         private const int   BEATS_PER_PHASE = 4;
-        private const int   MANA_GAIN_MOVE  = 1; // 일반 이동 시 획득
-        private const int   MANA_GAIN_DODGE = 2; // 회피(위험 타일에서 이동) 시 획득
+        private const int   MANA_GAIN_MOVE  = 1; // 이동 시 획득 (일반 이동은 퍼펙트일 때만, 회피는 항상)
+        private const float PERFECT_ATTACK_DAMAGE_MULT   = 1.4f; // 퍼펙트 공격 데미지 배율
+        private const float BLOCK_NORMAL_DAMAGE_REDUCTION = 0.5f; // 일반(비퍼펙트) 방어 데미지 경감률
 
         [Header("Charge Attack")]
         [SerializeField] private float _chargeMultPerBeat = 0.5f;   // 차지 유지 1박당 데미지 배율 증가량
@@ -26,8 +27,9 @@ namespace BeatHero.Combat
         [SerializeField] private int _blockManaCost = 1;
 
         [Header("Input Timing")]
-        [SerializeField] private float _judgmentWindowSec = 0.021f; // 판정구간 반폭 (비트 전후 각각)
-        [SerializeField] private float _failZoneSec       = 0.021f; // 판정 실패구간 반폭 (판정구간 바깥)
+        [SerializeField] private float _judgmentWindowSec = 0.084f; // 판정구간 반폭 (비트 전후 각각)
+        [SerializeField] private float _failZoneSec       = 0.042f; // 판정 실패구간 반폭 (판정구간 바깥)
+        [SerializeField] private float _perfectWindowSec  = 0.042f; // 퍼펙트 판정 반폭 (판정구간의 부분집합)
 
         [Header("Audio")]
         [SerializeField] private AudioClip _callBeatSfx;
@@ -91,9 +93,15 @@ namespace BeatHero.Combat
         private double  _lastAttackPressTime        = -1.0;
         private double  _lastAttackReleaseTime      = -1.0;
         private double  _lastBlockPressTime         = -1.0;
-        private bool    _blockActive;        // 이번 박자 JudgeTile에서 피해 무효화 예약
+        private bool    _blockActive;        // 이번 박자 JudgeTile에서 피해 무효화/경감 예약
+        private bool    _blockPerfect;       // 이번 방어가 퍼펙트 판정이었는지 (완전 무효화 여부)
         private bool    _chargeKeyDown;      // K키가 물리적으로 눌린 상태
         private bool    _beatInputConsumed;  // true면 이번 비트 추가 입력 무시
+
+        // 퍼펙트 판정 — 판정창 내 즉시 처리(이벤트 핸들러)에서 기준 비트 시각을 참조하기 위한 필드
+        private double  _currentBeatDsp        = -1.0; // 현재 서브비트의 beatTime(DSP)
+        private double  _pendingMoveInputDsp   = -1.0; // 확정된 이동 입력의 원본 타임스탬프 (프리버퍼 리셋 전 보존)
+        private bool    _perfectThisBeat;               // 이번 비트에 퍼펙트 액션이 있었는지 (인디케이터용)
 
         // 타이밍 미스 감지
         private double _lateZoneEndDsp;     // Late Zone(Slow 감지) 종료 DSP 절대시각
@@ -257,11 +265,13 @@ namespace BeatHero.Combat
                 double beatTime     = noteStartDsp;
                 double preJudgStart = beatTime - _judgmentWindowSec;
                 double preFailStart = preJudgStart - _failZoneSec;
+                _currentBeatDsp     = beatTime;
+                _perfectThisBeat    = false;
 
                 if (_attackHeld && !_chargeKeyDown)
                 {
                     bool inPreBuffer = _lastAttackReleaseTime >= preJudgStart;
-                    if (inPreBuffer) FireAttack();
+                    if (inPreBuffer) FireAttack(IsPerfect(_lastAttackReleaseTime, beatTime));
                     else CancelCharge();
                     _lastAttackReleaseTime = -1f;
                 }
@@ -280,13 +290,14 @@ namespace BeatHero.Combat
 
                 _beatInputConsumed = preMoveJudge || preMovesFail || preBasicAttackJudge || preBasicAttackFail
                                    || preChargeJudge || preChargeFail || preBlockJudge || preBlockFail;
-                _hasPendingMove    = preMoveJudge;
-                _pendingMove       = preMoveJudge ? _lastMoveDir : Vector2.zero;
+                _hasPendingMove      = preMoveJudge;
+                _pendingMove         = preMoveJudge ? _lastMoveDir : Vector2.zero;
+                _pendingMoveInputDsp = preMoveJudge ? _lastMoveTime : -1.0;
 
                 if (preBasicAttackJudge && !_attackHeld)
                 {
                     _beatInputConsumed = true;
-                    FireAttack(); // _chargeBeats == 0 → 기본공격, FireAttack 내에서 마나 소모
+                    FireAttack(IsPerfect(_lastBasicAttackPressTime, beatTime)); // _chargeBeats == 0 → 기본공격, FireAttack 내에서 마나 소모
                 }
                 else if (preChargeJudge)
                 {
@@ -301,7 +312,7 @@ namespace BeatHero.Combat
                 else if (preBlockJudge && !_attackHeld)
                 {
                     _beatInputConsumed = true;
-                    TryActivateBlock();
+                    TryActivateBlock(IsPerfect(_lastBlockPressTime, beatTime));
                 }
 
                 _lastMoveTime             = -1.0;
@@ -324,7 +335,7 @@ namespace BeatHero.Combat
                 _lateZoneEndDsp        = noteStartDsp + secPerUnit * (int)bu.noteLength * 0.5;
 
                 if (_attackHeld && !_chargeKeyDown)
-                    FireAttack();
+                    FireAttack(IsPerfect(_lastAttackReleaseTime, beatTime));
                 else if (_attackHeld && _chargeKeyDown)
                 {
                     if (_player.SpendMana(1))
@@ -334,12 +345,14 @@ namespace BeatHero.Combat
                     }
                 }
 
-                if (_hasPendingMove) ProcessMovement(_pendingMove);
+                if (_hasPendingMove) ProcessMovement(_pendingMove, IsPerfect(_pendingMoveInputDsp, beatTime));
                 JudgeTile();
                 _grid.SetHazards(_hazards);
 
                 if (fastHappened)
                     OnTimingMissed?.Invoke(TimingResult.Fast);
+                else if (_perfectThisBeat)
+                    OnTimingMissed?.Invoke(TimingResult.Perfect);
 
                 // 중간점 또는 Slow 입력 수신 시 조기 탈출 — 입력이 오면 즉시 표시
                 yield return new WaitUntil(() => !_paused &&
@@ -358,7 +371,7 @@ namespace BeatHero.Combat
             // 전투 종료 시점의 정리는 EndBattle에서 처리.
         }
 
-        private void ProcessMovement(Vector2 raw)
+        private void ProcessMovement(Vector2 raw, bool isPerfect)
         {
             var delta = Vector2Int.zero;
             if (Mathf.Abs(raw.x) > Mathf.Abs(raw.y))
@@ -370,7 +383,10 @@ namespace BeatHero.Combat
             if (moved)
             {
                 _player.transform.position = _grid.GetTileWorldPosition(_grid.PlayerPosition);
-                _player.AddMana(_tileWasDangerAtWindowOpen ? MANA_GAIN_DODGE : MANA_GAIN_MOVE);
+                // 아슬아슬 회피(위험 타일)는 퍼펙트 여부 무관하게 지급, 일반 이동은 퍼펙트일 때만 지급
+                if (_tileWasDangerAtWindowOpen || isPerfect)
+                    _player.AddMana(MANA_GAIN_MOVE);
+                if (isPerfect) _perfectThisBeat = true;
             }
 
             // 이동 시 차지 취소 (이동과 공격 배타적)
@@ -380,15 +396,16 @@ namespace BeatHero.Combat
 
         private void JudgeTile()
         {
-            bool blocked = _blockActive;
-            _blockActive = false;
+            bool blocked       = _blockActive;
+            bool perfectBlock  = _blockPerfect;
+            _blockActive  = false;
+            _blockPerfect = false;
 
             // 장애물 위에 있으면 데미지
             foreach (var h in _hazards)
                 if (h.Position == _grid.PlayerPosition)
                 {
-                    if (blocked) { FireBlockAbsorbFeedback(); return; }
-                    _player.TakeDamage(CalcMonsterDamage());
+                    ApplyMonsterDamage(blocked, perfectBlock);
                     if (_attackHeld) CancelCharge(); // 피격 시 차지 취소
                     return;
                 }
@@ -399,11 +416,10 @@ namespace BeatHero.Combat
                 if (blocked) _playerAnim?.ClearBlock();
                 return;
             }
-            if (blocked) { FireBlockAbsorbFeedback(); return; }
 
             if (effect is DamageEffect)
             {
-                _player.TakeDamage(CalcMonsterDamage());
+                ApplyMonsterDamage(blocked, perfectBlock);
                 if (_attackHeld) CancelCharge(); // 피격 시 차지 취소
             }
             else if (effect is PersistentHazardEffect hazardEffect)
@@ -414,14 +430,33 @@ namespace BeatHero.Combat
                     Effect   = hazardEffect,
                     RemainingResponsePhases = hazardEffect.durationResponsePhases
                 });
-                _player.TakeDamage(CalcMonsterDamage());
+                ApplyMonsterDamage(blocked, perfectBlock);
                 // 피격 시 차지 취소
                 if (_attackHeld) CancelCharge();
             }
             else if (effect is ShieldEffect)
             {
-                _player.GainShield();
+                if (blocked) FireBlockAbsorbFeedback();
+                else _player.GainShield();
             }
+        }
+
+        // 방어 미적용/일반 방어(50% 경감)/퍼펙트 방어(완전 무효화)를 한 곳에서 처리
+        private void ApplyMonsterDamage(bool blocked, bool perfectBlock)
+        {
+            if (blocked && perfectBlock)
+            {
+                FireBlockAbsorbFeedback();
+                return;
+            }
+
+            int dmg = CalcMonsterDamage();
+            if (blocked)
+            {
+                dmg = Mathf.RoundToInt(dmg * BLOCK_NORMAL_DAMAGE_REDUCTION);
+                FireBlockAbsorbFeedback();
+            }
+            _player.TakeDamage(dmg);
         }
 
         private int CalcMonsterDamage()
@@ -431,6 +466,10 @@ namespace BeatHero.Combat
                 : 1f;
             return Mathf.RoundToInt(_monster.attackPower * multiplier);
         }
+
+        // 입력 시각이 비트 시각 기준 퍼펙트 판정 폭(_perfectWindowSec) 이내인지
+        private bool IsPerfect(double inputDsp, double beatDsp)
+            => inputDsp >= 0.0 && Mathf.Abs((float)(inputDsp - beatDsp)) <= _perfectWindowSec;
 
         private void TickHazards()
         {
@@ -548,9 +587,10 @@ namespace BeatHero.Combat
                 return;
             }
             if (_beatInputConsumed) return;
-            _beatInputConsumed = true;
-            _pendingMove    = dir;
-            _hasPendingMove = true;
+            _beatInputConsumed   = true;
+            _pendingMove         = dir;
+            _hasPendingMove      = true;
+            _pendingMoveInputDsp = _lastMoveTime;
         }
 
         private void OnBasicAttackPressed()
@@ -567,7 +607,7 @@ namespace BeatHero.Combat
             }
             if (_beatInputConsumed) return;
             _beatInputConsumed = true;
-            FireAttack(); // _chargeBeats == 0 → 기본공격, 마나는 FireAttack 내에서 소모
+            FireAttack(IsPerfect(_lastBasicAttackPressTime, _currentBeatDsp)); // _chargeBeats == 0 → 기본공격, 마나는 FireAttack 내에서 소모
         }
 
         private void OnChargeAttackPressed()
@@ -607,7 +647,7 @@ namespace BeatHero.Combat
             if (_inputWindowOpen)
             {
                 _beatInputConsumed = true;
-                FireAttack();
+                FireAttack(IsPerfect(_lastAttackReleaseTime, _currentBeatDsp));
                 return;
             }
             if (AudioSettings.dspTime < _lateZoneEndDsp) _slowInputReceived = true;
@@ -628,7 +668,7 @@ namespace BeatHero.Combat
             }
             if (_beatInputConsumed) return;
             _beatInputConsumed = true;
-            TryActivateBlock();
+            TryActivateBlock(IsPerfect(_lastBlockPressTime, _currentBeatDsp));
         }
 
         private void FireBlockAbsorbFeedback()
@@ -638,15 +678,17 @@ namespace BeatHero.Combat
             OnPlayerBlockAbsorbed?.Invoke();
         }
 
-        private void TryActivateBlock()
+        private void TryActivateBlock(bool isPerfect)
         {
             if (!_player.SpendMana(_blockManaCost)) return;
-            _blockActive = true;
+            _blockActive  = true;
+            _blockPerfect = isPerfect;
+            if (isPerfect) _perfectThisBeat = true;
             _playerAnim?.TriggerBlock();
             AudioManager.Instance?.PlaySFX(_playerConfig.blockSfx);
         }
 
-        private void FireAttack()
+        private void FireAttack(bool isPerfect)
         {
             // 탭 공격(차지 0단계): 여기서 마나 1 소비, 기본 공격력
             // 차지 공격: 시작/유지 비트에서 이미 마나 소비 → (공격력 + 차지배율) × 차지단계
@@ -656,6 +698,11 @@ namespace BeatHero.Combat
             int dmg = _chargeBeats > 0
                 ? Mathf.RoundToInt(_playerConfig.attackPower * (1 + _chargeMultPerBeat) * _chargeBeats)
                 : _playerConfig.attackPower;
+            if (isPerfect)
+            {
+                dmg = Mathf.RoundToInt(dmg * PERFECT_ATTACK_DAMAGE_MULT);
+                _perfectThisBeat = true;
+            }
             _monsterHp = Mathf.Max(0, _monsterHp - dmg);
             OnMonsterHpChanged?.Invoke(_monsterHp, _monster.maxHp);
             OnMonsterHit?.Invoke(_monsterHp <= 0);
