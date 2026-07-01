@@ -18,7 +18,9 @@ ResponsePhase에서 플레이어의 입력이 판정윈도우 밖으로 무시�
 |---|---|---|
 | **Fast** | 입력 시각이 Fast Zone (`preFailStart ~ preJudgStart`)에 해당 | "Fast" |
 | **Slow** | 입력 시각이 Slow Zone (`windowClose ~ windowClose + failZoneSec`)에 해당 | "Slow" |
-| **(미래) Perfect** | 입력이 `_perfectWindowSec` 이내 정확한 타이밍 | "Perfect" |
+| **Perfect** | 판정창 안에서 소비된 입력이 비트 기준 `_perfectWindowSec`(±42ms) 이내 | "Perfect!" |
+
+퍼펙트 판정은 공격/방어/이동 보상에도 쓰인다 (상세: `Design/PerfectJudgment_Design.md`). Fast가 발생하면 Perfect보다 우선 표시.
 
 - 정상 히트(`_beatInputConsumed = true` 인 상태에서 in-window 입력) 시 이벤트 미발화
 - 플레이어가 아무것도 입력하지 않은 경우 이벤트 미발화
@@ -31,8 +33,7 @@ ResponsePhase에서 플레이어의 입력이 판정윈도우 밖으로 무시�
 
 ```csharp
 // Combat 네임스페이스 또는 BattleStateMachine 중첩 — TimingResult
-public enum TimingResult { Fast, Slow }
-// 추후 Perfect 추가 시: { Fast, Slow, Perfect }
+public enum TimingResult { Fast, Slow, Perfect }
 ```
 
 ### 추가 이벤트
@@ -90,6 +91,7 @@ bool fastHappened = preMovesFail || preBasicAttackFail || preChargeFail || preBl
 | `_battleSM` | — | BattleStateMachine 참조 (이벤트 구독) |
 | `_fastColor` | `#FF8C00` (주황) | Fast 판정 텍스트 색상 |
 | `_slowColor` | `#00BFFF` (하늘) | Slow 판정 텍스트 색상 |
+| `_perfectColor` | `#FFD700` (골드) | Perfect 판정 텍스트 색상 |
 | `_driftY` | `60f` | 위로 이동할 픽셀 거리 (RectTransform 기준) |
 | `_duration` | `0.8f` | 애니메이션 총 시간(초) |
 
@@ -129,11 +131,10 @@ private IEnumerator PlayAnim()
 
 ---
 
-## 확장성 (Perfect 대비)
+## Perfect 반영 메모
 
-- `TimingResult` enum에 `Perfect` 추가 시 `Show()` 분기만 추가하면 됨 (API 변경 없음)
-- 색상·텍스트를 enum 기반 딕셔너리로 관리하면 항목 추가가 더 용이 (현재 2개라 if/else 유지)
-- 나중에 `OnTimingMissed` → `OnTimingJudged`로 이름 변경 가능 (Perfect는 miss가 아님)
+- `Perfect`는 `OnTimingMissed` 이벤트를 그대로 재사용 (이름 변경 없음 — 구독부 변경 최소화)
+- `Show()`는 `TimingResult` 3종 분기로 텍스트/색상 결정 (현재 3개라 if/else 유지, 추가 확장 시 딕셔너리 전환 고려)
 
 ---
 
