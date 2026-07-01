@@ -23,7 +23,7 @@ namespace BeatHero.Combat
         [SerializeField] private float _chargeMultPerBeat = 0.5f;   // 차지 유지 1박당 데미지 배율 증가량
 
         [Header("Block")]
-        [SerializeField] private int _blockManaCost = 1;
+        [SerializeField] private int _blockManaCost = 4;
 
         [Header("Input Timing")]
         [SerializeField] private float _judgmentWindowSec = 0.021f; // 판정구간 반폭 (비트 전후 각각)

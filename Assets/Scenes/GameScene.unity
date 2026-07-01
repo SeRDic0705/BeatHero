@@ -18754,7 +18754,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: BeatHero::BeatHero.Combat.BattleStateMachine
   _chargeMultPerBeat: 0.5
-  _blockManaCost: 1
+  _blockManaCost: 4
   _judgmentWindowSec: 0.042
   _failZoneSec: 0.042
   _callBeatSfx: {fileID: 8300000, guid: 44376458ef543b94e97e7090ae81c23c, type: 3}
