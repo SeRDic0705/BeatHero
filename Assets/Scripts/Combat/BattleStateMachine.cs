@@ -339,7 +339,11 @@ namespace BeatHero.Combat
 
                 if (fastHappened)
                     OnTimingMissed?.Invoke(TimingResult.Fast);
-                else if (_slowInputReceived && !hadInWindowPress)
+
+                // Late Zone(_failZoneSec) 만료까지 대기 — 그 사이 입력이 오면 _slowInputReceived가 세팅됨
+                yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= _lateZoneEndDsp + _pauseDelta);
+
+                if (!fastHappened && _slowInputReceived && !hadInWindowPress)
                     OnTimingMissed?.Invoke(TimingResult.Slow);
 
                 unitOffset += (int)bu.noteLength;
