@@ -320,7 +320,8 @@ namespace BeatHero.Combat
                 _inputWindowOpen       = false;
                 _beatInputConsumed     = false;
                 _slowInputReceived     = false;
-                _lateZoneEndDsp        = windowCloseDsp + _failZoneSec;
+                // Slow 구간 = 현재 비트 시작 ~ 다음 비트 시작의 중간점 (BPM·음표 길이에 자동 스케일)
+                _lateZoneEndDsp        = noteStartDsp + secPerUnit * (int)bu.noteLength * 0.5;
 
                 if (_attackHeld && !_chargeKeyDown)
                     FireAttack();
@@ -340,8 +341,9 @@ namespace BeatHero.Combat
                 if (fastHappened)
                     OnTimingMissed?.Invoke(TimingResult.Fast);
 
-                // Late Zone(_failZoneSec) 만료까지 대기 — 그 사이 입력이 오면 _slowInputReceived가 세팅됨
-                yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= _lateZoneEndDsp + _pauseDelta);
+                // 중간점 또는 Slow 입력 수신 시 조기 탈출 — 입력이 오면 즉시 표시
+                yield return new WaitUntil(() => !_paused &&
+                    (AudioSettings.dspTime >= _lateZoneEndDsp + _pauseDelta || _slowInputReceived));
 
                 if (!fastHappened && _slowInputReceived && !hadInWindowPress)
                     OnTimingMissed?.Invoke(TimingResult.Slow);
