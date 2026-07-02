@@ -229,8 +229,9 @@ namespace BeatHero.Combat
 
                 // WaitUntil 전에 SFX 예약 — 리드타임 최대화로 DSP 정확도 확보
                 // gridEffectShape == null이면 빈 비트이므로 효과음 스킵
+                // _pauseDelta 반영 — 안 하면 이전 일시정지 누적분만큼 SFX가 시각 연출보다 일찍 울림
                 if (bu.gridEffectShape != null)
-                    AudioManager.Instance?.PlaySFXScheduled(_callBeatSfx, noteStartDsp);
+                    AudioManager.Instance?.PlaySFXScheduled(_callBeatSfx, noteStartDsp + _pauseDelta);
 
                 // _pauseDelta = 누적 일시정지 시간. noteStartDsp는 원래 절대시각이므로
                 // noteStartDsp + _pauseDelta = 프레이즈 경계 포함 모든 일시정지 반영한 목표 시각.
@@ -267,7 +268,8 @@ namespace BeatHero.Combat
                 _grid.UpdateDangerMap(bu.gridEffectShape); // 타일 색상 변경 없이 판정맵만 갱신
                 PlayShapeFeedbacks(bu.gridEffectShape);
 
-                double beatTime     = noteStartDsp;
+                // _pauseDelta 반영 — 안 하면 판정 기준시각이 실제(일시정지 보정된) dspTime과 어긋남
+                double beatTime     = noteStartDsp + _pauseDelta;
                 double preJudgStart = beatTime - _judgmentWindowSec;
                 double preFailStart = preJudgStart - _failZoneSec;
                 _currentBeatDsp     = beatTime;
@@ -588,7 +590,7 @@ namespace BeatHero.Combat
             // 윈도우가 열린 구간에서만 첫 입력 처리 후 슬롯 소진
             if (!_inputWindowOpen)
             {
-                if (AudioSettings.dspTime < _lateZoneEndDsp) _slowInputReceived = true;
+                if (AudioSettings.dspTime < _lateZoneEndDsp + _pauseDelta) _slowInputReceived = true;
                 return;
             }
             if (_beatInputConsumed) return;
@@ -607,7 +609,7 @@ namespace BeatHero.Combat
 
             if (!_inputWindowOpen)
             {
-                if (AudioSettings.dspTime < _lateZoneEndDsp) _slowInputReceived = true;
+                if (AudioSettings.dspTime < _lateZoneEndDsp + _pauseDelta) _slowInputReceived = true;
                 return;
             }
             if (_beatInputConsumed) return;
@@ -624,7 +626,7 @@ namespace BeatHero.Combat
 
             if (!_inputWindowOpen)
             {
-                if (AudioSettings.dspTime < _lateZoneEndDsp) _slowInputReceived = true;
+                if (AudioSettings.dspTime < _lateZoneEndDsp + _pauseDelta) _slowInputReceived = true;
                 return;
             }
             if (_beatInputConsumed) return;
@@ -655,7 +657,7 @@ namespace BeatHero.Combat
                 FireAttack(IsPerfect(_lastAttackReleaseTime, _currentBeatDsp));
                 return;
             }
-            if (AudioSettings.dspTime < _lateZoneEndDsp) _slowInputReceived = true;
+            if (AudioSettings.dspTime < _lateZoneEndDsp + _pauseDelta) _slowInputReceived = true;
             // 유예 구간 없음 — pre-buffer에서만 처리
         }
 
@@ -668,7 +670,7 @@ namespace BeatHero.Combat
 
             if (!_inputWindowOpen)
             {
-                if (AudioSettings.dspTime < _lateZoneEndDsp) _slowInputReceived = true;
+                if (AudioSettings.dspTime < _lateZoneEndDsp + _pauseDelta) _slowInputReceived = true;
                 return;
             }
             if (_beatInputConsumed) return;
