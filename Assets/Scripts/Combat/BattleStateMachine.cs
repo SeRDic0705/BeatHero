@@ -178,7 +178,12 @@ namespace BeatHero.Combat
         {
             // 프레이즈 시작 비트에만 반응 — 서브비트 처리는 코루틴 내부에서
             if (_state == State.CallPhase && !_phraseRunning)
+            {
+                // 새 프레이즈 체인의 기준시각은 Conductor에서 방금 받아온 최신(보정 완료) 값이므로
+                // 그 이전 일시정지 누적분(_pauseDelta)은 더 이상 필요 없음 — 여기서 리셋.
+                _pauseDelta = 0;
                 StartCoroutine(HandlePhrasePair(_conductor.GetBeatDspTime(beatIndex)));
+            }
         }
 
         // ── 프레이즈 사이클 ─────────────────────────────────────
