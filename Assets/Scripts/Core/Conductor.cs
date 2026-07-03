@@ -41,6 +41,7 @@ namespace BeatHero.Core
 
         private bool _isPaused;
         private double _pauseDspTime;
+        private bool _pausedBeforeStart; // 일시정지 시점이 BGM 실제 재생 시작(_dspSongStartTime) 이전(리드인 중)인지
 
         private void Awake()
         {
@@ -145,6 +146,7 @@ namespace BeatHero.Core
         {
             if (!_isPlaying || _isPaused) return;
             _pauseDspTime = AudioSettings.dspTime;
+            _pausedBeforeStart = _pauseDspTime < _dspSongStartTime;
             _activeSource.Pause();
             _isPaused = true;
             OnPaused?.Invoke();
@@ -156,7 +158,18 @@ namespace BeatHero.Core
             double pausedDuration = AudioSettings.dspTime - _pauseDspTime;
             _floorStartDsp    += pausedDuration;
             _dspSongStartTime += pausedDuration;
-            _activeSource.UnPause();
+
+            if (_pausedBeforeStart)
+            {
+                // Unity 버그: PlayScheduled로 예약만 되고 아직 재생 시작 전인 AudioSource를
+                // Pause 후 UnPause하면 예약 시각을 무시하고 즉시 재생됨 → Stop 후 보정된 시각으로 재예약.
+                _activeSource.Stop();
+                _activeSource.PlayScheduled(_dspSongStartTime);
+            }
+            else
+            {
+                _activeSource.UnPause();
+            }
             _isPaused = false;
             OnResumed?.Invoke(pausedDuration);
         }
