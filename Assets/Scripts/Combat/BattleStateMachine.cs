@@ -268,8 +268,10 @@ namespace BeatHero.Combat
                 _grid.UpdateDangerMap(bu.gridEffectShape); // 타일 색상 변경 없이 판정맵만 갱신
                 PlayShapeFeedbacks(bu.gridEffectShape);
 
+                // 판정 싱크 오프셋 — 그리드 표시 기준(noteStartDsp)은 그대로 두고 판정 기준시각만 이동
+                double judgedNoteDsp = noteStartDsp + SyncSettings.JudgmentOffsetSec;
                 // _pauseDelta 반영 — 안 하면 판정 기준시각이 실제(일시정지 보정된) dspTime과 어긋남
-                double beatTime     = noteStartDsp + _pauseDelta;
+                double beatTime     = judgedNoteDsp + _pauseDelta;
                 double preJudgStart = beatTime - _judgmentWindowSec;
                 double preFailStart = preJudgStart - _failZoneSec;
                 _currentBeatDsp     = beatTime;
@@ -330,16 +332,16 @@ namespace BeatHero.Combat
                 _tileWasDangerAtWindowOpen = _grid.GetDangerAt(_grid.PlayerPosition) != null;
                 _inputWindowOpen = true;
 
-                // 판정 윈도우 닫힘 = 비트 + 판정구간 반폭 (DSP 절대시각 기준)
-                double windowCloseDsp = noteStartDsp + _judgmentWindowSec;
+                // 판정 윈도우 닫힘 = 비트 + 판정구간 반폭 (DSP 절대시각 기준, 판정 싱크 오프셋 반영)
+                double windowCloseDsp = judgedNoteDsp + _judgmentWindowSec;
                 yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= windowCloseDsp + _pauseDelta);
 
                 bool hadInWindowPress  = _beatInputConsumed;
                 _inputWindowOpen       = false;
                 _beatInputConsumed     = false;
                 _slowInputReceived     = false;
-                // Slow 구간 = 현재 비트 시작 ~ 다음 비트 시작의 중간점 (BPM·음표 길이에 자동 스케일)
-                _lateZoneEndDsp        = noteStartDsp + secPerUnit * (int)bu.noteLength * 0.5;
+                // Slow 구간 = 현재 비트 시작 ~ 다음 비트 시작의 중간점 (BPM·음표 길이에 자동 스케일, 판정 싱크 오프셋 반영)
+                _lateZoneEndDsp        = judgedNoteDsp + secPerUnit * (int)bu.noteLength * 0.5;
 
                 if (_attackHeld && !_chargeKeyDown)
                     FireAttack(IsPerfect(_lastAttackReleaseTime, beatTime));
