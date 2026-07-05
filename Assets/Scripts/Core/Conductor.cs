@@ -42,6 +42,7 @@ namespace BeatHero.Core
         private bool _isPaused;
         private double _pauseDspTime;
         private bool _pausedBeforeStart; // 일시정지 시점이 BGM 실제 재생 시작(_dspSongStartTime) 이전(리드인 중)인지
+        private bool _isFadingOut; // FadeOutAndStop 진행 중 — 이 구간에도 Pause/Resume이 실제 오디오에 적용되게 함
 
         private void Awake()
         {
@@ -85,6 +86,7 @@ namespace BeatHero.Core
             _switchPending = false;
             _isPlaying = false;
             _isPaused = false;
+            _isFadingOut = false;
 
             _activeSource.clip   = bgm;
             _activeSource.loop   = true;
@@ -122,6 +124,7 @@ namespace BeatHero.Core
             _isPlaying = false;
             _isPaused = false;
             _switchPending = false;
+            _isFadingOut = false;
         }
 
         // 클리어 연출용: 비트 클럭은 즉시 멈추되 BGM은 duration에 걸쳐 페이드아웃 후 정지.
@@ -132,6 +135,7 @@ namespace BeatHero.Core
             _isPaused = false;
             _switchPending = false;
             if (duration <= 0f) { Stop(); return; }
+            _isFadingOut = true;
             StartCoroutine(FadeOutThenStop(duration));
         }
 
@@ -140,11 +144,12 @@ namespace BeatHero.Core
             yield return FadeOutSource(_activeSource, duration);
             _activeSource.Stop();
             _standbySource.Stop();
+            _isFadingOut = false;
         }
 
         public void Pause()
         {
-            if (!_isPlaying || _isPaused) return;
+            if ((!_isPlaying && !_isFadingOut) || _isPaused) return;
             _pauseDspTime = AudioSettings.dspTime;
             _pausedBeforeStart = _pauseDspTime < _dspSongStartTime;
             _activeSource.Pause();
@@ -154,8 +159,18 @@ namespace BeatHero.Core
 
         public void Resume()
         {
-            if (!_isPlaying || !_isPaused) return;
+            if ((!_isPlaying && !_isFadingOut) || !_isPaused) return;
             double pausedDuration = AudioSettings.dspTime - _pauseDspTime;
+
+            // 클리어 페이드아웃 중엔 전투가 이미 끝난 상태라 비트 클럭 보정이 무의미 — 오디오 재생만 재개.
+            if (_isFadingOut)
+            {
+                _activeSource.UnPause();
+                _isPaused = false;
+                OnResumed?.Invoke(pausedDuration);
+                return;
+            }
+
             _floorStartDsp    += pausedDuration;
             _dspSongStartTime += pausedDuration;
 
