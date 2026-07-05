@@ -23,6 +23,8 @@
 각 박자마다 **입력 유효 구간(±84ms, `_judgmentWindowSec` — 플레이 테스트 후 조정 가능)**이 열린다.
 그중 비트와 ±42ms(`_perfectWindowSec`) 이내로 맞춘 입력은 **퍼펙트** 판정을 받아 추가 보상을 얻는다 (상세: `Design/PerfectJudgment_Design.md`).
 
+**판정 싱크 오프셋:** 판정창의 기준 시각(`beatTime`)은 실제 비트 시각에 `SyncSettings.JudgmentOffsetSec`(설정에서 조정, 기본 0)를 더해서 계산한다. 그리드에 패턴이 표시되는 시각(`noteStartDsp`)은 이 오프셋과 무관 — 화면 연출은 그대로 두고 판정창만 앞뒤로 이동한다 (상세: `Design/Conductor_Design.md`).
+
 **구간 내 입력 선택지 (이동/공격 배타적):**
 - 이동 (방향키) → 1칸 이동
 - J키 (기본공격, 누를 때 판정) → 즉시 기본 공격 (차지 중 무시)
