@@ -110,7 +110,7 @@ namespace BeatHero.Core
             double leadSec = _secPerBeat * BEATS_PER_MEASURE; // 240/BPM
             _dspSongStartTime = _floorStartDsp + leadSec;
             _lastFiredBeat = -1;
-            _activeSource.PlayScheduled(_dspSongStartTime);
+            _activeSource.PlayScheduled(_dspSongStartTime + SyncSettings.AudioOffsetSec);
             _isPlaying = true;
             OnSongScheduled?.Invoke(_dspSongStartTime, _bpm);
             // 리드인 1마디(StartFloor ~ beat0) 연출용 — 페이즈 전환과 달리 층 시작에서만 발화.
@@ -179,7 +179,7 @@ namespace BeatHero.Core
                 // Unity 버그: PlayScheduled로 예약만 되고 아직 재생 시작 전인 AudioSource를
                 // Pause 후 UnPause하면 예약 시각을 무시하고 즉시 재생됨 → Stop 후 보정된 시각으로 재예약.
                 _activeSource.Stop();
-                _activeSource.PlayScheduled(_dspSongStartTime);
+                _activeSource.PlayScheduled(_dspSongStartTime + SyncSettings.AudioOffsetSec);
             }
             else
             {
@@ -193,17 +193,19 @@ namespace BeatHero.Core
         // 클럭 파라미터(BPM·dspSongStartTime)는 즉시 갱신 → 다음 프레이즈가 올바른 BPM으로 시작됨.
         public void SwitchPhaseAt(double dspTime, AudioClip bgm, float bpm)
         {
-            _switchDspTime = dspTime;
+            // 오디오 싱크 오프셋은 실제 스케줄링(PlayScheduled 등)에만 적용 — 클럭(_dspSongStartTime)은 그대로 유지
+            double audioDspTime = dspTime + SyncSettings.AudioOffsetSec;
+            _switchDspTime = audioDspTime;
             _nextBpm       = bpm;
             _switchPending = true;
 
-            _activeSource.SetScheduledEndTime(dspTime);
+            _activeSource.SetScheduledEndTime(audioDspTime);
 
             _standbySource.clip   = bgm;
             _standbySource.loop   = true;
             _standbySource.volume = 1f;
             _standbySource.pitch  = 1f;
-            _standbySource.PlayScheduled(dspTime);
+            _standbySource.PlayScheduled(audioDspTime);
 
             // 클럭 파라미터 즉시 교체 — 프레임 순서 경쟁 없이 새 BPM으로 전환
             _bpm                = bpm;
@@ -225,13 +227,15 @@ namespace BeatHero.Core
 
             double newSecPerBeat = 60.0 / bpm;
             double bgmStartDsp   = dspTime + transitionBeats * newSecPerBeat;
+            // 오디오 싱크 오프셋은 실제 스케줄링에만 적용 — 전환 연출(FlashTransition)이 참조하는 dspTime/bgmStartDsp는 그대로
+            double audioBgmStartDsp = bgmStartDsp + SyncSettings.AudioOffsetSec;
 
             // 구 BGM: CallPhase 시작 직전 정지 + 전환 마디 전체에 걸쳐 페이드아웃
-            _activeSource.SetScheduledEndTime(bgmStartDsp);
-            StartCoroutine(FadeOutSource(_activeSource, (float)(bgmStartDsp - AudioSettings.dspTime)));
+            _activeSource.SetScheduledEndTime(audioBgmStartDsp);
+            StartCoroutine(FadeOutSource(_activeSource, (float)(audioBgmStartDsp - AudioSettings.dspTime)));
 
-            // 신 BGM: CallPhase 시작 시각에 예약 (대기 소스 재사용 — AddComponent 없음)
-            _switchDspTime = bgmStartDsp;
+            // 신 BGM: CallPhase 시작 시각(+오디오 오프셋)에 예약 (대기 소스 재사용 — AddComponent 없음)
+            _switchDspTime = audioBgmStartDsp;
             _nextBpm       = bpm;
             _switchPending = true;
 
@@ -239,7 +243,7 @@ namespace BeatHero.Core
             _standbySource.loop   = true;
             _standbySource.volume = 1f;
             _standbySource.pitch  = 1f;
-            _standbySource.PlayScheduled(bgmStartDsp);
+            _standbySource.PlayScheduled(audioBgmStartDsp);
 
             // 클럭 파라미터 즉시 교체 — 전환 마디부터 신 BPM 기준
             _bpm                = bpm;

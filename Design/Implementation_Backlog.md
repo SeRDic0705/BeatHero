@@ -112,8 +112,16 @@
 ### 비필수 (추후, 우선순위 최하)
 - [ ] 차지 단계별 빛 모이는 VFX
 - [ ] 3박+ 차지 성공 컷씬 연출 (BGM 정지·페이즈 일시중단)
-- [ ] 입력 오프셋 보정 옵션 (오디오 레이턴시)
 - [ ] 입력 윈도우 시각화 옵션
+
+### 진행 중 — 싱크 조절 설정 (feature/sync-offset-settings, Settings_Design.md §싱크)
+- [x] `SyncSettings.cs` (판정/오디오 오프셋 저장)
+- [x] `BattleStateMachine` 판정 오프셋 적용
+- [x] `Conductor` 오디오 오프셋 적용
+- [x] `SettingsPanel` 스크립트 로직
+- [ ] 프리팹 UI 배선 (Slider 2 / Button 4 / TMP_Text 2)
+- [ ] 컴파일 검증
+- [ ] 알려진 기존 버그: EndBattle 페이드아웃 중 ESC로 일시정지해도 BGM이 안 멈춤 — 별도 처리 예정(이번 작업 범위 아님)
 
 ---
 

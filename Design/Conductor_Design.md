@@ -112,9 +112,16 @@ public class Conductor : MonoBehaviour
 
 ---
 
-## 지연/보정 (확장)
+## 지연/보정 — 싱크 오프셋 (구현 완료)
 
-- `inputOffsetSec`: 오디오 출력 지연·디스플레이 지연 보정용 전역 오프셋. 기본 0, 추후 설정 메뉴에서 캘리브레이션 (Settings_Design.md 추후 계획과 연동).
+`Assets/Scripts/Core/SyncSettings.cs`(static, PlayerPrefs 기반)에 두 오프셋을 독립적으로 보관한다. **서로 다른 지점에 주입되어 간섭하지 않는다:**
+
+- `SyncSettings.JudgmentOffsetSec` (판정 싱크): 입력 판정 기준 시각에만 더해진다. `BattleStateMachine.HandleResponsePhrase()`에서 `judgedNoteDsp = noteStartDsp + JudgmentOffsetSec`를 만들어 `beatTime`/`preJudgStart`/`preFailStart`/`windowCloseDsp`/`_lateZoneEndDsp` 계산에 사용. 그리드 표시 타이밍 기준인 `noteStartDsp` 자체는 건드리지 않으므로 시각 연출은 그대로 유지된다.
+- `SyncSettings.AudioOffsetSec` (오디오 싱크): 실제 BGM이 스피커로 나오는 시각에만 더해진다. `Conductor`의 `StartFloor()`/`SwitchPhaseAt()`/`SwitchPhaseWithTransition()`/`Resume()`에서 `AudioSource.PlayScheduled`/`SetScheduledEndTime`에 넘기는 dspTime에만 적용. 클럭 기준(`_dspSongStartTime`, `_firstBeatOffsetSec`)은 그대로 유지되므로 `SongPositionInBeats`/`OnBeat`/`GetBeatDspTime`(판정·시각 모두의 기준)은 영향받지 않는다.
+
+**중요한 제약 (설계상 트레이드오프):** 오디오 오프셋은 `PlayScheduled` 호출 시점에만 값이 고정된다. 이 호출은 **층 진입(StartFloor)** 과 **보스 페이즈 전환**(`SwitchPhaseAt`/`SwitchPhaseWithTransition`, 이때 `_switchDspTime`도 함께 오프셋 반영)에서만 일어나므로, 같은 페이즈 안에서 값을 바꿔도 이미 재생 예약된 BGM에는 소급 적용되지 않는다 — 다음 보스 페이즈 전환이나 다음 층부터 반영된다. 판정 오프셋은 매 박자(BeatUnit)마다 값을 새로 읽으므로 다음 박자부터 바로 반영된다.
+
+설정 UI/PlayerPrefs 스펙은 `Settings_Design.md` 참조.
 
 ---
 
