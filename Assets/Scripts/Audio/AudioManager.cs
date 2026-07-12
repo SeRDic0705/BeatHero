@@ -33,6 +33,8 @@ namespace BeatHero.Audio
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
 
+            if (_sfxSource != null) _sfxSource.outputAudioMixerGroup = _sfxGroup;
+
             _scheduledSfxSources = new AudioSource[2];
             for (int i = 0; i < 2; i++)
             {
