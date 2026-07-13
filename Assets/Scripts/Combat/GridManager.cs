@@ -61,7 +61,7 @@ namespace BeatHero.Combat
         // 연속 동일 패턴/8분음표가 한 장판처럼 보이지 않도록 매 비트 재점화.
         public void ShowShape(GridEffectShape shape, double beatDurationSec = 0)
         {
-            _dangerMap = new CellEffect[GridWidth, GridHeight];
+            Array.Clear(_dangerMap, 0, _dangerMap.Length);
             if (shape == null) { StopDangerBlink(); RefreshVisuals(); return; }
 
             if (shape is GridEffectShape3x3 s3 && GridWidth == 3)
@@ -80,7 +80,7 @@ namespace BeatHero.Combat
         public void ClearShape()
         {
             StopDangerBlink();
-            _dangerMap = new CellEffect[GridWidth, GridHeight];
+            Array.Clear(_dangerMap, 0, _dangerMap.Length);
             RefreshVisuals();
         }
 
@@ -111,7 +111,7 @@ namespace BeatHero.Combat
         // ResponsePhase용: 타일 색상 변경 없이 _dangerMap만 갱신 (시각 피드백은 VFX가 담당)
         public void UpdateDangerMap(GridEffectShape shape)
         {
-            _dangerMap = new CellEffect[GridWidth, GridHeight];
+            Array.Clear(_dangerMap, 0, _dangerMap.Length);
             if (shape == null) return;
 
             if (shape is GridEffectShape3x3 s3 && GridWidth == 3)
