@@ -22,7 +22,8 @@ namespace BeatHero.Audio
         private const string PREF_BGM    = "BGMVolume";
         private const string PREF_SFX    = "SFXVolume";
 
-        // DSP 예약용 AudioSource 2개 (교대로 사용해 짧은 음표 간격 폴리포니 대응)
+        // DSP 예약용 AudioSource 풀 (교대로 사용해 짧은 음표 간격 폴리포니 대응)
+        private const int SCHEDULED_SFX_POOL_SIZE = 4;
         private AudioSource[] _scheduledSfxSources;
         private int           _scheduledSfxIndex;
 
@@ -35,8 +36,8 @@ namespace BeatHero.Audio
 
             if (_sfxSource != null) _sfxSource.outputAudioMixerGroup = _sfxGroup;
 
-            _scheduledSfxSources = new AudioSource[2];
-            for (int i = 0; i < 2; i++)
+            _scheduledSfxSources = new AudioSource[SCHEDULED_SFX_POOL_SIZE];
+            for (int i = 0; i < SCHEDULED_SFX_POOL_SIZE; i++)
             {
                 var src = gameObject.AddComponent<AudioSource>();
                 src.outputAudioMixerGroup = _sfxGroup;
@@ -65,7 +66,7 @@ namespace BeatHero.Audio
         public void PlaySFXScheduled(AudioClip clip, double dspTime)
         {
             if (clip == null) return;
-            var src = _scheduledSfxSources[_scheduledSfxIndex & 1];
+            var src = _scheduledSfxSources[_scheduledSfxIndex % SCHEDULED_SFX_POOL_SIZE];
             _scheduledSfxIndex++;
             src.clip = clip;
             src.PlayScheduled(dspTime);

@@ -1,5 +1,4 @@
 using System.Collections;
-using BeatHero.Audio;
 using BeatHero.Core;
 using BeatHero.Data;
 using UnityEngine;
@@ -10,7 +9,7 @@ namespace BeatHero.Combat
     // OnBattleStarted         → 층 전환마다 MonsterData 클립으로 OverrideController 교체.
     // OnBeatUnitFired(sec)    → BeatUnit 재생 길이에 맞춰 Idle 속도 조정 + 재생.
     // OnMonsterHit            → Hurt 트리거.
-    // OnMonsterCellEffectFired→ CellEffect 타입별 SFX + VFX 재생.
+    // OnMonsterCellEffectFired→ CellEffect 타입별 VFX 재생(SFX는 BattleStateMachine이 사전 예약).
     // PlayDeath()             → GameManager가 시네마틱 타이밍에 직접 호출.
     [RequireComponent(typeof(SpriteRenderer), typeof(Animator))]
     public class MonsterView : MonoBehaviour
@@ -62,7 +61,6 @@ namespace BeatHero.Combat
         private float       _idleClipLength = 1f;
         private Vector3     _baseLocalPos;
         private Vector3     _baseScale = Vector3.one;
-        private readonly System.Collections.Generic.HashSet<CellEffectFeedback> _sfxPlayedThisBeat = new();
 
         private Coroutine     _flashRoutine;
         private Coroutine     _knockbackRoutine;
@@ -151,7 +149,6 @@ namespace BeatHero.Combat
 
             _animator.speed = _idleClipLength / (float)beatDurationSec;
             _animator.Play(Animator.StringToHash("Idle"), 0, 0f);
-            _sfxPlayedThisBeat.Clear();
         }
 
         // 층 시작(StartFloor) ~ 첫 비트(beat0) 사이 1마디 동안 Idle을 박자에 맞춰 4번 재생.
@@ -317,12 +314,11 @@ namespace BeatHero.Combat
             transform.localPosition = _baseLocalPos;
         }
 
+        // SFX는 BattleStateMachine.ScheduleShapeSfx가 비트 도달 전에 미리 예약 재생하므로 여기선 VFX만 담당.
         private void PlayCellEffectFeedback(CellEffectFeedback feedback, Vector3 worldPos)
         {
             if (feedback.vfxFrames != null && feedback.vfxFrames.Length > 0)
                 VFXPool.Instance?.Play(feedback.vfxFrames, feedback.vfxFps, worldPos);
-            if (_sfxPlayedThisBeat.Add(feedback))
-                AudioManager.Instance?.PlaySFX(feedback.activateSfx);
         }
     }
 }

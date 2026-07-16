@@ -262,12 +262,16 @@ namespace BeatHero.Combat
             foreach (var bu in _patternPlayer.CurrentPattern.beatUnits)
             {
                 double noteStartDsp = phraseStartDsp + secPerUnit * unitOffset;
+
+                // WaitUntil 전에 SFX 예약 — 프레임 폴링 지연 없이 DSP 정확도 확보 (CallPhase _callBeatSfx와 동일 패턴)
+                ScheduleShapeSfx(bu.gridEffectShape, noteStartDsp + _pauseDelta);
+
                 yield return new WaitUntil(() => !_paused && AudioSettings.dspTime >= noteStartDsp + _pauseDelta);
 
                 OnBeatUnitFired?.Invoke(secPerUnit * (int)bu.noteLength, bu.gridEffectShape != null);
                 if (bu.gridEffectShape != null) OnEffectiveBeatFired?.Invoke();
                 _grid.UpdateDangerMap(bu.gridEffectShape); // 타일 색상 변경 없이 판정맵만 갱신
-                PlayShapeFeedbacks(bu.gridEffectShape);
+                PlayShapeFeedbacks(bu.gridEffectShape); // VFX용 이벤트만 발화(SFX는 위에서 이미 예약됨)
 
                 // 판정 싱크 오프셋 — 그리드 표시 기준(noteStartDsp)은 그대로 두고 판정 기준시각만 이동
                 double judgedNoteDsp = noteStartDsp + SyncSettings.JudgmentOffsetSec;
@@ -743,6 +747,20 @@ namespace BeatHero.Combat
                 if (effect == null) continue;
                 if (!_monster.effectFeedbacks.TryGetValue(effect, out var fb) || fb == null) continue;
                 OnMonsterCellEffectFired?.Invoke(fb, _grid.GetTileWorldPosition(pos));
+            }
+        }
+
+        // 셀 이펙트 SFX를 비트 도달 전에 미리 DSP 예약 재생 (PlayShapeFeedbacks의 VFX 이벤트보다 먼저 호출됨)
+        private void ScheduleShapeSfx(GridEffectShape shape, double dspTime)
+        {
+            if (shape == null) return;
+            var scheduled = new HashSet<CellEffectFeedback>();
+            foreach (var (_, effect) in shape.AllCellsWithPosition())
+            {
+                if (effect == null) continue;
+                if (!_monster.effectFeedbacks.TryGetValue(effect, out var fb) || fb == null) continue;
+                if (!scheduled.Add(fb)) continue; // 같은 비트 내 동일 피드백 중복 예약 방지
+                AudioManager.Instance?.PlaySFXScheduled(fb.activateSfx, dspTime);
             }
         }
 
