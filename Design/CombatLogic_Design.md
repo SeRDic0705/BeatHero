@@ -168,12 +168,14 @@ ActiveHazard {
 | 판정 | 조건 | 표시 | 색상 |
 |---|---|---|---|
 | **Fast** | 입력 시각이 `[preFailStart, preJudgStart)` | "Fast" | 주황 #FF8C00 |
+| **Perfect** | 판정창 안 소비 액션이 `_perfectWindowSec`(±42ms) 이내 | "Perfect!" | 골드 #FFD700 |
+| **Great** | 판정창 안 소비 액션이 있으나 퍼펙트 폭 밖 (일반 성공) | "Great" | 라임그린 #32CD32 |
 | **Slow** | 입력 시각이 `(windowClose, windowClose + failZoneSec)` | "Slow" | 하늘 #00BFFF |
 
-- 정상 히트(`_beatInputConsumed = true` 상태에서 in-window 입력) 시 이벤트 미발화
+- Fast > Perfect > Great 순으로 배타적 발화(비트당 1회)
 - 플레이어가 아무것도 입력하지 않은 경우 이벤트 미발화
 - 이벤트: `BattleStateMachine.OnTimingMissed(TimingResult)`
-- 구현 상세: `Design/TimingIndicator_Design.md`
+- 구현 상세: `Design/TimingIndicator_Design.md`, `Design/GreatJudgment_Design.md`
 
 ---
 

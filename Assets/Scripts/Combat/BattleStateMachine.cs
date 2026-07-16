@@ -8,8 +8,8 @@ using UnityEngine;
 
 namespace BeatHero.Combat
 {
-    // 타이밍 판정 결과 — Fast/Slow/Perfect 피드백에 사용
-    public enum TimingResult { Fast, Slow, Perfect }
+    // 타이밍 판정 결과 — Fast/Slow/Perfect/Great 피드백에 사용
+    public enum TimingResult { Fast, Slow, Perfect, Great }
 
     // Call & Response 전투 루프 총괄.
     // 의존: Conductor, GridManager, PatternPlayer, PlayerController, PlayerConfig, InputReader
@@ -102,6 +102,7 @@ namespace BeatHero.Combat
         private double  _currentBeatDsp        = -1.0; // 현재 서브비트의 beatTime(DSP)
         private double  _pendingMoveInputDsp   = -1.0; // 확정된 이동 입력의 원본 타임스탬프 (프리버퍼 리셋 전 보존)
         private bool    _perfectThisBeat;               // 이번 비트에 퍼펙트 액션이 있었는지 (인디케이터용)
+        private bool    _hitThisBeat;                   // 이번 비트에 퍼펙트 여부 무관 유효 액션이 있었는지 (Great 인디케이터용)
 
         // 타이밍 미스 감지
         private double _lateZoneEndDsp;     // Late Zone(Slow 감지) 종료 DSP 절대시각
@@ -276,6 +277,7 @@ namespace BeatHero.Combat
                 double preFailStart = preJudgStart - _failZoneSec;
                 _currentBeatDsp     = beatTime;
                 _perfectThisBeat    = false;
+                _hitThisBeat        = false;
 
                 if (_attackHeld && !_chargeKeyDown)
                 {
@@ -362,6 +364,8 @@ namespace BeatHero.Combat
                     OnTimingMissed?.Invoke(TimingResult.Fast);
                 else if (_perfectThisBeat)
                     OnTimingMissed?.Invoke(TimingResult.Perfect);
+                else if (_hitThisBeat)
+                    OnTimingMissed?.Invoke(TimingResult.Great);
 
                 // 중간점 또는 Slow 입력 수신 시 조기 탈출 — 입력이 오면 즉시 표시
                 yield return new WaitUntil(() => !_paused &&
@@ -396,6 +400,7 @@ namespace BeatHero.Combat
                 if (_tileWasDangerAtWindowOpen || isPerfect)
                     _player.AddMana(MANA_GAIN_MOVE);
                 if (isPerfect) _perfectThisBeat = true;
+                _hitThisBeat = true;
             }
 
             // 이동 시 차지 취소 (이동과 공격 배타적)
@@ -693,6 +698,7 @@ namespace BeatHero.Combat
             _blockActive  = true;
             _blockPerfect = isPerfect;
             if (isPerfect) _perfectThisBeat = true;
+            _hitThisBeat  = true;
             _playerAnim?.TriggerBlock();
             AudioManager.Instance?.PlaySFX(_playerConfig.blockSfx);
         }
@@ -703,6 +709,7 @@ namespace BeatHero.Combat
             // 차지 공격: 시작/유지 비트에서 이미 마나 소비 → (공격력 + 차지배율) × 차지단계
             if (_chargeBeats == 0 && !_player.SpendMana(1)) return;
             _hasPendingMove = false; // 공격 발동 → 같은 비트 이동 무효
+            _hitThisBeat    = true;
             _playerAnim?.TriggerAttack();
             int dmg = _chargeBeats > 0
                 ? Mathf.RoundToInt(_playerConfig.attackPower * (1 + _chargeMultPerBeat) * _chargeBeats)

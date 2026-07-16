@@ -17,12 +17,12 @@ ResponsePhase에서 플레이어의 입력이 판정윈도우 밖으로 무시�
 | 판정 | 조건 | 표시 |
 |---|---|---|
 | **Fast** | 입력 시각이 Fast Zone (`preFailStart ~ preJudgStart`)에 해당 | "Fast" |
-| **Slow** | 입력 시각이 Slow Zone (`windowClose ~ windowClose + failZoneSec`)에 해당 | "Slow" |
 | **Perfect** | 판정창 안에서 소비된 입력이 비트 기준 `_perfectWindowSec`(±42ms) 이내 | "Perfect!" |
+| **Great** | 판정창 안에서 소비된 입력이 있으나 퍼펙트 폭 밖 (일반 성공) | "Great" |
+| **Slow** | 입력 시각이 Slow Zone (`windowClose ~ windowClose + failZoneSec`)에 해당 | "Slow" |
 
-퍼펙트 판정은 공격/방어/이동 보상에도 쓰인다 (상세: `Design/PerfectJudgment_Design.md`). Fast가 발생하면 Perfect보다 우선 표시.
+퍼펙트 판정은 공격/방어/이동 보상에도 쓰인다 (상세: `Design/PerfectJudgment_Design.md`). 우선순위는 Fast > Perfect > Great (비트당 배타적 1회 발화, 상세: `Design/GreatJudgment_Design.md`).
 
-- 정상 히트(`_beatInputConsumed = true` 인 상태에서 in-window 입력) 시 이벤트 미발화
 - 플레이어가 아무것도 입력하지 않은 경우 이벤트 미발화
 
 ---
@@ -33,7 +33,7 @@ ResponsePhase에서 플레이어의 입력이 판정윈도우 밖으로 무시�
 
 ```csharp
 // Combat 네임스페이스 또는 BattleStateMachine 중첩 — TimingResult
-public enum TimingResult { Fast, Slow, Perfect }
+public enum TimingResult { Fast, Slow, Perfect, Great }
 ```
 
 ### 추가 이벤트
@@ -72,9 +72,17 @@ bool fastHappened = preMovesFail || preBasicAttackFail || preChargeFail || preBl
 3. JudgeTile() 직후:
    if (fastHappened)
        OnTimingMissed?.Invoke(TimingResult.Fast);
-   else if (_slowInputReceived && !hadInWindowPress)
+   else if (_perfectThisBeat)
+       OnTimingMissed?.Invoke(TimingResult.Perfect);
+   else if (_hitThisBeat)
+       OnTimingMissed?.Invoke(TimingResult.Great);
+
+   (Late Zone 종료 후, 별도)
+   if (!fastHappened && _slowInputReceived && !hadInWindowPress)
        OnTimingMissed?.Invoke(TimingResult.Slow);
 ```
+
+Great 판정(`_hitThisBeat`) 상세: `Design/GreatJudgment_Design.md`
 
 ---
 
@@ -92,6 +100,7 @@ bool fastHappened = preMovesFail || preBasicAttackFail || preChargeFail || preBl
 | `_fastColor` | `#FF8C00` (주황) | Fast 판정 텍스트 색상 |
 | `_slowColor` | `#00BFFF` (하늘) | Slow 판정 텍스트 색상 |
 | `_perfectColor` | `#FFD700` (골드) | Perfect 판정 텍스트 색상 |
+| `_greatColor` | `#32CD32` (라임그린) | Great 판정 텍스트 색상 |
 | `_driftY` | `60f` | 위로 이동할 픽셀 거리 (RectTransform 기준) |
 | `_duration` | `0.8f` | 애니메이션 총 시간(초) |
 
