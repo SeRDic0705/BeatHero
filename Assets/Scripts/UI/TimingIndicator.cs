@@ -6,7 +6,7 @@ using UnityEngine;
 namespace BeatHero.UI
 {
     // BeatBar 위쪽에 표시하는 타이밍 판정 인디케이터.
-    // BattleStateMachine.OnTimingMissed 이벤트 구독 → "Fast" / "Slow" / "Perfect!" 텍스트를
+    // BattleStateMachine.OnTimingMissed 이벤트 구독 → "Fast" / "Slow" / "Perfect!" / "Great" 텍스트를
     // 위로 드리프트하며 페이드아웃. 겹침 시 즉시 인터럽트 후 처음부터 재시작.
     public class TimingIndicator : MonoBehaviour
     {
@@ -17,6 +17,7 @@ namespace BeatHero.UI
         [SerializeField] private Color _fastColor    = new Color(1f, 0.549f, 0f, 1f);    // #FF8C00
         [SerializeField] private Color _slowColor    = new Color(0f, 0.749f, 1f, 1f);    // #00BFFF
         [SerializeField] private Color _perfectColor = new Color(1f, 0.843f, 0f, 1f);    // #FFD700
+        [SerializeField] private Color _greatColor   = new Color(0.196f, 0.804f, 0.196f, 1f); // #32CD32
 
         [Header("Animation")]
         [SerializeField] private float _driftY    = 60f;   // 위로 이동할 픽셀 거리
@@ -52,6 +53,7 @@ namespace BeatHero.UI
                 case TimingResult.Fast:    _text.text = "Fast";    _text.color = _fastColor;    break;
                 case TimingResult.Slow:    _text.text = "Slow";    _text.color = _slowColor;    break;
                 case TimingResult.Perfect: _text.text = "Perfect!"; _text.color = _perfectColor; break;
+                case TimingResult.Great:   _text.text = "Great";    _text.color = _greatColor;   break;
             }
             ((RectTransform)transform).anchoredPosition = _basePosition;
 
